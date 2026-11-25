@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>HinglishCut AI — Gemini Video Editor & MP4 Exporter</title>
+  <style>
+    :root {
+      --bg: #080a0f;
+      --card: #121622;
+      --card-2: #191f30;
+      --border: #273049;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-2: #8b5cf6;
+      --success: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(18, 22, 34, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .badge {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .badge.ok { color: var(--success); border-color: rgba(16, 185, 129, 0.4); }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 900px) {
+      .container {
+        grid-template-columns: 1fr 1.15fr;
+        align-items: start;
+        padding: 24px;
+      }
+      .full-span { grid-column: 1 / -1; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .subtext { font-size: 0.82rem; color: var(--muted); }
+
+    input[type="password"],
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      min-height: 44px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { min-height: 88px; resize: vertical; }
+
+    .row { display: flex; gap: 8px; align-items: center; }
+    .row > * { flex: 1; }
+    .row .shrink { flex: 0 0 auto; }
+
+    .btn {
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s, transform 0.1s;
+      text-decoration: none;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      color: #fff;
+    }
+    .btn-success {
+      background: var(--success);
+      border: none;
+      color: #032217;
+      font-weight: 700;
+    }
+
+    /* Upload Box */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(25, 31, 48, 0.45);
+      transition: border-color 0.2s;
+    }
+    .upload-zone:hover { border-color: var(--accent); }
+    .upload-zone strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
+
+    /* Alerts & Progress */
+    .alert {
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      display: none;
+      word-break: break-word;
+    }
+    .alert.show { display: block; }
+    .alert.error { background: rgba(239, 68, 68, 0.14); border: 1px solid rgba(239, 68, 68, 0.45); color: #fecaca; }
+    .alert.info { background: rgba(99, 102, 241, 0.14); border: 1px solid rgba(99, 102, 241, 0.45); color: #c7d2fe; }
+    .alert.warn { background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.45); color: #fde68a; }
+
+    .progress-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .progress-wrap.show { display: flex; }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--card-2);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      transition: width 0.2s ease;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Live Preview Stage */
+    .stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 62vh;
+      background: #030407;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .stage video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+    }
+    .stage-empty {
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+      padding: 20px;
+    }
+    .vignette-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle, transparent 52%, rgba(0, 0, 0, 0.65) 100%);
+      display: none;
+    }
+    .title-banner {
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(99, 102, 241, 0.9);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 5px 14px;
+      border-radius: 999px;
+      pointer-events: none;
+      display: none;
+      max-width: 88%;
+      text-align: center;
+    }
+    .caption-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 88%;
+      text-align: center;
+      pointer-events: none;
+      font-weight: 700;
+      font-size: clamp(0.95rem, 2.8vw, 1.25rem);
+      line-height: 1.3;
+      padding: 6px 14px;
+      border-radius: 8px;
+      display: none;
+      white-space: pre-wrap;
+    }
+    .caption-overlay.pos-bottom { bottom: 10%; top: auto; }
+    .caption-overlay.pos-center { top: 50%; transform: translate(-50%, -50%); }
+    .caption-overlay.pos-top { top: 14%; bottom: auto; }
+
+    .caption-overlay.style-box { background: rgba(0, 0, 0, 0.72); color: #ffffff; }
+    .caption-overlay.style-minimal { background: transparent; color: #ffffff; text-shadow: 0 2px 6px rgba(0,0,0,0.95); }
+    .caption-overlay.style-bold-yellow { background: rgba(0, 0, 0, 0.55); color: #fde047; text-shadow: 0 2px 4px rgba(0,0,0,0.9); }
+
+    /* Plan Chips & Editable Captions */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .stat {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+    .stat small { display: block; font-size: 0.72rem; color: var(--muted); }
+    .stat span { font-size: 0.88rem; font-weight: 600; }
+
+    .captions-list {
+      max-height: 230px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cap-item {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: 64px 64px 1fr;
+      gap: 6px;
+      align-items: center;
+    }
+    .cap-item input {
+      min-height: 36px;
+      padding: 6px 8px;
+      font-size: 0.82rem;
+    }
+    .export-preview {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .export-preview.show { display: flex; }
+    .export-preview video {
+      width: 100%;
+      max-height: 320px;
+      border-radius: 10px;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="logo">🎬</div>
+      <span>HinglishCut AI</span>
+    </div>
+    <span id="keyBadge" class="badge">API Key Required</span>
+  </header>
+
+  <main class="container">
+    <div id="fileProtocolWarn" class="alert warn full-span">
+      Running from <code>file://</code> detected. Some browsers restrict Web Workers for <code>ffmpeg.wasm</code> on <code>file://</code>. If MP4 export fails to initialize, serve this file via <code>python3 -m http.server 8000</code> or <code>npx serve</code>.
+    </div>
+
+    <!-- LEFT COLUMN: Setup, Upload, Prompt -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <!-- 1. Gemini API Key -->
+      <section class="card">
+        <div class="card-title">
+          <span>1. Gemini API Key</span>
+          <span class="subtext">Stored only in browser</span>
+        </div>
+        <div class="row">
+          <input type="password" id="apiKeyInput" placeholder="Paste your Gemini API key (AIza...)" autocomplete="off" />
+          <button class="btn shrink" id="saveKeyBtn" type="button">Save</button>
+          <button class="btn shrink" id="clearKeyBtn" type="button">Clear</button>
+        </div>
+      </section>
+
+      <!-- 2. Upload Raw Video -->
+      <section class="card">
+        <div class="card-title">
+          <span>2. Upload Raw Video</span>
+          <span id="videoMeta" class="subtext">No file selected</span>
+        </div>
+        <label class="upload-zone" for="videoInput">
+          <strong>Tap to select raw video</strong>
+          <span class="subtext">MP4, MOV, WebM • Audio in Hindi, Gujarati, or English</span>
+          <input type="file" id="videoInput" accept="video/*" hidden />
+        </label>
+      </section>
+
+      <!-- 3. Prompt Box -->
+      <section class="card">
+        <div class="card-title">
+          <span>3. AI Editing Prompt</span>
+          <span class="badge">gemini-2.5-flash</span>
+        </div>
+        <textarea id="promptInput" placeholder="Example: Make it a fast-paced 1.25x vibrant reel, trim silence from start/end, add Hinglish captions at bottom in bold yellow, and add title 'Day in My Life'."></textarea>
+        <button class="btn btn-primary" id="analyzeBtn" type="button" disabled>
+          ✨ Analyze Video &amp; Generate Edit Plan
+        </button>
+
+        <div id="aiProgress" class="progress-wrap">
+          <div class="progress-track"><div id="aiProgressBar" class="progress-fill"></div></div>
+          <div class="progress-label"><span id="aiStatusText">Preparing...</span><span id="aiPctText">0%</span></div>
+        </div>
+        <div id="aiError" class="alert error"></div>
+        <div id="aiSummaryAlert" class="alert info"></div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN: Live Preview, AI Edit Plan, Export MP4 -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <!-- 4. Live Preview -->
+      <section class="card">
+        <div class="card-title">
+          <span>4. Live Preview</span>
+          <span id="previewTime" class="subtext">0.0s / 0.0s</span>
+        </div>
+
+        <div class="stage">
+          <div id="stageEmpty" class="stage-empty">Upload a video to preview edits &amp; live Hinglish captions.</div>
+          <video id="previewVideo" playsinline controls></video>
+          <div id="vignetteOverlay" class="vignette-overlay"></div>
+          <div id="titleBanner" class="title-banner"></div>
+          <div id="captionOverlay" class="caption-overlay pos-bottom style-box"></div>
+        </div>
+
+        <div class="plan-grid" id="planSummary" style="display:none;">
+          <div class="stat"><small>Color Filter</small><span id="statFilter">none</span></div>
+          <div class="stat"><small>Speed</small><span id="statSpeed">1.0x</span></div>
+          <div class="stat"><small>Trim Window</small><span id="statTrim">0.0s - 0.0s</span></div>
+          <div class="stat"><small>Effects</small><span id="statEffects">Standard</span></div>
+        </div>
+
+        <div id="captionsSection" style="display:none;">
+          <div class="card-title" style="margin-bottom:8px;">
+            <span>Hinglish Captions (Editable)</span>
+            <span class="subtext" id="capCount">0 lines</span>
+          </div>
+          <div class="captions-list" id="captionsList"></div>
+        </div>
+      </section>
+
+      <!-- 5. Export MP4 -->
+      <section class="card">
+        <div class="card-title">
+          <span>5. Render &amp; Export MP4</span>
+          <span class="subtext">ffmpeg.wasm (in-browser)</span>
+        </div>
+        <button class="btn btn-success" id="exportBtn" type="button" disabled>
+          ⚡ Render Final MP4 (with Burned Captions &amp; Audio)
+        </button>
+
+        <div id="ffmpegProgress" class="progress-wrap">
+          <div class="progress-track"><div id="ffmpegProgressBar" class="progress-fill"></div></div>
+          <div class="progress-label"><span id="ffmpegStatusText">Waiting...</span><span id="ffmpegPctText">0%</span></div>
+        </div>
+        <div id="ffmpegError" class="alert error"></div>
+
+        <div id="exportPreview" class="export-preview">
+          <video id="exportedVideo" playsinline controls></video>
+          <a id="downloadLink" class="btn btn-primary" download="hinglishcut-edited.mp4">
+            ⬇ Download Edited MP4
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ==============================
+    // State & DOM Elements
+    // ==============================
+    const STORAGE_KEY = "hinglishcut_gemini_api_key";
+
+    const apiKeyInput = document.getElementById("apiKeyInput");
+    const saveKeyBtn = document.getElementById("saveKeyBtn");
+    const clearKeyBtn = document.getElementById("clearKeyBtn");
+    const keyBadge = document.getElementById("keyBadge");
+
+    const videoInput = document.getElementById("videoInput");
+    const videoMeta = document.getElementById("videoMeta");
+    const promptInput = document.getElementById("promptInput");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+
+    const aiProgress = document.getElementById("aiProgress");
+    const aiProgressBar = document.getElementById("aiProgressBar");
+    const aiStatusText = document.getElementById("aiStatusText");
+    const aiPctText = document.getElementById("aiPctText");
+    const aiError = document.getElementById("aiError");
+    const aiSummaryAlert = document.getElementById("aiSummaryAlert");
+
+    const stageEmpty = document.getElementById("stageEmpty");
+    const previewVideo = document.getElementById("previewVideo");
+    const vignetteOverlay = document.getElementById("vignetteOverlay");
+    const titleBanner = document.getElementById("titleBanner");
+    const captionOverlay = document.getElementById("captionOverlay");
+    const previewTime = document.getElementById("previewTime");
+
+    const planSummary = document.getElementById("planSummary");
+    const statFilter = document.getElementById("statFilter");
+    const statSpeed = document.getElementById("statSpeed");
+    const statTrim = document.getElementById("statTrim");
+    const statEffects = document.getElementById("statEffects");
+
+    const captionsSection = document.getElementById("captionsSection");
+    const captionsList = document.getElementById("captionsList");
+    const capCount = document.getElementById("capCount");
+
+    const exportBtn = document.getElementById("exportBtn");
+    const ffmpegProgress = document.getElementById("ffmpegProgress");
+    const ffmpegProgressBar = document.getElementById("ffmpegProgressBar");
+    const ffmpegStatusText = document.getElementById("ffmpegStatusText");
+    const ffmpegPctText = document.getElementById("ffmpegPctText");
+    const ffmpegError = document.getElementById("ffmpegError");
+
+    const exportPreview = document.getElementById("exportPreview");
+    const exportedVideo = document.getElementById("exportedVideo");
+    const downloadLink = document.getElementById("downloadLink");
+
+    if (window.location.protocol === "file:") {
+      document.getElementById("fileProtocolWarn").classList.add("show");
+    }
+
+    let rawFile = null;
+    let rawObjectUrl = null;
+    let exportObjectUrl = null;
+    let videoDuration = 0;
+
+    let editPlan = {
+      summary: "",
+      colorFilter: "none",
+      playbackSpeed: 1.0,
+      trimStart: 0,
+      trimEnd: 0,
+      styleEffects: {
+        captionStyle: "box",
+        captionPosition: "bottom",
+        vignette: false,
+        sharpen: false,
+        titleBanner: ""
+      },
+      captions: []
+    };
+
+    // ==============================
+    // 1. API Key Management
+    // ==============================
+    function refreshKeyUI() {
+      const saved = localStorage.getItem(STORAGE_KEY) || "";
+      apiKeyInput.value = saved;
+      if (saved.trim()) {
+        keyBadge.textContent = "API Key Ready";
+        keyBadge.classList.add("ok");
+      } else {
+        keyBadge.textContent = "API Key Required";
+        keyBadge.classList.remove("ok");
+      }
+      updateActionButtons();
+    }
+
+    saveKeyBtn.addEventListener("click", () => {
+      const val = apiKeyInput.value.trim();
+      if (!val) {
+        showAlert(aiError, "Please paste a valid Gemini API key before saving.");
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, val);
+      hideAlert(aiError);
+      refreshKeyUI();
+    });
+
+    clearKeyBtn.addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      apiKeyInput.value = "";
+      refreshKeyUI();
+    });
+
+    function getApiKey() {
+      const typed = apiKeyInput.value.trim();
+      if (typed) {
+        localStorage.setItem(STORAGE_KEY, typed);
+        return typed;
+      }
+      return (localStorage.getItem(STORAGE_KEY) || "").trim();
+    }
+
+    function updateActionButtons() {
+      const hasFile = Boolean(rawFile && videoDuration > 0);
+      analyzeBtn.disabled = !hasFile;
+      exportBtn.disabled = !hasFile;
+    }
+
+    // ==============================
+    // 2. Upload & Preview Setup
+    // ==============================
+    videoInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      rawFile = file;
+      if (rawObjectUrl) URL.revokeObjectURL(rawObjectUrl);
+      rawObjectUrl = URL.createObjectURL(file);
+
+      hideAlert(aiError);
+      hideAlert(aiSummaryAlert);
+      hideAlert(ffmpegError);
+      exportPreview.classList.remove("show");
+
+      previewVideo.src = rawObjectUrl;
+      previewVideo.style.display = "block";
+      stageEmpty.style.display = "none";
+
+      previewVideo.onloadedmetadata = () => {
+        videoDuration = Number.isFinite(previewVideo.duration) && previewVideo.duration > 0
+          ? previewVideo.duration
+          : 0;
+        const mb = (file.size / (1024 * 1024)).toFixed(1);
+        videoMeta.textContent = `${file.name} (${mb} MB • ${videoDuration.toFixed(1)}s)`;
+
+        editPlan = {
+          summary: "",
+          colorFilter: "none",
+          playbackSpeed: 1.0,
+          trimStart: 0,
+          trimEnd: videoDuration,
+          styleEffects: {
+            captionStyle: "box",
+            captionPosition: "bottom",
+            vignette: false,
+            sharpen: false,
+            titleBanner: ""
+          },
+          captions: []
+        };
+        applyPlanToPreview();
+        updateActionButtons();
+      };
+
+      previewVideo.onerror = () => {
+        showAlert(aiError, "Could not decode this video in your browser. Try an MP4, MOV, or WebM file.");
+      };
+    });
+
+    const CSS_FILTERS = {
+      none: "none",
+      cinematic: "contrast(1.18) brightness(0.98) saturate(1.22)",
+      bw: "grayscale(100%) contrast(1.22)",
+      vintage: "sepia(0.6) contrast(1.08) saturate(0.85)",
+      vibrant: "saturate(1.65) contrast(1.08) brightness(1.02)",
+      warm: "sepia(0.25) saturate(1.2) brightness(1.03)",
+      cool: "hue-rotate(-10deg) saturate(1.1) contrast(1.06)"
+    };
+
+    function applyPlanToPreview() {
+      previewVideo.style.filter = CSS_FILTERS[editPlan.colorFilter] || "none";
+      previewVideo.playbackRate = editPlan.playbackSpeed;
+
+      vignetteOverlay.style.display = editPlan.styleEffects.vignette ? "block" : "none";
+
+      const banner = (editPlan.styleEffects.titleBanner || "").trim();
+      if (banner) {
+        titleBanner.textContent = banner;
+        titleBanner.style.display = "block";
+      } else {
+        titleBanner.style.display = "none";
+      }
+
+      captionOverlay.className = `caption-overlay pos-${editPlan.styleEffects.captionPosition} style-${editPlan.styleEffects.captionStyle}`;
+
+      statFilter.textContent = editPlan.colorFilter;
+      statSpeed.textContent = `${editPlan.playbackSpeed.toFixed(2).replace(/\.00$/, ".0")}x`;
+      statTrim.textContent = `${editPlan.trimStart.toFixed(1)}s - ${editPlan.trimEnd.toFixed(1)}s`;
+
+      const fx = [];
+      if (editPlan.styleEffects.vignette) fx.push("Vignette");
+      if (editPlan.styleEffects.sharpen) fx.push("Sharpen");
+      if (banner) fx.push("Banner");
+      statEffects.textContent = fx.length ? fx.join(", ") : "Clean";
+
+      planSummary.style.display = "grid";
+      renderEditableCaptions();
+      syncPreviewOverlays();
+    }
+
+    function renderEditableCaptions() {
+      captionsList.innerHTML = "";
+      capCount.textContent = `${editPlan.captions.length} lines`;
+      captionsSection.style.display = editPlan.captions.length ? "block" : "none";
+
+      editPlan.captions.forEach((cap, idx) => {
+        const row = document.createElement("div");
+        row.className = "cap-item";
+
+        const startIn = document.createElement("input");
+        startIn.type = "number";
+        startIn.step = "0.1";
+        startIn.min = "0";
+        startIn.value = cap.start.toFixed(1);
+        startIn.title = "Start (sec)";
+        startIn.addEventListener("change", () => {
+          editPlan.captions[idx].start = Math.max(0, parseFloat(startIn.value) || 0);
+        });
+
+        const endIn = document.createElement("input");
+        endIn.type = "number";
+        endIn.step = "0.1";
+        endIn.min = "0";
+        endIn.value = cap.end.toFixed(1);
+        endIn.title = "End (sec)";
+        endIn.addEventListener("change", () => {
+          editPlan.captions[idx].end = Math.max(editPlan.captions[idx].start + 0.1, parseFloat(endIn.value) || 0.5);
+        });
+
+        const txtIn = document.createElement("input");
+        txtIn.type = "text";
+        txtIn.value = cap.text;
+        txtIn.addEventListener("input", () => {
+          editPlan.captions[idx].text = txtIn.value;
+          syncPreviewOverlays();
+        });
+
+        row.append(startIn, endIn, txtIn);
+        captionsList.appendChild(row);
+      });
+    }
+
+    function syncPreviewOverlays() {
+      const t = previewVideo.currentTime || 0;
+      previewTime.textContent = `${t.toFixed(1)}s / ${videoDuration.toFixed(1)}s`;
+
+      const active = editPlan.captions.find(c => t >= c.start && t <= c.end);
+      if (active && active.text.trim()) {
+        captionOverlay.textContent = active.text.trim();
+        captionOverlay.style.display = "block";
+      } else {
+        captionOverlay.style.display = "none";
+      }
+    }
+
+    previewVideo.addEventListener("timeupdate", () => {
+      if (editPlan.trimEnd > editPlan.trimStart + 0.2) {
+        if (previewVideo.currentTime < editPlan.trimStart) {
+          previewVideo.currentTime = editPlan.trimStart;
+        } else if (previewVideo.currentTime >= editPlan.trimEnd) {
+          previewVideo.pause();
+          previewVideo.currentTime = editPlan.trimStart;
+        }
+      }
+      syncPreviewOverlays();
+    });
+
+    // ==============================
+    // 3. Real Gemini API Video Analysis
+    // ==============================
+    function setProgress(wrap, bar, statusEl, pctEl, pct, text) {
+      wrap.classList.add("show");
+      const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+      bar.style.width = `${clamped}%`;
+      pctEl.textContent = `${clamped}%`;
+      statusEl.textContent = text;
+    }
+
+    function showAlert(el, msg) {
+      el.textContent = msg;
+      el.classList.add("show");
+    }
+
+    function hideAlert(el) {
+      el.classList.remove("show");
+      el.textContent = "";
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const commaIdx = result.indexOf(",");
+          resolve(commaIdx >= 0 ? result.slice(commaIdx + 1) : result);
+        };
+        reader.onerror = () => reject(new Error("Failed to read video file into memory."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadToGeminiFiles(file, apiKey) {
+      const mimeType = file.type || "video/mp4";
+
+      // Path A: Resumable Upload Protocol
+      const startRes = await fetch(
+        `https://generativelanguage.googleapis.com/upload/v1beta/files?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: "POST",
+          headers: {
+            "X-Goog-Upload-Protocol": "resumable",
+            "X-Goog-Upload-Command": "start",
+            "X-Goog-Upload-Header-Content-Length": String(file.size),
+            "X-Goog-Upload-Header-Content-Type": mimeType,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ file: { display_name: file.name } })
+        }
+      );
+
+      if (!startRes.ok) {
+        const errBody = await startRes.text();
+        throw new Error(`Gemini File API init failed (${startRes.status}): ${errBody}`);
+      }
+
+      const uploadUrl = startRes.headers.get("x-goog-upload-url") || startRes.headers.get("X-Goog-Upload-URL");
+
+      let fileMeta = null;
+      if (uploadUrl) {
+        const uploadRes = await fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            "X-Goog-Upload-Offset": "0",
+            "X-Goog-Upload-Command": "upload, finalize"
+          },
+          body: file
+        });
+        if (!uploadRes.ok) {
+          const errBody = await uploadRes.text();
+          throw new Error(`Gemini File upload failed (${uploadRes.status}): ${errBody}`);
+        }
+        const json = await uploadRes.json();
+        fileMeta = json.file || json;
+      } else {
+        // Path B: Multipart Upload fallback (does not rely on reading X-Goog-Upload-URL header)
+        const boundary = "----hinglishcut_" + Math.random().toString(36).slice(2);
+        const metaPart = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ file: { display_name: file.name } })}\r\n`;
+        const fileHeader = `--${boundary}\r\nContent-Type: ${mimeType}\r\n\r\n`;
+        const closing = `\r\n--${boundary}--`;
+        const multipartBody = new Blob([metaPart, fileHeader, file, closing]);
+
+        const mpRes = await fetch(
+          `https://generativelanguage.googleapis.com/upload/v1beta/files?uploadType=multipart&key=${encodeURIComponent(apiKey)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
+            body: multipartBody
+          }
+        );
+        if (!mpRes.ok) {
+          const errBody = await mpRes.text();
+          throw new Error(`Gemini multipart upload failed (${mpRes.status}): ${errBody}`);
+        }
+        const json = await mpRes.json();
+        fileMeta = json.file || json;
+      }
+
+      if (!fileMeta || !fileMeta.name || !fileMeta.uri) {
+        throw new Error("Gemini File API returned incomplete file metadata.");
+      }
+
+      // Poll until video processing completes (ACTIVE)
+      let current = fileMeta;
+      let attempts = 0;
+      while (current.state === "PROCESSING") {
+        if (++attempts > 90) throw new Error("Timed out waiting for Gemini to process the video.");
+        await new Promise(r => setTimeout(r, 2000));
+        const pollRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/${current.name}?key=${encodeURIComponent(apiKey)}`
+        );
+        if (!pollRes.ok) {
+          const errBody = await pollRes.text();
+          throw new Error(`File status check failed (${pollRes.status}): ${errBody}`);
+        }
+        current = await pollRes.json();
+      }
+
+      if (current.state === "FAILED") {
+        throw new Error("Gemini failed to process this video format.");
+      }
+      return current;
+    }
+
+    async function deleteGeminiFile(fileName, apiKey) {
+      if (!fileName) return;
+      try {
+        await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${encodeURIComponent(apiKey)}`,
+          { method: "DELETE" }
+        );
+      } catch (_) {}
+    }
+
+    analyzeBtn.addEventListener("click", async () => {
+      hideAlert(aiError);
+      hideAlert(aiSummaryAlert);
+
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        showAlert(aiError, "Please enter and save your Gemini API key first.");
+        return;
+      }
+      if (!rawFile || videoDuration <= 0) {
+        showAlert(aiError, "Please upload a valid video first.");
+        return;
+      }
+
+      const userPrompt = promptInput.value.trim() ||
+        "Transcribe spoken audio into clean Hinglish captions, pick the best color filter, trim dead silence, and optimize pacing.";
+
+      analyzeBtn.disabled = true;
+      exportBtn.disabled = true;
+      let uploadedFileMeta = null;
+
+      try {
+        let mediaPart = null;
+
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 20, "Uploading video to Gemini File API...");
+        try {
+          uploadedFileMeta = await uploadToGeminiFiles(rawFile, apiKey);
+          mediaPart = {
+            fileData: {
+              mimeType: uploadedFileMeta.mimeType || rawFile.type || "video/mp4",
+              fileUri: uploadedFileMeta.uri
+            }
+          };
+        } catch (uploadErr) {
+          if (rawFile.size <= 14 * 1024 * 1024) {
+            setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 35, "Encoding clip inline for Gemini...");
+            const b64 = await fileToBase64(rawFile);
+            mediaPart = {
+              inlineData: {
+                mimeType: rawFile.type || "video/mp4",
+                data: b64
+              }
+            };
+          } else {
+            throw uploadErr;
+          }
+        }
+
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 65, "Analyzing audio, visuals & Hinglish speech with gemini-2.5-flash...");
+
+        const systemInstruction = `You are an expert AI video editor.
+Analyze the attached video (exact duration: ${videoDuration.toFixed(2)} seconds) and follow the user's editing request: "${userPrompt}".
+
+Requirements:
+1. Transcribe ALL spoken audio (whether Hindi, Gujarati, English, or mixed) into clean, natural Roman-script Hinglish captions (ASCII Latin letters only—no Devanagari/Gujarati script and no emojis).
+2. Break captions into short, readable phrases (2 to 5 seconds each) with accurate timestamps inside [0, ${videoDuration.toFixed(2)}]. If there is no speech, return an empty captions array [].
+3. Recommend:
+   - colorFilter: one of "none", "cinematic", "bw", "vintage", "vibrant", "warm", "cool"
+   - playbackSpeed: number between 0.5 and 2.0 (default 1.0 unless user asks for faster/slower/reel pacing)
+   - trimStart & trimEnd: timestamps in seconds within [0, ${videoDuration.toFixed(2)}] with trimEnd > trimStart
+   - styleEffects: captionStyle ("box" | "minimal" | "bold-yellow"), captionPosition ("bottom" | "center" | "top"), vignette (boolean), sharpen (boolean), titleBanner (short ASCII title string or "" if not needed).`;
+
+        const payload = {
+          contents: [
+            {
+              parts: [
+                mediaPart,
+                { text: systemInstruction }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.2,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                summary: { type: "STRING" },
+                colorFilter: {
+                  type: "STRING",
+                  enum: ["none", "cinematic", "bw", "vintage", "vibrant", "warm", "cool"]
+                },
+                playbackSpeed: { type: "NUMBER" },
+                trimStart: { type: "NUMBER" },
+                trimEnd: { type: "NUMBER" },
+                styleEffects: {
+                  type: "OBJECT",
+                  properties: {
+                    captionStyle: { type: "STRING", enum: ["box", "minimal", "bold-yellow"] },
+                    captionPosition: { type: "STRING", enum: ["bottom", "center", "top"] },
+                    vignette: { type: "BOOLEAN" },
+                    sharpen: { type: "BOOLEAN" },
+                    titleBanner: { type: "STRING" }
+                  },
+                  required: ["captionStyle", "captionPosition", "vignette", "sharpen", "titleBanner"]
+                },
+                captions: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      start: { type: "NUMBER" },
+                      end: { type: "NUMBER" },
+                      text: { type: "STRING" }
+                    },
+                    required: ["start", "end", "text"]
+                  }
+                }
+              },
+              required: ["summary", "colorFilter", "playbackSpeed", "trimStart", "trimEnd", "styleEffects", "captions"]
+            }
+          }
+        };
+
+        const genRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        const genJson = await genRes.json();
+        if (!genRes.ok) {
+          throw new Error(genJson?.error?.message || `Gemini API error (${genRes.status})`);
+        }
+
+        const rawText = genJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) {
+          throw new Error("Gemini returned an empty response.");
+        }
+
+        const parsed = JSON.parse(rawText);
+        editPlan = sanitizePlan(parsed, videoDuration);
+        applyPlanToPreview();
+
+        previewVideo.currentTime = editPlan.trimStart;
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 100, "AI edit plan ready!");
+        showAlert(aiSummaryAlert, `Gemini Plan: ${editPlan.summary}`);
+      } catch (err) {
+        console.error(err);
+        aiProgress.classList.remove("show");
+        showAlert(aiError, err.message || "Unexpected error communicating with Gemini API.");
+      } finally {
+        if (uploadedFileMeta?.name) {
+          deleteGeminiFile(uploadedFileMeta.name, apiKey);
+        }
+        refreshKeyUI();
+      }
+    });
+
+    function sanitizePlan(raw, dur) {
+      const validFilters = ["none", "cinematic", "bw", "vintage", "vibrant", "warm", "cool"];
+      const validStyles = ["box", "minimal", "bold-yellow"];
+      const validPos = ["bottom", "center", "top"];
+
+      let trimStart = Number(raw.trimStart);
+      let trimEnd = Number(raw.trimEnd);
+      if (!Number.isFinite(trimStart) || trimStart < 0 || trimStart >= dur) trimStart = 0;
+      if (!Number.isFinite(trimEnd) || trimEnd <= trimStart + 0.3 || trimEnd > dur) trimEnd = dur;
+
+      let speed = Number(raw.playbackSpeed);
+      if (!Number.isFinite(speed)) speed = 1.0;
+      speed = Math.min(2.0, Math.max(0.5, speed));
+
+      const fx = raw.styleEffects || {};
+      const captions = Array.isArray(raw.captions)
+        ? raw.captions
+            .map(c => ({
+              start: Math.max(0, Math.min(dur, Number(c.start) || 0)),
+              end: Math.max(0, Math.min(dur, Number(c.end) || 0)),
+              text: String(c.text || "").trim()
+            }))
+            .filter(c => c.text && c.end > c.start + 0.05)
+            .sort((a, b) => a.start - b.start)
+        : [];
+
+      return {
+        summary: String(raw.summary || "Applied AI color, pacing, and Hinglish captions."),
+        colorFilter: validFilters.includes(raw.colorFilter) ? raw.colorFilter : "none",
+        playbackSpeed: speed,
+        trimStart,
+        trimEnd,
+        styleEffects: {
+          captionStyle: validStyles.includes(fx.captionStyle) ? fx.captionStyle : "box",
+          captionPosition: validPos.includes(fx.captionPosition) ? fx.captionPosition : "bottom",
+          vignette: Boolean(fx.vignette),
+          sharpen: Boolean(fx.sharpen),
+          titleBanner: String(fx.titleBanner || "").trim()
+        },
+        captions
+      };
+    }
+
+    // ==============================
+    // 4. Real MP4 Rendering (ffmpeg.wasm)
+    // ==============================
+    let ffmpegInstance = null;
+    let fontLoaded = false;
+
+    async function fetchBufferWithFallback(urls) {
+      let lastErr = null;
+      for (const url of urls) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+          return await res.arrayBuffer();
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      throw lastErr || new Error("Failed to fetch required FFmpeg asset.");
+    }
+
+    async function toBlobURLFallback(urls, mime) {
+      const buf = await fetchBufferWithFallback(urls);
+      return URL.createObjectURL(new Blob([buf], { type: mime }));
+    }
+
+    async function getFFmpeg() {
+      if (ffmpegInstance) return ffmpegInstance;
+
+      setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 5, "Downloading FFmpeg WebAssembly engine (~31 MB)...");
+
+      if (!window.FFmpegWASM) {
+        const ffmpegJsBuf = await fetchBufferWithFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js",
+          "https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js"
+        ]);
+        const rawJs = new TextDecoder().decode(ffmpegJsBuf);
+        // Patch UMD worker loader so classic worker blob (814.ffmpeg.js) runs without type:module importScripts error
+        const patchedJs = rawJs.replace(/\{\s*type\s*:\s*["']module["']\s*\}/g, "{}");
+        (0, eval)(patchedJs);
+      }
+
+      const [classWorkerURL, coreURL, wasmURL] = await Promise.all([
+        toBlobURLFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js",
+          "https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js"
+        ], "text/javascript"),
+        toBlobURLFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js",
+          "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js"
+        ], "text/javascript"),
+        toBlobURLFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm",
+          "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm"
+        ], "application/wasm")
+      ]);
+
+      setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 18, "Booting FFmpeg engine...");
+      const ffmpeg = new window.FFmpegWASM.FFmpeg();
+      await ffmpeg.load({ classWorkerURL, coreURL, wasmURL });
+
+      if (!fontLoaded) {
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 24, "Loading caption font...");
+        const fontBuf = await fetchBufferWithFallback([
+          "https://cdn.jsdelivr.net/gh/ffmpegwasm/testdata@master/arial.ttf",
+          "https://cdn.jsdelivr.net/gh/openmaptiles/fonts@master/roboto/Roboto-Regular.ttf"
+        ]);
+        await ffmpeg.writeFile("font.ttf", new Uint8Array(fontBuf));
+        fontLoaded = true;
+      }
+
+      ffmpegInstance = ffmpeg;
+      return ffmpeg;
+    }
+
+    function toAsciiPrintable(str) {
+      return String(str || "")
+        .normalize("NFKD")
+        .replace(/[^\x20-\x7E\n]/g, "")
+        .trim();
+    }
+
+    function wrapCaption(text, maxChars = 30) {
+      const clean = toAsciiPrintable(text);
+      if (!clean) return "";
+      const words = clean.split(/\s+/);
+      const lines = [];
+      let current = "";
+      for (const word of words) {
+        if ((current + " " + word).trim().length <= maxChars) {
+          current = (current + " " + word).trim();
+        } else {
+          if (current) lines.push(current);
+          current = word;
+        }
+      }
+      if (current) lines.push(current);
+      return lines.join("\n");
+    }
+
+    const FFMPEG_COLOR_FILTERS = {
+      none: "",
+      cinematic: "eq=contrast=1.18:brightness=-0.02:saturation=1.22,colorbalance=rs=-0.03:gs=0.0:bs=0.04",
+      bw: "hue=s=0,eq=contrast=1.22",
+      vintage: "colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131,eq=contrast=1.08:saturation=0.85",
+      vibrant: "eq=saturation=1.65:contrast=1.08:brightness=0.02",
+      warm: "colorbalance=rs=0.08:gs=0.02:bs=-0.08,eq=saturation=1.15",
+      cool: "colorbalance=rs=-0.08:gs=0.0:bs=0.10,eq=contrast=1.06"
+    };
+
+    exportBtn.addEventListener("click", async () => {
+      hideAlert(ffmpegError);
+      exportPreview.classList.remove("show");
+
+      if (!rawFile) {
+        showAlert(ffmpegError, "Please upload a video first.");
+        return;
+      }
+
+      analyzeBtn.disabled = true;
+      exportBtn.disabled = true;
+
+      const tempFiles = [];
+      let logHandler = null;
+      let progressHandler = null;
+
+      try {
+        const ffmpeg = await getFFmpeg();
+        const extMatch = (rawFile.name || "").match(/\.[a-zA-Z0-9]+$/);
+        const inputName = "input" + (extMatch ? extMatch[0].toLowerCase() : ".mp4");
+        tempFiles.push(inputName, "output.mp4");
+
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 28, "Loading raw video into FFmpeg memory...");
+        const rawBytes = new Uint8Array(await rawFile.arrayBuffer());
+        await ffmpeg.writeFile(inputName, rawBytes);
+
+        // Probe input stream logs to detect audio presence accurately
+        let hasAudioStream = false;
+        let lastLines = [];
+        logHandler = ({ message }) => {
+          if (/Stream\s+#0:\d+.*Audio:/i.test(message)) hasAudioStream = true;
+          lastLines.push(message);
+          if (lastLines.length > 25) lastLines.shift();
+        };
+        ffmpeg.on("log", logHandler);
+        try {
+          await ffmpeg.exec(["-i", inputName]);
+        } catch (_) {}
+
+        const trimStart = Math.max(0, editPlan.trimStart || 0);
+        const trimEnd = editPlan.trimEnd > trimStart + 0.2 ? editPlan.trimEnd : videoDuration;
+        const trimDur = Math.max(0.3, trimEnd - trimStart);
+        const speed = Math.min(2.0, Math.max(0.5, editPlan.playbackSpeed || 1.0));
+        const expectedOutDur = trimDur / speed;
+
+        // Build video filter chain
+        const vf = [
+          "scale=w='min(1280,trunc(iw/2)*2)':h=-2",
+          "setpts=PTS-STARTPTS"
+        ];
+
+        const colorExpr = FFMPEG_COLOR_FILTERS[editPlan.colorFilter];
+        if (colorExpr) vf.push(colorExpr);
+        if (editPlan.styleEffects.vignette) vf.push("vignette=PI/4");
+        if (editPlan.styleEffects.sharpen) vf.push("unsharp=5:5:0.8:5:5:0.0");
+
+        // Optional Title Banner
+        const cleanBanner = toAsciiPrintable(editPlan.styleEffects.titleBanner);
+        if (cleanBanner) {
+          await ffmpeg.writeFile("title.txt", new TextEncoder().encode(cleanBanner));
+          tempFiles.push("title.txt");
+          vf.push(
+            "drawtext=fontfile=/font.ttf:textfile=/title.txt:expansion=none:fontcolor=white:fontsize=h*0.036:box=1:boxcolor=0x6366f1@0.9:boxborderw=10:x=(w-text_w)/2:y=h*0.05"
+          );
+        }
+
+        // Burn timestamped Hinglish captions (using trimmed pre-speed timeline)
+        const posY =
+          editPlan.styleEffects.captionPosition === "top" ? "h*0.14" :
+          editPlan.styleEffects.captionPosition === "center" ? "(h-text_h)/2" :
+          "h-text_h-(h*0.09)";
+
+        const capColor = editPlan.styleEffects.captionStyle === "bold-yellow" ? "yellow" : "white";
+        const capBox = editPlan.styleEffects.captionStyle === "minimal"
+          ? "box=0:shadowcolor=black@0.9:shadowx=2:shadowy=2"
+          : "box=1:boxcolor=black@0.68:boxborderw=10";
+
+        let capIndex = 0;
+        for (const cap of editPlan.captions) {
+          const s = Math.max(0, cap.start - trimStart);
+          const e = Math.min(trimDur, cap.end - trimStart);
+          if (e <= s + 0.05) continue;
+
+          const wrapped = wrapCaption(cap.text, 30);
+          if (!wrapped) continue;
+
+          const capFile = `cap_${capIndex++}.txt`;
+          await ffmpeg.writeFile(capFile, new TextEncoder().encode(wrapped));
+          tempFiles.push(capFile);
+
+          vf.push(
+            `drawtext=fontfile=/font.ttf:textfile=/${capFile}:expansion=none:fontcolor=${capColor}:fontsize=h*0.044:${capBox}:x=(w-text_w)/2:y=${posY}:enable='between(t,${s.toFixed(2)},${e.toFixed(2)})'`
+          );
+        }
+
+        if (Math.abs(speed - 1.0) > 0.01) {
+          vf.push(`setpts=PTS/${speed.toFixed(3)}`);
+        }
+        vf.push("format=yuv420p");
+
+        const args = [];
+        if (trimStart > 0.05) args.push("-ss", trimStart.toFixed(3));
+        args.push("-i", inputName);
+        if (trimEnd < videoDuration - 0.05 || trimStart > 0.05) {
+          args.push("-t", trimDur.toFixed(3));
+        }
+
+        args.push("-vf", vf.join(","));
+
+        if (hasAudioStream) {
+          if (Math.abs(speed - 1.0) > 0.01) {
+            args.push("-af", `atempo=${speed.toFixed(3)}`);
+          }
+          args.push("-c:a", "aac", "-b:a", "128k");
+        } else {
+          args.push("-an");
+        }
+
+        args.push(
+          "-c:v", "libx264",
+          "-preset", "ultrafast",
+          "-crf", "23",
+          "-movflags", "+faststart",
+          "-y",
+          "output.mp4"
+        );
+
+        progressHandler = ({ progress, time }) => {
+          let ratio = Number.isFinite(progress) && progress >= 0 && progress <= 1 ? progress : 0;
+          if (Number.isFinite(time) && time > 0 && expectedOutDur > 0) {
+            ratio = Math.max(ratio, Math.min(0.99, (time / 1_000_000) / expectedOutDur));
+          }
+          const pct = 30 + ratio * 68;
+          setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, pct, "Rendering MP4 with captions & audio...");
+        };
+        ffmpeg.on("progress", progressHandler);
+
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 30, "Starting FFmpeg render...");
+        const exitCode = await ffmpeg.exec(args);
+        if (exitCode !== 0) {
+          throw new Error(`FFmpeg render failed (code ${exitCode}). Tail log: ${lastLines.slice(-4).join(" | ")}`);
+        }
+
+        const outData = await ffmpeg.readFile("output.mp4");
+        if (!outData || outData.byteLength === 0) {
+          throw new Error("Rendered MP4 file was empty.");
+        }
+
+        if (exportObjectUrl) URL.revokeObjectURL(exportObjectUrl);
+        exportObjectUrl = URL.createObjectURL(new Blob([outData], { type: "video/mp4" }));
+
+        exportedVideo.src = exportObjectUrl;
+        downloadLink.href = exportObjectUrl;
+        downloadLink.download = `hinglishcut-${Date.now()}.mp4`;
+        exportPreview.classList.add("show");
+
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 100, "MP4 ready for download!");
+      } catch (err) {
+        console.error(err);
+        ffmpegProgress.classList.remove("show");
+        showAlert(ffmpegError, err.message || "Failed to render MP4 in browser.");
+      } finally {
+        if (ffmpegInstance) {
+          if (logHandler) ffmpegInstance.off("log", logHandler);
+          if (progressHandler) ffmpegInstance.off("progress", progressHandler);
+          for (const f of tempFiles) {
+            try { await ffmpegInstance.deleteFile(f); } catch (_) {}
+          }
+        }
+        updateActionButtons();
+      }
+    });
+
+    // Init
+    refreshKeyUI();
+  </script>
+</body>
+</html>
