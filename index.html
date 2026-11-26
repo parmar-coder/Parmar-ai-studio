@@ -731,21 +731,35 @@
   }
 
   // Fast Task-Routed Model Fallback
+  async function fetchWikiFallback(query) {
+    try {
+      const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&origin=*&srlimit=3&srsearch=${encodeURIComponent(query)}`);
+      if (!r.ok) return [];
+      const j = await r.json();
+      return (j?.query?.search || []).map(s => ({
+        title: s.title,
+        snippet: s.snippet.replace(/<[^>]+>/g, ""),
+        uri: `https://en.wikipedia.org/wiki/${encodeURIComponent(s.title.replace(/ /g, "_"))}`
+      }));
+    } catch { return []; }
+  }
+
   async function callGeminiWithFallback(apiKey, bodyPayload, onStep, taskType = "chat") {
     const preferred = modelSelect.value;
-    const fastChatChain = ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-4-hydrogen", "gemini-3.5-flash"];
-    const mediaChain = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-4-hydrogen", "gemini-3.5-flash-lite"];
+    const fastChatChain = ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash"];
+    const mediaChain = ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash"];
     const baseChain = taskType === "chat" ? fastChatChain : mediaChain;
     const order = preferred === "auto" ? baseChain : [preferred, ...baseChain.filter(m => m !== preferred)];
 
     let lastErr = null;
     for (const model of order) {
       for (const useTools of (bodyPayload.tools ? [true, false] : [false])) {
+        let tid = null;
         try {
           if (onStep) onStep(`Running ${model}...`);
           const payloadCopy = useTools ? bodyPayload : { ...bodyPayload, tools: undefined };
           const ctrl = new AbortController();
-          const tid = setTimeout(() => ctrl.abort(), 30000);
+          tid = setTimeout(() => ctrl.abort(new Error(`${model} timed out after 65s`)), 65000);
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -764,7 +778,9 @@
           }
           throw new Error(msg);
         } catch (e) {
-          lastErr = e;
+          if (tid) clearTimeout(tid);
+          const em = (e && e.message && !e.message.includes("without reason")) ? e.message : `${model} connection timed out on mobile network`;
+          lastErr = new Error(em);
         }
       }
     }
@@ -794,20 +810,46 @@
     return { b64: c.toDataURL("image/jpeg", 0.88).split(",")[1], dataUrl };
   }
 
-  function renderPosterCanvas(spec) {
+  function loadAiArtwork(promptText) {
+    return new Promise((resolve) => {
+      if (!promptText) return resolve(null);
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      const timer = setTimeout(() => resolve(null), 22000);
+      img.onload = () => { clearTimeout(timer); resolve(img); };
+      img.onerror = () => { clearTimeout(timer); resolve(null); };
+      const seed = Math.floor(Math.random() * 99999);
+      img.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptText)}?width=1080&height=1350&nologo=true&seed=${seed}`;
+    });
+  }
+
+  async function renderPosterCanvas(spec) {
     const c = document.createElement("canvas");
     c.className = "photo-out";
     c.width = 1080; c.height = 1350;
     const ctx = c.getContext("2d");
 
-    const bg1 = spec.bgStart || "#faf8f5";
-    const bg2 = spec.bgEnd || "#efe7da";
-    const accent = spec.accentColor || "#8c6d46";
-    const ink = spec.textColor || "#171717";
+    const aiImg = await loadAiArtwork(spec.imagePrompt || spec.headline);
+    const bg1 = spec.bgStart || "#141418";
+    const bg2 = spec.bgEnd || "#2a2016";
+    const accent = spec.accentColor || "#fbbf24";
+    const ink = aiImg ? "#ffffff" : (spec.textColor || "#ffffff");
 
-    const g = ctx.createLinearGradient(0, 0, 1080, 1350);
-    g.addColorStop(0, bg1); g.addColorStop(1, bg2);
-    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1350);
+    if (aiImg) {
+      const sc = Math.max(1080 / aiImg.width, 1350 / aiImg.height);
+      const dw = aiImg.width * sc, dh = aiImg.height * sc;
+      ctx.drawImage(aiImg, (1080 - dw) / 2, (1350 - dh) / 2, dw, dh);
+      const scrim = ctx.createLinearGradient(0, 0, 0, 1350);
+      scrim.addColorStop(0, "rgba(15,15,20,0.58)");
+      scrim.addColorStop(0.45, "rgba(15,15,20,0.38)");
+      scrim.addColorStop(1, "rgba(15,15,20,0.88)");
+      ctx.fillStyle = scrim;
+      ctx.fillRect(0, 0, 1080, 1350);
+    } else {
+      const g = ctx.createLinearGradient(0, 0, 1080, 1350);
+      g.addColorStop(0, bg1); g.addColorStop(1, bg2);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1350);
+    }
 
     // Editorial border frame
     ctx.strokeStyle = accent; ctx.lineWidth = 6;
@@ -1260,10 +1302,11 @@
 
       // MODE 3: POSTER / PAMPHLET DESIGNER
       } else if (isPosterReq) {
-        addStep("ds", "Designing custom business poster...", "active");
+        addStep("ds", "Designing banner copy & AI artwork...", "active");
         const schema = {
           type: "OBJECT",
           properties: {
+            imagePrompt: { type: "STRING" },
             eyebrow: { type: "STRING" },
             headline: { type: "STRING" },
             subheadline: { type: "STRING" },
@@ -1274,22 +1317,26 @@
             accentColor: { type: "STRING" },
             textColor: { type: "STRING" }
           },
-          required: ["headline", "subheadline", "highlights", "cta"]
+          required: ["imagePrompt", "headline", "subheadline", "highlights", "cta"]
         };
         const payload = {
           system_instruction: { parts: [{ text: sysInstr }] },
-          contents: [{ role: "user", parts: [{ text: `Design a professional poster/pamphlet for: "${text}". Return clean hex colors and crisp copy.` }] }],
+          contents: [{ role: "user", parts: [{ text: `Design a vibrant banner/poster for: "${text}". Include a detailed English imagePrompt (no text in imagePrompt, rich illustration/photography) plus crisp copy and dark-friendly hex colors.` }] }],
           generationConfig: { responseMimeType: "application/json", responseSchema: schema }
         };
         const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
         const spec = JSON.parse(data.candidates[0].content.parts[0].text);
-        addStep("ds", `Poster designed (${model})`, "done");
-        badge.textContent = model;
+        addStep("ds", "Generating AI background artwork...", "active");
 
-        const c = renderPosterCanvas(spec);
-        const pngUrl = c.toDataURL("image/png");
+        const c = await renderPosterCanvas(spec);
+        addStep("ds", `Banner ready (${model})`, "done");
+        badge.textContent = model;
+        let pngUrl = "";
+        try { pngUrl = c.toDataURL("image/png"); } catch { pngUrl = ""; }
         content.appendChild(c);
-        content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-poster.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Poster (PNG)</a>`);
+        if (pngUrl) {
+          content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-poster.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Banner / Poster (PNG)</a>`);
+        }
 
       // MODE 4: Q&A + GOOGLE SEARCH + SPEAKER BUTTON
       } else {
