@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Parmar AI Studio — Multi-Agent Video, Photo &amp; Research Atelier</title>
+  <title>Parmar AI Studio — Multi-Agent Video, Photo &amp; Design Atelier</title>
   <style>
     :root {
       --bg: #faf8f5;
@@ -32,7 +32,18 @@
     .app-shell { display: flex; flex-direction: column; height: 100dvh; width: 100%; position: relative; }
     .hidden { display: none !important; }
 
-    /* Top Bar */
+    /* Smooth Keyframes */
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes waveBar {
+      0%, 100% { transform: scaleY(0.35); }
+      50% { transform: scaleY(1); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Header */
     header {
       flex: 0 0 auto; z-index: 30;
       background: rgba(250, 248, 245, 0.94); backdrop-filter: blur(12px);
@@ -43,9 +54,9 @@
     .drawer-btn {
       width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
       background: var(--card); color: var(--text); font-size: 1.15rem; cursor: pointer;
-      display: grid; place-items: center; flex-shrink: 0;
+      display: grid; place-items: center; flex-shrink: 0; transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
     }
-    .drawer-btn:hover { border-color: var(--gold); background: var(--surface); }
+    .drawer-btn:active { transform: scale(0.94); }
     .brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
     .monogram {
       width: 32px; height: 32px; border-radius: 50%; background: var(--dark); color: #fff;
@@ -56,20 +67,20 @@
     .status-pill {
       flex-shrink: 0; font-size: 0.72rem; font-weight: 600; padding: 6px 12px;
       border-radius: 999px; background: var(--card); border: 1px solid var(--border);
-      color: var(--muted); cursor: pointer; white-space: nowrap;
+      color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
     }
     .status-pill.ready { color: var(--gold); border-color: var(--gold); background: #fdfbf7; }
 
-    /* Slide-Out Drawer */
+    /* Drawer */
     .drawer-backdrop {
       position: fixed; inset: 0; background: rgba(23,23,23,0.42); backdrop-filter: blur(3px);
-      z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
+      z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.24s ease;
     }
     .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
     .drawer-panel {
       position: fixed; top: 0; left: 0; bottom: 0; width: min(90vw, 390px);
       background: var(--bg); border-right: 1px solid var(--border); z-index: 70;
-      transform: translateX(-104%); transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+      transform: translateX(-104%); transition: transform 0.28s cubic-bezier(0.22,1,0.36,1);
       display: flex; flex-direction: column; height: 100dvh;
       box-shadow: 12px 0 36px rgba(23,23,23,0.12);
     }
@@ -78,7 +89,7 @@
       padding: 14px 16px; background: var(--card); border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
-    .drawer-title { font-family: Georgia, serif; font-size: 1.05rem; color: var(--text); }
+    .drawer-title { font-family: Georgia, serif; font-size: 1.05rem; }
     .drawer-body {
       flex: 1; min-height: 0; overflow-y: auto; padding: 14px;
       display: flex; flex-direction: column; gap: 14px;
@@ -93,19 +104,17 @@
     .agent-row {
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
       padding: 8px 10px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; cursor: pointer;
+      border-radius: 12px; cursor: pointer; transition: border-color 0.2s;
     }
     .agent-info strong { display: block; font-size: 0.81rem; font-weight: 600; }
     .agent-info small { display: block; font-size: 0.71rem; color: var(--muted); line-height: 1.25; }
 
     .switch { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .slider {
-      position: absolute; inset: 0; border-radius: 999px; background: #d6cfc4; transition: background 0.18s; cursor: pointer;
-    }
+    .slider { position: absolute; inset: 0; border-radius: 999px; background: #d6cfc4; transition: background 0.2s; cursor: pointer; }
     .slider::before {
       content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
-      border-radius: 50%; background: #fff; transition: transform 0.18s;
+      border-radius: 50%; background: #fff; transition: transform 0.2s;
     }
     .switch input:checked + .slider { background: var(--dark); }
     .switch input:checked + .slider::before { transform: translateX(16px); }
@@ -113,7 +122,8 @@
     .skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
     .skill-pill {
       padding: 6px 11px; border-radius: 999px; border: 1px solid var(--border);
-      background: var(--surface); color: var(--muted); font-size: 0.75rem; font-weight: 600; cursor: pointer;
+      background: var(--surface); color: var(--muted); font-size: 0.75rem; font-weight: 600;
+      cursor: pointer; transition: all 0.18s ease;
     }
     .skill-pill.active { background: var(--dark); border-color: var(--dark); color: #fff; }
 
@@ -127,20 +137,23 @@
       min-height: 38px; padding: 8px 15px; border-radius: 999px; border: 1px solid var(--border);
       background: var(--card); color: var(--text); font-weight: 600; font-size: 0.81rem; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;
+      transition: all 0.18s cubic-bezier(0.22,1,0.36,1);
     }
+    .btn:active:not(:disabled) { transform: scale(0.96); }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-dark { background: var(--dark); border-color: var(--dark); color: #fff; }
-    .btn-sm { min-height: 30px; padding: 4px 11px; font-size: 0.74rem; }
+    .btn-sm { min-height: 32px; padding: 4px 12px; font-size: 0.75rem; }
     .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .row > .grow { flex: 1; min-width: 140px; }
 
     /* Chat Area */
-    .chat-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 14px 28px; }
+    .chat-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 14px 28px; scroll-behavior: smooth; }
     .chat-container { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
     .home-hero {
       padding: 30px 10px 16px; text-align: center;
       display: flex; flex-direction: column; align-items: center; gap: 12px;
+      animation: msgIn 0.35s ease;
     }
     .home-eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); font-weight: 600; }
     .home-hero h1 { font-family: Georgia, serif; font-size: clamp(1.75rem, 5vw, 2.55rem); font-weight: 400; line-height: 1.18; max-width: 600px; }
@@ -152,12 +165,14 @@
     .quick-chip {
       background: var(--card); border: 1px solid var(--border); border-radius: 16px;
       padding: 13px 15px; text-align: left; cursor: pointer; font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
     }
-    .quick-chip:hover { border-color: var(--gold); }
+    .quick-chip:hover { border-color: var(--gold); transform: translateY(-1px); }
+    .quick-chip:active { transform: scale(0.98); }
     .quick-chip strong { display: block; font-size: 0.85rem; margin-bottom: 2px; }
     .quick-chip span { display: block; font-size: 0.75rem; color: var(--muted); }
 
-    .msg-row { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .msg-row { display: flex; flex-direction: column; gap: 6px; width: 100%; animation: msgIn 0.28s cubic-bezier(0.22,1,0.36,1); }
     .msg-row.user { align-items: flex-end; }
     .msg-row.ai { align-items: flex-start; }
 
@@ -187,7 +202,7 @@
       display: flex; flex-direction: column; gap: 5px; padding: 10px 12px;
       background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
     }
-    .tracker-step { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--muted); }
+    .tracker-step { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--muted); transition: color 0.2s; }
     .tracker-step.active { color: var(--text); font-weight: 600; }
     .tracker-step.done { color: var(--ok); }
     .tracker-step.err { color: var(--danger); }
@@ -198,50 +213,48 @@
     .tracker-step.active .step-dot { border-color: var(--gold); border-top-color: transparent; animation: spin 0.8s linear infinite; }
     .tracker-step.done .step-dot { border-color: var(--ok); background: var(--ok); color: #fff; }
     .tracker-step.err .step-dot { border-color: var(--danger); background: var(--danger); color: #fff; }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     .progress-wrap { display: none; flex-direction: column; gap: 5px; }
     .progress-wrap.show { display: flex; }
     .progress-track { width: 100%; height: 7px; border-radius: 999px; background: #efeae2; border: 1px solid var(--border); overflow: hidden; }
-    .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gold), var(--dark)); transition: width 0.2s; }
+    .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gold), var(--dark)); transition: width 0.2s ease; }
     .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
 
     .alert { padding: 10px 12px; border-radius: 12px; font-size: 0.82rem; display: none; word-break: break-word; }
-    .alert.show { display: block; }
+    .alert.show { display: block; animation: msgIn 0.2s ease; }
     .alert.error { background: var(--danger-bg); border: 1px solid var(--danger-bd); color: var(--danger); }
     .alert.info { background: var(--info-bg); border: 1px solid var(--info-bd); color: var(--info); }
 
-    .md-body { font-size: 0.92rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .md-body { font-size: 0.93rem; line-height: 1.62; white-space: pre-wrap; word-break: break-word; }
     .sources-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; border-top: 1px solid var(--border); }
     .source-pill {
       padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
       color: var(--text); text-decoration: none; font-size: 0.74rem;
     }
+    .tts-row { display: flex; align-items: center; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 
-    /* Video & Photo Stages */
+    /* Video, Photo & Poster Stages */
     .stage {
-      position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 50vh;
-      background: #111; border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
+      position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 52vh;
+      background: #000000; border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
       display: flex; align-items: center; justify-content: center;
     }
-    .stage video { width: 100%; height: 100%; object-fit: contain; }
+    .stage video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
     .stage-title {
-      position: absolute; top: 8%; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 7%; left: 50%; transform: translateX(-50%);
       background: rgba(24,24,27,0.88); border: 1px solid var(--gold); color: #fff;
-      font-size: 0.8rem; font-weight: 600; padding: 4px 14px; border-radius: 999px;
-      pointer-events: none; display: none;
+      font-size: 0.78rem; font-weight: 600; padding: 4px 13px; border-radius: 999px;
+      pointer-events: none; display: none; z-index: 4;
     }
     .stage-caption {
       position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); max-width: 86%;
       text-align: center; pointer-events: none; font-weight: 700; font-size: 0.86rem; line-height: 1.3;
-      padding: 5px 12px; border-radius: 8px; background: rgba(0,0,0,0.72); color: #fde047;
-      display: none; transition: opacity 0.15s ease;
+      padding: 5px 12px; border-radius: 8px; background: rgba(0,0,0,0.74); color: #fde047;
+      display: none; z-index: 4; transition: all 0.16s ease;
     }
-    .ai-card, .btn, .quick-chip, .attach-menu { transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
-    .tts-row { display: flex; align-items: center; gap: 8px; padding-top: 6px; border-top: 1px solid var(--border); }
     .stage-vignette {
-      position: absolute; inset: 0; pointer-events: none;
-      background: radial-gradient(circle, transparent 52%, rgba(0,0,0,0.65) 100%); display: none;
+      position: absolute; inset: 0; pointer-events: none; z-index: 3;
+      background: radial-gradient(circle, transparent 54%, rgba(0,0,0,0.52) 100%); display: none;
     }
 
     .captions-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
@@ -251,7 +264,7 @@
     }
     .cap-item input { min-height: 32px; padding: 4px 6px; font-size: 0.78rem; background: #fff; border-radius: 6px; }
 
-    canvas.photo-out { max-width: 100%; max-height: 420px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 0 auto; }
+    canvas.photo-out { max-width: 100%; max-height: 440px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 0 auto; }
 
     /* Bottom Floating Gemini Bar */
     .bottom-dock {
@@ -262,7 +275,7 @@
     .attach-chip {
       display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
       background: var(--card); border: 1px solid var(--gold); border-radius: 999px;
-      padding: 4px 12px; font-size: 0.76rem; font-weight: 600;
+      padding: 4px 12px; font-size: 0.76rem; font-weight: 600; animation: msgIn 0.2s ease;
     }
     .attach-chip button { background: none; border: none; color: var(--danger); font-weight: 700; cursor: pointer; font-size: 0.9rem; }
 
@@ -274,10 +287,24 @@
     .circle-btn {
       width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
       background: var(--surface); color: var(--text); display: grid; place-items: center;
-      cursor: pointer; flex-shrink: 0; font-size: 1.1rem;
+      cursor: pointer; flex-shrink: 0; font-size: 1.1rem; transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
     }
+    .circle-btn:active { transform: scale(0.92); }
     .circle-btn.send { background: var(--dark); border-color: var(--dark); color: #fff; }
-    .circle-btn.listening { background: #dc2626; border-color: #dc2626; color: #fff; }
+    .circle-btn svg { width: 18px; height: 18px; }
+
+    /* Gemini-Style Animated Mic Waves */
+    .mic-waves { display: none; align-items: center; gap: 2.5px; height: 16px; }
+    .mic-waves span {
+      width: 2.5px; height: 14px; border-radius: 2px; background: var(--gold);
+      animation: waveBar 0.7s ease-in-out infinite;
+    }
+    .mic-waves span:nth-child(2) { animation-delay: 0.15s; height: 18px; }
+    .mic-waves span:nth-child(3) { animation-delay: 0.3s; height: 12px; }
+    .circle-btn.listening { border-color: var(--gold); background: #fdfbf7; }
+    .circle-btn.listening .mic-svg { display: none; }
+    .circle-btn.listening .mic-waves { display: flex; }
+
     .command-pill textarea {
       flex: 1; border: none; background: transparent; resize: none; outline: none;
       font-family: inherit; font-size: 15px; line-height: 1.4; max-height: 110px;
@@ -287,11 +314,13 @@
     .attach-menu {
       position: absolute; bottom: 56px; left: 0; background: var(--card);
       border: 1px solid var(--border); border-radius: 16px; padding: 6px;
-      box-shadow: 0 10px 30px rgba(23,23,23,0.14); display: none; flex-direction: column; gap: 4px; z-index: 40;
+      box-shadow: 0 10px 30px rgba(23,23,23,0.14); display: flex; flex-direction: column; gap: 4px; z-index: 40;
+      opacity: 0; transform: translateY(8px) scale(0.96); pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
     }
-    .attach-menu.open { display: flex; }
+    .attach-menu.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
     .attach-opt {
-      padding: 9px 14px; border-radius: 10px; border: none; background: transparent;
+      padding: 10px 14px; border-radius: 10px; border: none; background: transparent;
       text-align: left; font-size: 0.84rem; font-weight: 600; color: var(--text); cursor: pointer;
     }
     .attach-opt:hover { background: var(--surface); }
@@ -299,11 +328,10 @@
 </head>
 <body>
 <div class="app-shell">
-  <!-- Header -->
   <header>
     <div class="header-inner">
       <div class="header-left">
-        <button type="button" class="drawer-btn" id="openDrawerBtn" aria-label="Open Agents &amp; Skills Menu">☰</button>
+        <button type="button" class="drawer-btn" id="openDrawerBtn" aria-label="Open Menu">☰</button>
         <div class="brand">
           <div class="monogram">P</div>
           <div class="brand-name">Parmar AI Studio</div>
@@ -313,7 +341,6 @@
     </div>
   </header>
 
-  <!-- Slide-out Drawer -->
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="drawer-panel" id="drawerPanel">
     <div class="drawer-head">
@@ -321,7 +348,6 @@
       <button type="button" class="btn btn-sm" id="closeDrawerBtn">Close</button>
     </div>
     <div class="drawer-body">
-      <!-- API Key & Model -->
       <section class="drawer-section">
         <div class="sec-title"><span>Gemini API &amp; Model</span><span class="sec-tag">Local Storage</span></div>
         <div class="row">
@@ -330,26 +356,23 @@
           <button type="button" class="btn btn-sm" id="clearKeyBtn">Clear</button>
         </div>
         <select id="modelSelect">
-          <option value="auto">Auto Fallback (3.8 → 3.5 → Auto-Discover)</option>
+          <option value="auto">Auto Smart Routing (Fastest)</option>
           <option value="gemini-3.8-flash">gemini-3.8-flash</option>
           <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
           <option value="gemini-3.5-flash">gemini-3.5-flash</option>
         </select>
       </section>
 
-      <!-- Connect AI Agents -->
       <section class="drawer-section">
-        <div class="sec-title"><span>Connect AI Agents</span><span class="sec-tag" id="agentCountTag">4 Active</span></div>
-        <div class="agent-list" id="agentList"></div>
+        <div class="sec-title"><span>Connect AI Agents</span><span class="sec-tag" id="agentCountTag">5 Active</span></div>
+        <div id="agentList" style="display:flex;flex-direction:column;gap:7px;"></div>
       </section>
 
-      <!-- Built-In Skills -->
       <section class="drawer-section">
         <div class="sec-title"><span>Built-In Skills</span><span class="sec-tag">1-Tap Toggle</span></div>
         <div class="skills-wrap" id="skillsWrap"></div>
       </section>
 
-      <!-- Custom Skill Creator -->
       <section class="drawer-section">
         <div class="sec-title"><span>Import / Create Skill</span><span class="sec-tag">Custom</span></div>
         <input type="text" id="customSkillName" placeholder="Skill name (e.g. Podcast Reels)" />
@@ -362,36 +385,34 @@
     </div>
   </aside>
 
-  <!-- Chat Workspace -->
   <main class="chat-scroll" id="chatScroll">
     <div class="chat-container" id="chatContainer">
       <div class="home-hero" id="homeHero">
-        <div class="home-eyebrow">Multi-Agent Atelier • Gemini 3.9 &amp; FFmpeg</div>
+        <div class="home-eyebrow">Multi-Agent Atelier • Gemini AI &amp; Studio</div>
         <h1>Create Your Vision <em class="gold-amp">&amp;</em> Command Your AI Crew</h1>
-        <p class="home-sub">Attach a raw video or photo with <strong>+</strong>, or ask any question. Open <strong>☰</strong> anytime to connect AI Agents and Skills.</p>
+        <p class="home-sub">Attach any video or photo with <strong>+</strong> at any time, or ask anything. Open <strong>☰</strong> to connect AI Agents &amp; Skills.</p>
         <div class="quick-grid">
-          <button type="button" class="quick-chip" data-prompt="Edit my video into a fast-paced vibrant 1.15x reel with bold yellow Hinglish captions and title Parmar AI Studio">
-            <strong>Edit Raw Reel</strong>
-            <span>Auto Hinglish captions + vibrant color + MP4</span>
+          <button type="button" class="quick-chip" data-action="video">
+            <strong>Edit Any Raw Video</strong>
+            <span>Attach video with + and describe any style</span>
+          </button>
+          <button type="button" class="quick-chip" data-action="photo">
+            <strong>Retouch Photo / Thumbnail</strong>
+            <span>Attach photo with + for HDR or custom edits</span>
+          </button>
+          <button type="button" class="quick-chip" data-prompt="Design a luxury minimalist poster for my business Parmar AI Studio with bold typography and gold accents">
+            <strong>Design Business Poster</strong>
+            <span>Generate custom poster &amp; download PNG</span>
           </button>
           <button type="button" class="quick-chip" data-prompt="Find 5 trending viral YouTube Shorts topics in tech and AI for India today with high-CTR titles">
             <strong>Find Viral Topics</strong>
-            <span>Live Google Search + keyword strategy</span>
-          </button>
-          <button type="button" class="quick-chip" data-prompt="Retouch this photo with dramatic warm HDR contrast and add bold thumbnail title text">
-            <strong>Design Thumbnail / Photo</strong>
-            <span>AI color grade + PNG export</span>
-          </button>
-          <button type="button" class="quick-chip" data-prompt="Write a 30-second viral Hinglish hook, script, and SEO tags for a video about AI video editing">
-            <strong>YouTube Script &amp; SEO</strong>
-            <span>Multi-agent hook, script &amp; tags</span>
+            <span>Fast Q&amp;A + Google Search + Listen mode</span>
           </button>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Bottom Floating Gemini Command Bar -->
   <footer class="bottom-dock">
     <div class="dock-inner">
       <div class="attach-chip hidden" id="attachChip">
@@ -402,11 +423,18 @@
       <div class="command-pill">
         <div class="attach-menu" id="attachMenu">
           <button type="button" class="attach-opt" id="pickVideoBtn">Upload Raw Video (Up to 60s / 100 MB)</button>
-          <button type="button" class="attach-opt" id="pickPhotoBtn">Upload Photo (Retouch / Thumbnail)</button>
+          <button type="button" class="attach-opt" id="pickPhotoBtn">Upload Photo (HDR / Retouch / Edit)</button>
         </div>
         <button type="button" class="circle-btn" id="plusBtn" aria-label="Attach media">+</button>
-        <textarea id="promptBox" rows="1" placeholder="Ask anything, or drop a video/photo to edit..."></textarea>
-        <button type="button" class="circle-btn" id="micBtn" aria-label="Voice prompt">🎙</button>
+        <textarea id="promptBox" rows="1" placeholder="Ask anything, design a poster, or attach video/photo..."></textarea>
+        <button type="button" class="circle-btn" id="micBtn" aria-label="Voice prompt">
+          <svg class="mic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" x2="12" y1="19" y2="22"></line>
+          </svg>
+          <div class="mic-waves"><span></span><span></span><span></span></div>
+        </button>
         <button type="button" class="circle-btn send" id="sendBtn" aria-label="Send">↑</button>
       </div>
     </div>
@@ -421,27 +449,25 @@
   const STORAGE_SKILLS = "parmar_studio_custom_skills";
 
   const AGENTS = [
-    { id: "video_dir", name: "Video Director Agent", desc: "Plans cuts, pacing & dynamic FFmpeg filters", on: true },
+    { id: "video_dir", name: "Video Director Agent", desc: "Dynamic edits, pacing, color & motion", on: true },
     { id: "caption", name: "Hinglish Caption Agent", desc: "Hindi/Gujarati/English → Roman Hinglish", on: true },
     { id: "photo", name: "Thumbnail & Photo Agent", desc: "HDR retouch, lighting & text overlays", on: true },
-    { id: "research", name: "Trend & Keyword Researcher", desc: "Live Google Search grounding for topics", on: true },
-    { id: "script", name: "Hook & Script Writer", desc: "3-second retention hooks & Hinglish scripts", on: false },
-    { id: "seo", name: "SEO Title & Tags Agent", desc: "High-CTR titles, descriptions & hashtags", on: false },
-    { id: "coder", name: "Web & Automation Architect", desc: "HTML/CSS/JS & FFmpeg script builder", on: false }
+    { id: "poster", name: "Poster & Graphic Designer", desc: "Business posters, flyers & banners", on: true },
+    { id: "research", name: "Trend & Keyword Researcher", desc: "Fast Q&A + Google Search grounding", on: true },
+    { id: "script", name: "Hook & Script Writer", desc: "3-second retention hooks & scripts", on: false },
+    { id: "seo", name: "SEO Title & Tags Agent", desc: "High-CTR titles, descriptions & tags", on: false }
   ];
 
   const BUILTIN_SKILLS = [
-    { id: "viral_pacing", name: "Viral Reels Pacing", instr: "Trim dead silence, use 1.1x-1.25x pacing, vibrant contrast, and punchy 3-4 word captions.", on: true },
-    { id: "hinglish_pro", name: "Roman Hinglish Master", instr: "Always transcribe Hindi, Gujarati, or English speech into clean, natural Roman Hinglish.", on: true },
-    { id: "cinema_grade", name: "Cinema Film Color", instr: "Apply warm filmic contrast, subtle vignette, and optional 21:9 letterbox bars.", on: false },
-    { id: "ctr_thumb", name: "High-CTR Thumbnail", instr: "Boost subject contrast, warmth, and suggest short bold 2-4 word overlay headlines.", on: false }
+    { id: "viral_pacing", name: "Viral Reels Pacing", instr: "Keep edits punchy with 3-4 word captions and vibrant contrast.", on: true },
+    { id: "hinglish_pro", name: "Roman Hinglish Master", instr: "Transcribe spoken Hindi, Gujarati, or English into clean Roman Hinglish.", on: true },
+    { id: "cinema_grade", name: "Cinema Film Color", instr: "Apply filmic contrast, warm tones, subtle vignette, and optional letterbox.", on: false },
+    { id: "hdr_photo", name: "HDR & Thumbnail Pro", instr: "Enhance lighting, clarity, saturation, and sharp contrast on photos.", on: false }
   ];
 
   let customSkills = [];
-  let attachedFile = null; // { type: 'video'|'photo', file: File, duration: number }
-  let ffmpegInstance = null;
+  let attachedFile = null;
 
-  // DOM
   const drawerBackdrop = document.getElementById("drawerBackdrop");
   const drawerPanel = document.getElementById("drawerPanel");
   const headerStatusBtn = document.getElementById("headerStatusBtn");
@@ -480,7 +506,6 @@
         <span class="switch"><input type="checkbox" data-agent="${a.id}" ${a.on ? "checked" : ""}><span class="slider"></span></span>
       </label>
     `).join("");
-
     aList.querySelectorAll("input[data-agent]").forEach(inp => {
       inp.addEventListener("change", () => {
         const ag = AGENTS.find(x => x.id === inp.dataset.agent);
@@ -502,8 +527,8 @@
 
     const cList = document.getElementById("customSkillsList");
     cList.innerHTML = customSkills.map((cs, i) => `
-      <div class="custom-skill-item">
-        <span><strong>${cs.name}</strong></span>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:0.78rem;">
+        <strong>${cs.name}</strong>
         <button type="button" class="btn btn-sm" data-del-skill="${i}">Remove</button>
       </div>
     `).join("");
@@ -520,10 +545,9 @@
   function buildSystemInstruction() {
     const activeAgents = AGENTS.filter(a => a.on).map(a => `- ${a.name}: ${a.desc}`).join("\n");
     const activeSkills = [...BUILTIN_SKILLS.filter(s => s.on), ...customSkills].map(s => `- ${s.name}: ${s.instr}`).join("\n");
-    return `You are Parmar AI Studio, an elite multi-agent creative & technical assistant.\nActive Agents:\n${activeAgents}\nActive Skills:\n${activeSkills}`;
+    return `You are Parmar AI Studio, a fast, elite multi-agent creative & technical assistant.\nActive Agents:\n${activeAgents}\nActive Skills:\n${activeSkills}`;
   }
 
-  // Drawer open/close
   function setDrawer(open) {
     drawerPanel.classList.toggle("open", open);
     drawerBackdrop.classList.toggle("open", open);
@@ -533,7 +557,6 @@
   drawerBackdrop.addEventListener("click", () => setDrawer(false));
   headerStatusBtn.addEventListener("click", () => setDrawer(true));
 
-  // API Key Save/Clear
   try {
     const k = getApiKey();
     if (k) apiKeyInput.value = k;
@@ -553,7 +576,6 @@
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
     refreshHeader();
   });
-
   document.getElementById("addCustomSkillBtn").addEventListener("click", () => {
     const n = document.getElementById("customSkillName").value.trim();
     const p = document.getElementById("customSkillPrompt").value.trim();
@@ -564,7 +586,6 @@
     document.getElementById("customSkillPrompt").value = "";
     renderDrawerControls();
   });
-
   document.getElementById("newChatBtn").addEventListener("click", () => {
     chatContainer.innerHTML = "";
     chatContainer.appendChild(homeHero);
@@ -572,7 +593,7 @@
     setDrawer(false);
   });
 
-  // Attachment Controls
+  // Attachment Controls (works in ANY existing chat immediately!)
   document.getElementById("plusBtn").addEventListener("click", e => {
     e.stopPropagation();
     attachMenu.classList.toggle("open");
@@ -584,13 +605,18 @@
   document.getElementById("videoInput").addEventListener("change", e => {
     const f = e.target.files?.[0];
     if (!f) return;
+    // Set synchronously so user can hit Send immediately in any chat!
+    attachedFile = { type: "video", file: f, duration: 15 };
+    attachChipLabel.textContent = `Video: ${f.name} (${(f.size / 1048576).toFixed(1)} MB)`;
+    attachChip.classList.remove("hidden");
+
     const v = document.createElement("video");
     v.preload = "metadata";
     v.src = URL.createObjectURL(f);
     v.onloadedmetadata = () => {
-      attachedFile = { type: "video", file: f, duration: Math.min(60, v.duration || 15) };
-      attachChipLabel.textContent = `Video: ${f.name} (${(f.size / 1048576).toFixed(1)} MB)`;
-      attachChip.classList.remove("hidden");
+      if (attachedFile && attachedFile.file === f) {
+        attachedFile.duration = Math.min(60, v.duration || 15);
+      }
       URL.revokeObjectURL(v.src);
     };
   });
@@ -610,13 +636,14 @@
     document.getElementById("photoInput").value = "";
   });
 
-  // Voice Mic
+  // Gemini-Style Mic with Animated Sound Waves
   document.getElementById("micBtn").addEventListener("click", () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
+    const micBtn = document.getElementById("micBtn");
+    if (micBtn.classList.contains("listening")) return;
     const rec = new SR();
     rec.lang = "en-IN";
-    const micBtn = document.getElementById("micBtn");
     micBtn.classList.add("listening");
     rec.onresult = ev => {
       promptBox.value = (promptBox.value + " " + ev.results[0][0].transcript).trim();
@@ -628,12 +655,19 @@
 
   document.querySelectorAll(".quick-chip").forEach(c => {
     c.addEventListener("click", () => {
-      promptBox.value = c.dataset.prompt;
-      promptBox.focus();
+      if (c.dataset.action === "video") { document.getElementById("videoInput").click(); return; }
+      if (c.dataset.action === "photo") { document.getElementById("photoInput").click(); return; }
+      if (c.dataset.prompt) { promptBox.value = c.dataset.prompt; promptBox.focus(); }
     });
   });
 
-  // Gemini Resumable File Upload via XHR (Zero 400 chunk-size errors + real progress)
+  // Auto-expand textarea smoothly
+  promptBox.addEventListener("input", () => {
+    promptBox.style.height = "auto";
+    promptBox.style.height = Math.min(110, promptBox.scrollHeight) + "px";
+  });
+
+  // XHR Resumable Video Upload (Zero 400 chunk error + real progress)
   async function uploadToGeminiFiles(apiKey, file, onProgress) {
     const mime = file.type || "video/mp4";
     const initRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${encodeURIComponent(apiKey)}`, {
@@ -647,10 +681,7 @@
       },
       body: JSON.stringify({ file: { display_name: file.name } })
     });
-    if (!initRes.ok) {
-      const errTxt = await initRes.text().catch(() => "");
-      throw new Error(`Upload init failed (${initRes.status}): ${errTxt.slice(0, 120)}`);
-    }
+    if (!initRes.ok) throw new Error(`Upload init failed (${initRes.status})`);
     const uploadUrl = initRes.headers.get("X-Goog-Upload-URL");
     if (!uploadUrl) throw new Error("Missing upload URL from Gemini.");
 
@@ -667,25 +698,20 @@
       };
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const parsed = JSON.parse(xhr.responseText);
-            resolve(parsed.file || parsed);
-          } catch { reject(new Error("Invalid JSON from Gemini upload.")); }
+          try { const d = JSON.parse(xhr.responseText); resolve(d.file || d); }
+          catch { reject(new Error("Invalid JSON from Gemini upload.")); }
         } else {
-          reject(new Error(`Video upload failed (${xhr.status}): ${xhr.responseText.slice(0, 120)}`));
+          reject(new Error(`Video upload failed (${xhr.status})`));
         }
       };
       xhr.onerror = () => reject(new Error("Network error while uploading video."));
       xhr.send(file);
     });
 
-    const fileUri = fileObj.uri;
-    const fileName = fileObj.name;
-
     for (let i = 0; i < 35; i++) {
-      const check = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${encodeURIComponent(apiKey)}`);
+      const check = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileObj.name}?key=${encodeURIComponent(apiKey)}`);
       const info = await check.json();
-      if (info.state === "ACTIVE") return { fileUri, mimeType: mime };
+      if (info.state === "ACTIVE") return { fileUri: fileObj.uri, mimeType: mime };
       if (info.state === "FAILED") throw new Error("Gemini failed to process video.");
       onProgress(72 + Math.min(20, i * 2), "Gemini processing video...");
       await new Promise(r => setTimeout(r, 1500));
@@ -693,11 +719,11 @@
     throw new Error("Video processing timed out.");
   }
 
-  // Fast Task-Routed Model Fallback Engine
+  // Fast Task-Routed Model Fallback
   async function callGeminiWithFallback(apiKey, bodyPayload, onStep, taskType = "chat") {
     const preferred = modelSelect.value;
-    const fastChatChain = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-4-hydrogen", "gemini-3.5-flash"];
-    const mediaChain = ["gemini-3.8-flash", "gemini-4-hydrogen", "gemini-3.5-flash", "gemini-3.5-flash-lite"];
+    const fastChatChain = ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-4-hydrogen", "gemini-3.5-flash"];
+    const mediaChain = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-4-hydrogen", "gemini-3.5-flash-lite"];
     const baseChain = taskType === "chat" ? fastChatChain : mediaChain;
     const order = preferred === "auto" ? baseChain : [preferred, ...baseChain.filter(m => m !== preferred)];
 
@@ -720,9 +746,9 @@
           if (res.ok && data.candidates?.[0]) return { model, data };
           const msg = data?.error?.message || `HTTP ${res.status}`;
           lastErr = new Error(`${model}: ${msg}`);
-          if (res.status === 404) break; // model doesn't exist, skip to next model
+          if (res.status === 404) break;
           if (res.status === 429 || res.status === 503 || res.status === 400 || msg.toLowerCase().includes("high demand") || msg.toLowerCase().includes("quota")) {
-            await new Promise(r => setTimeout(r, 400));
+            await new Promise(r => setTimeout(r, 350));
             continue;
           }
           throw new Error(msg);
@@ -734,7 +760,6 @@
     throw lastErr || new Error("All Gemini models failed.");
   }
 
-  // Photo Resize to Safe InlineData
   async function fileToSafeJpegBase64(file) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -744,32 +769,85 @@
         c.width = Math.round(img.width * sc);
         c.height = Math.round(img.height * sc);
         c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        const dataUrl = c.toDataURL("image/jpeg", 0.88);
-        resolve(dataUrl.split(",")[1]);
+        resolve(c.toDataURL("image/jpeg", 0.88).split(",")[1]);
       };
       img.onerror = () => reject(new Error("Could not read photo."));
       img.src = URL.createObjectURL(file);
     });
   }
 
-  // FFmpeg.wasm Loader (Full Blob Worker Patch for GitHub Pages)
-  async function loadFFmpeg() {
-    if (ffmpegInstance) return ffmpegInstance;
-    const { FFmpeg } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js");
-    const { toBlobURL } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js");
-    const ff = new FFmpeg();
-    const coreBase = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
-    const ffBase = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm";
-    await ff.load({
-      classWorkerURL: await toBlobURL(`${ffBase}/worker.js`, "text/javascript"),
-      coreURL: await toBlobURL(`${coreBase}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${coreBase}/ffmpeg-core.wasm`, "application/wasm")
-    });
-    ffmpegInstance = ff;
-    return ff;
+  function renderPosterCanvas(spec) {
+    const c = document.createElement("canvas");
+    c.className = "photo-out";
+    c.width = 1080; c.height = 1350;
+    const ctx = c.getContext("2d");
+
+    const bg1 = spec.bgStart || "#faf8f5";
+    const bg2 = spec.bgEnd || "#efe7da";
+    const accent = spec.accentColor || "#8c6d46";
+    const ink = spec.textColor || "#171717";
+
+    const g = ctx.createLinearGradient(0, 0, 1080, 1350);
+    g.addColorStop(0, bg1); g.addColorStop(1, bg2);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1350);
+
+    // Editorial border frame
+    ctx.strokeStyle = accent; ctx.lineWidth = 6;
+    ctx.strokeRect(56, 56, 1080 - 112, 1350 - 112);
+
+    // Decorative top badge
+    ctx.fillStyle = accent;
+    ctx.font = '600 28px -apple-system, sans-serif';
+    ctx.textAlign = "center";
+    ctx.fillText((spec.eyebrow || "SPECIAL EDITION").toUpperCase(), 540, 190);
+
+    // Main Headline
+    ctx.fillStyle = ink;
+    ctx.font = '700 84px Georgia, serif';
+    const words = (spec.headline || "Parmar AI Studio").split(/\s+/);
+    let line = "", y = 370;
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > 840) {
+        ctx.fillText(line, 540, y); line = w; y += 100;
+      } else { line = test; }
+    }
+    if (line) ctx.fillText(line, 540, y);
+
+    // Subtitle
+    ctx.fillStyle = ink;
+    ctx.globalAlpha = 0.78;
+    ctx.font = '400 38px -apple-system, sans-serif';
+    ctx.fillText(spec.subheadline || "", 540, y + 110, 840);
+    ctx.globalAlpha = 1;
+
+    // Bullet highlights
+    const pts = (spec.highlights || []).slice(0, 4);
+    let py = y + 230;
+    ctx.textAlign = "left";
+    ctx.font = '600 34px -apple-system, sans-serif';
+    for (const pt of pts) {
+      ctx.fillStyle = accent;
+      ctx.fillRect(140, py - 24, 16, 16);
+      ctx.fillStyle = ink;
+      ctx.fillText(pt, 180, py, 760);
+      py += 76;
+    }
+
+    // Bottom CTA Pill
+    if (spec.cta) {
+      ctx.fillStyle = ink;
+      ctx.beginPath();
+      ctx.roundRect(290, 1100, 500, 96, 48);
+      ctx.fill();
+      ctx.fillStyle = bg1;
+      ctx.textAlign = "center";
+      ctx.font = '700 34px -apple-system, sans-serif';
+      ctx.fillText(spec.cta, 540, 1160);
+    }
+    return c;
   }
 
-  // Main Send Handler
   async function handleSend() {
     const text = promptBox.value.trim();
     const apiKey = getApiKey();
@@ -777,7 +855,6 @@
 
     homeHero.classList.add("hidden");
 
-    // User Message Bubble
     const uRow = document.createElement("div");
     uRow.className = "msg-row user";
     uRow.innerHTML = `<div class="user-bubble">
@@ -788,12 +865,12 @@
 
     const media = attachedFile;
     promptBox.value = "";
+    promptBox.style.height = "auto";
     attachedFile = null;
     attachChip.classList.add("hidden");
     document.getElementById("videoInput").value = "";
     document.getElementById("photoInput").value = "";
 
-    // AI Response Card
     const aRow = document.createElement("div");
     aRow.className = "msg-row ai";
     const card = document.createElement("div");
@@ -832,11 +909,7 @@
     }
     function addStep(id, label, state = "active") {
       let el = tracker.querySelector(`[data-st="${id}"]`);
-      if (!el) {
-        el = document.createElement("div");
-        el.dataset.st = id;
-        tracker.appendChild(el);
-      }
+      if (!el) { el = document.createElement("div"); el.dataset.st = id; tracker.appendChild(el); }
       el.className = `tracker-step ${state}`;
       el.innerHTML = `<span class="step-dot">${state === "done" ? "✓" : state === "err" ? "!" : ""}</span><span>${label}</span>`;
     }
@@ -851,21 +924,20 @@
 
     try {
       const sysInstr = buildSystemInstruction();
+      const isPosterReq = !media && /\b(poster|pamphlet|flyer|banner|brochure)\b/i.test(text);
 
-      // MODE B: VIDEO EDITING
+      // MODE 1: VIDEO EDITING
       if (media && media.type === "video") {
         addStep("up", "Uploading raw video to Gemini...", "active");
-        setProgress(15, "Starting resumable upload...");
+        setProgress(12, "Starting resumable upload...");
         const { fileUri, mimeType } = await uploadToGeminiFiles(apiKey, media.file, setProgress);
         addStep("up", "Video uploaded & ready", "done");
 
-        addStep("ai", "Analyzing video & generating Hinglish captions...", "active");
+        addStep("ai", "Analyzing video & generating smooth Hinglish captions...", "active");
         const schema = {
           type: "OBJECT",
           properties: {
             editSummary: { type: "STRING" },
-            trimStart: { type: "NUMBER" },
-            trimEnd: { type: "NUMBER" },
             speed: { type: "NUMBER" },
             brightness: { type: "NUMBER" },
             contrast: { type: "NUMBER" },
@@ -877,16 +949,12 @@
               type: "ARRAY",
               items: {
                 type: "OBJECT",
-                properties: {
-                  start: { type: "NUMBER" },
-                  end: { type: "NUMBER" },
-                  text: { type: "STRING" }
-                },
+                properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, text: { type: "STRING" } },
                 required: ["start", "end", "text"]
               }
             }
           },
-          required: ["editSummary", "trimStart", "trimEnd", "speed", "captions"]
+          required: ["editSummary", "speed", "captions"]
         };
 
         const payload = {
@@ -895,51 +963,25 @@
             role: "user",
             parts: [
               { file_data: { mime_type: mimeType, file_uri: fileUri } },
-              { text: `Analyze this video and apply this edit prompt: "${text || "Make a vibrant reel with Hinglish captions"}". Transcribe any spoken Hindi, Gujarati, or English audio into clean, timed Roman Hinglish captions.` }
+              { text: `Edit this video according to: "${text || "Make a clean vibrant reel with Hinglish captions"}". Return brightness around 1.0 (0.9-1.2), contrast around 1.15, saturation around 1.25. Transcribe Hindi/Gujarati/English speech into short 3-4 word Roman Hinglish captions.` }
             ]
           }],
           generationConfig: { responseMimeType: "application/json", responseSchema: schema }
         };
 
-        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, media ? "media" : "chat");
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "media");
         const plan = JSON.parse(data.candidates[0].content.parts[0].text);
         addStep("ai", `Edit Plan & Hinglish Captions ready (${model})`, "done");
         progWrap.classList.remove("show");
         badge.textContent = model;
 
-        const vidUrl = URL.createObjectURL(media.file);
-        content.innerHTML = `
-          <div class="alert info show" style="margin-bottom:10px;">${plan.editSummary}</div>
-          <div class="stage">
-            <video controls playsinline src="${vidUrl}"></video>
-            <div class="stage-vignette"></div>
-            <div class="stage-title"></div>
-            <div class="stage-caption"></div>
-          </div>
-          <div class="captions-list" style="margin-top:10px;"></div>
-          <button type="button" class="btn btn-dark render-mp4-btn" style="width:100%;margin-top:10px;">Render &amp; Download Final MP4 (With Audio)</button>
-          <div class="mp4-out" style="margin-top:10px;"></div>
-        `;
-
-        const vEl = content.querySelector("video");
-        const capOverlay = content.querySelector(".stage-caption");
-        const titleOverlay = content.querySelector(".stage-title");
-        const vigOverlay = content.querySelector(".stage-vignette");
-        const capList = content.querySelector(".captions-list");
-
-        // Normalize brightness/contrast/saturation safely so video never turns black
         const normB = (plan.brightness !== undefined && plan.brightness < 0.5) ? (1 + plan.brightness) : (plan.brightness || 1);
-        const safeB = Math.min(1.35, Math.max(0.85, normB));
-        const safeC = Math.min(1.45, Math.max(0.85, plan.contrast || 1.12));
-        const safeS = Math.min(1.75, Math.max(0.70, plan.saturation || 1.22));
+        const safeB = Math.min(1.35, Math.max(0.88, normB));
+        const safeC = Math.min(1.45, Math.max(0.88, plan.contrast || 1.12));
+        const safeS = Math.min(1.75, Math.max(0.75, plan.saturation || 1.2));
         const safeSpd = Math.min(2, Math.max(0.5, plan.speed || 1));
 
-        vEl.playbackRate = safeSpd;
-        vEl.style.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`;
-        if (plan.vignette) vigOverlay.style.display = "block";
-        if (plan.titleBanner) { titleOverlay.textContent = plan.titleBanner; titleOverlay.style.display = "block"; }
-
-        // Split long captions into smooth 3-4 word chunks
+        // Chunk any long caption into 3-4 word smooth lines
         const caps = [];
         for (const rawC of (plan.captions || [])) {
           const words = (rawC.text || "").trim().split(/\s+/).filter(Boolean);
@@ -959,6 +1001,35 @@
             });
           }
         }
+
+        const vidUrl = URL.createObjectURL(media.file);
+        content.innerHTML = `
+          <div class="alert info show" style="margin-bottom:10px;">${plan.editSummary}</div>
+          <div class="stage">
+            <video controls playsinline preload="auto" src="${vidUrl}"></video>
+            <div class="stage-vignette"></div>
+            <div class="stage-title"></div>
+            <div class="stage-caption"></div>
+          </div>
+          <div class="captions-list" style="margin-top:10px;"></div>
+          <button type="button" class="btn btn-dark render-mp4-btn" style="width:100%;margin-top:10px;">Render &amp; Download Edited Video (With Sound)</button>
+          <div class="mp4-out" style="margin-top:10px;"></div>
+        `;
+
+        const vEl = content.querySelector("video");
+        const capOverlay = content.querySelector(".stage-caption");
+        const titleOverlay = content.querySelector(".stage-title");
+        const vigOverlay = content.querySelector(".stage-vignette");
+        const capList = content.querySelector(".captions-list");
+
+        vEl.onloadedmetadata = () => {
+          vEl.playbackRate = safeSpd;
+          vEl.currentTime = 0.05;
+        };
+        vEl.style.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`;
+        if (plan.vignette) vigOverlay.style.display = "block";
+        if (plan.titleBanner) { titleOverlay.textContent = plan.titleBanner; titleOverlay.style.display = "block"; }
+
         capList.innerHTML = caps.map((c, idx) => `
           <div class="cap-item">
             <input type="number" step="0.1" value="${c.start}" data-cap-start="${idx}" />
@@ -966,7 +1037,6 @@
             <input type="text" value="${c.text.replace(/"/g, "&quot;")}" data-cap-text="${idx}" />
           </div>
         `).join("");
-
         capList.querySelectorAll("input").forEach(inp => {
           inp.addEventListener("input", () => {
             if (inp.dataset.capStart !== undefined) caps[inp.dataset.capStart].start = parseFloat(inp.value) || 0;
@@ -978,26 +1048,21 @@
         vEl.addEventListener("timeupdate", () => {
           const ct = vEl.currentTime;
           const active = caps.find(c => ct >= c.start && ct <= c.end);
-          if (active && active.text) {
-            capOverlay.textContent = active.text;
-            capOverlay.style.display = "block";
-          } else {
-            capOverlay.style.display = "none";
-          }
+          if (active && active.text) { capOverlay.textContent = active.text; capOverlay.style.display = "block"; }
+          else { capOverlay.style.display = "none"; }
         });
 
-        // Render Edited Video (Canvas + Audio Recorder with burned captions & effects, plus FFmpeg.wasm option)
+        // Reliable Hardware-Accelerated Canvas + Audio Export (zero Worker errors!)
         content.querySelector(".render-mp4-btn").addEventListener("click", async function () {
           this.disabled = true;
           errBox.classList.remove("show");
           try {
-            setProgress(10, "Preparing HD Video Renderer...");
+            setProgress(10, "Preparing HD Video Exporter...");
             const offVid = document.createElement("video");
             offVid.src = vidUrl;
             offVid.playsInline = true;
-            offVid.crossOrigin = "anonymous";
             await new Promise((res, rej) => {
-              offVid.onloadedmetadata = res;
+              offVid.onloadeddata = res;
               offVid.onerror = () => rej(new Error("Could not load video for export."));
             });
 
@@ -1026,10 +1091,7 @@
             const rec = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime, videoBitsPerSecond: 5000000 } : { videoBitsPerSecond: 5000000 });
             const chunks = [];
             rec.ondataavailable = e => { if (e.data?.size) chunks.push(e.data); };
-
-            const donePromise = new Promise(resolve => {
-              rec.onstop = () => resolve(new Blob(chunks, { type: mime || "video/webm" }));
-            });
+            const donePromise = new Promise(resolve => { rec.onstop = () => resolve(new Blob(chunks, { type: mime || "video/webm" })); });
 
             offVid.playbackRate = safeSpd;
             offVid.currentTime = 0;
@@ -1041,28 +1103,28 @@
             const drawExport = () => {
               const ct = offVid.currentTime || 0;
               rCtx.save();
-              rCtx.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`;
+              try { rCtx.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`; } catch {}
               rCtx.drawImage(offVid, 0, 0, cw, ch);
               rCtx.restore();
 
               if (plan.vignette) {
                 const vg = rCtx.createRadialGradient(cw/2, ch/2, Math.min(cw,ch)*0.3, cw/2, ch/2, Math.max(cw,ch)*0.75);
-                vg.addColorStop(0, "transparent"); vg.addColorStop(1, "rgba(0,0,0,0.55)");
+                vg.addColorStop(0, "transparent"); vg.addColorStop(1, "rgba(0,0,0,0.52)");
                 rCtx.fillStyle = vg; rCtx.fillRect(0, 0, cw, ch);
               }
               if (plan.titleBanner) {
-                rCtx.fillStyle = "rgba(24,24,27,0.85)";
+                rCtx.fillStyle = "rgba(24,24,27,0.86)";
                 const tw = Math.min(cw * 0.72, 240);
-                rCtx.fillRect((cw - tw) / 2, 22, tw, 30);
+                rCtx.fillRect((cw - tw) / 2, 20, tw, 28);
                 rCtx.fillStyle = "#ffffff"; rCtx.font = "600 13px sans-serif"; rCtx.textAlign = "center";
-                rCtx.fillText(plan.titleBanner, cw / 2, 42, tw - 16);
+                rCtx.fillText(plan.titleBanner, cw / 2, 39, tw - 16);
               }
               const active = caps.find(c => ct >= c.start && ct <= c.end);
               if (active && active.text) {
-                const fs = Math.round(Math.min(cw, ch) * 0.048);
+                const fs = Math.round(Math.min(cw, ch) * 0.046);
                 rCtx.font = `700 ${fs}px -apple-system, sans-serif`;
                 const bw = Math.min(cw * 0.88, rCtx.measureText(active.text).width + 26);
-                const by = ch - 64;
+                const by = ch - 56;
                 rCtx.fillStyle = "rgba(0,0,0,0.75)";
                 rCtx.fillRect((cw - bw) / 2, by - fs / 2 - 8, bw, fs + 16);
                 rCtx.fillStyle = "#fde047"; rCtx.textAlign = "center"; rCtx.textBaseline = "middle";
@@ -1070,12 +1132,9 @@
               }
 
               const pct = Math.min(99, 15 + Math.round((ct / totalDur) * 84));
-              setProgress(pct, `Rendering video with captions & sound... ${pct}%`);
-              if (!offVid.ended && ct < totalDur) {
-                rafId = requestAnimationFrame(drawExport);
-              } else {
-                if (rec.state === "recording") rec.stop();
-              }
+              setProgress(pct, `Rendering video... ${pct}%`);
+              if (!offVid.ended && ct < totalDur) rafId = requestAnimationFrame(drawExport);
+              else if (rec.state === "recording") rec.stop();
             };
             rafId = requestAnimationFrame(drawExport);
             offVid.onended = () => { if (rec.state === "recording") rec.stop(); };
@@ -1084,7 +1143,7 @@
             cancelAnimationFrame(rafId);
             if (ac) ac.close().catch(() => {});
             const outUrl = URL.createObjectURL(outBlob);
-            setProgress(100, "Edited Video Ready!");
+            setProgress(100, "Video Ready!");
             content.querySelector(".mp4-out").innerHTML = `
               <video controls playsinline src="${outUrl}" style="width:100%;border-radius:12px;max-height:300px;"></video>
               <a href="${outUrl}" download="parmar-ai-edited.${ext}" class="btn btn-dark" style="width:100%;margin-top:8px;">Download Edited Video</a>
@@ -1097,9 +1156,9 @@
           }
         });
 
-      // MODE C: PHOTO EDITING
+      // MODE 2: PHOTO EDITING (HDR / RETOUCH / ANY PROMPT)
       } else if (media && media.type === "photo") {
-        addStep("ph", "Analyzing photo & planning edits...", "active");
+        addStep("ph", "Analyzing photo & applying edits...", "active");
         const b64 = await fileToSafeJpegBase64(media.file);
         const schema = {
           type: "OBJECT",
@@ -1120,15 +1179,19 @@
             role: "user",
             parts: [
               { inline_data: { mime_type: "image/jpeg", data: b64 } },
-              { text: text || "Enhance photo with dramatic HDR contrast" }
+              { text: `Edit this photo as requested: "${text || "Enhance with crisp HDR contrast and vivid colors"}". Return brightness around 1.05 (0.85-1.3), contrast around 1.25, saturation around 1.3.` }
             ]
           }],
           generationConfig: { responseMimeType: "application/json", responseSchema: schema }
         };
-        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, media ? "media" : "chat");
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "media");
         const plan = JSON.parse(data.candidates[0].content.parts[0].text);
         addStep("ph", `Photo edited (${model})`, "done");
         badge.textContent = model;
+
+        const pb = (plan.brightness !== undefined && plan.brightness < 0.5) ? (1 + plan.brightness) : (plan.brightness || 1.05);
+        const pc = Math.min(1.6, Math.max(0.85, plan.contrast || 1.2));
+        const ps = Math.min(1.8, Math.max(0.7, plan.saturation || 1.25));
 
         const img = new Image();
         img.onload = () => {
@@ -1136,7 +1199,7 @@
           c.className = "photo-out";
           c.width = img.width; c.height = img.height;
           const ctx = c.getContext("2d");
-          ctx.filter = `brightness(${plan.brightness || 1}) contrast(${plan.contrast || 1.15}) saturate(${plan.saturation || 1.2}) sepia(${plan.sepia || 0})`;
+          try { ctx.filter = `brightness(${pb}) contrast(${pc}) saturate(${ps}) sepia(${plan.sepia || 0})`; } catch {}
           ctx.drawImage(img, 0, 0);
           ctx.filter = "none";
           if (plan.vignette) {
@@ -1158,7 +1221,40 @@
         };
         img.src = URL.createObjectURL(media.file);
 
-      // MODE A: Q&A + GOOGLE SEARCH
+      // MODE 3: POSTER / PAMPHLET DESIGNER
+      } else if (isPosterReq) {
+        addStep("ds", "Designing custom business poster...", "active");
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            eyebrow: { type: "STRING" },
+            headline: { type: "STRING" },
+            subheadline: { type: "STRING" },
+            highlights: { type: "ARRAY", items: { type: "STRING" } },
+            cta: { type: "STRING" },
+            bgStart: { type: "STRING" },
+            bgEnd: { type: "STRING" },
+            accentColor: { type: "STRING" },
+            textColor: { type: "STRING" }
+          },
+          required: ["headline", "subheadline", "highlights", "cta"]
+        };
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{ role: "user", parts: [{ text: `Design a professional poster/pamphlet for: "${text}". Return clean hex colors and crisp copy.` }] }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
+        const spec = JSON.parse(data.candidates[0].content.parts[0].text);
+        addStep("ds", `Poster designed (${model})`, "done");
+        badge.textContent = model;
+
+        const c = renderPosterCanvas(spec);
+        const pngUrl = c.toDataURL("image/png");
+        content.appendChild(c);
+        content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-poster.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Poster (PNG)</a>`);
+
+      // MODE 4: Q&A + GOOGLE SEARCH + SPEAKER BUTTON
       } else {
         addStep("qa", "Thinking & searching with active AI Agents...", "active");
         const payload = {
@@ -1166,7 +1262,7 @@
           contents: [{ role: "user", parts: [{ text }] }],
           tools: [{ google_search: {} }]
         };
-        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, media ? "media" : "chat");
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
         const cand = data.candidates[0];
         const reply = cand.content.parts.map(p => p.text || "").join("\n");
         const chunks = cand.groundingMetadata?.groundingChunks || [];
@@ -1194,9 +1290,9 @@
             return;
           }
           window.speechSynthesis.cancel();
-          const cleanText = reply.replace(/[*_#`>]/g, "").trim();
-          const utter = new SpeechSynthesisUtterance(cleanText);
-          utter.lang = /[\u0900-\u097F]/.test(cleanText) ? "hi-IN" : "en-IN";
+          const clean = reply.replace(/[*_#`>]/g, "").trim();
+          const utter = new SpeechSynthesisUtterance(clean);
+          utter.lang = /[\u0900-\u097F]/.test(clean) ? "hi-IN" : "en-IN";
           utter.rate = 1.02;
           ttsBtn.dataset.speaking = "1";
           ttsBtn.textContent = "⏹ Stop";
