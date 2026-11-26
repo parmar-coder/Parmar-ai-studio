@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Parmar AI Studio — Multi-Agent Video, Photo &amp; Research Atelier</title>
+  <style>
+    :root {
+      --bg: #faf8f5;
+      --card: #ffffff;
+      --surface: #f7f4ef;
+      --border: #e6e0d6;
+      --text: #171717;
+      --muted: #57534e;
+      --gold: #8c6d46;
+      --dark: #18181b;
+      --danger: #991b1b;
+      --danger-bg: #fef2f2;
+      --danger-bd: #fecaca;
+      --info: #5c4529;
+      --info-bg: #faf6f0;
+      --info-bd: #e6dccb;
+      --ok: #15803d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      height: 100dvh; width: 100%; overflow: hidden;
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    .app-shell { display: flex; flex-direction: column; height: 100dvh; width: 100%; position: relative; }
+    .hidden { display: none !important; }
+
+    /* Top Bar */
+    header {
+      flex: 0 0 auto; z-index: 30;
+      background: rgba(250, 248, 245, 0.94); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border); padding: 10px 14px;
+    }
+    .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .drawer-btn {
+      width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-size: 1.15rem; cursor: pointer;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .drawer-btn:hover { border-color: var(--gold); background: var(--surface); }
+    .brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .monogram {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--dark); color: #fff;
+      border: 1.5px solid var(--gold); display: grid; place-items: center;
+      font-family: Georgia, serif; font-size: 0.98rem; font-weight: 700; flex-shrink: 0;
+    }
+    .brand-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .status-pill {
+      flex-shrink: 0; font-size: 0.72rem; font-weight: 600; padding: 6px 12px;
+      border-radius: 999px; background: var(--card); border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer; white-space: nowrap;
+    }
+    .status-pill.ready { color: var(--gold); border-color: var(--gold); background: #fdfbf7; }
+
+    /* Slide-Out Drawer */
+    .drawer-backdrop {
+      position: fixed; inset: 0; background: rgba(23,23,23,0.42); backdrop-filter: blur(3px);
+      z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
+    }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+    .drawer-panel {
+      position: fixed; top: 0; left: 0; bottom: 0; width: min(90vw, 390px);
+      background: var(--bg); border-right: 1px solid var(--border); z-index: 70;
+      transform: translateX(-104%); transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+      display: flex; flex-direction: column; height: 100dvh;
+      box-shadow: 12px 0 36px rgba(23,23,23,0.12);
+    }
+    .drawer-panel.open { transform: translateX(0); }
+    .drawer-head {
+      padding: 14px 16px; background: var(--card); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .drawer-title { font-family: Georgia, serif; font-size: 1.05rem; color: var(--text); }
+    .drawer-body {
+      flex: 1; min-height: 0; overflow-y: auto; padding: 14px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .drawer-section {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .sec-title { font-size: 0.84rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    .sec-tag { font-family: Georgia, serif; font-style: italic; color: var(--gold); font-weight: 400; font-size: 0.78rem; }
+
+    .agent-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 8px 10px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer;
+    }
+    .agent-info strong { display: block; font-size: 0.81rem; font-weight: 600; }
+    .agent-info small { display: block; font-size: 0.71rem; color: var(--muted); line-height: 1.25; }
+
+    .switch { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .slider {
+      position: absolute; inset: 0; border-radius: 999px; background: #d6cfc4; transition: background 0.18s; cursor: pointer;
+    }
+    .slider::before {
+      content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
+      border-radius: 50%; background: #fff; transition: transform 0.18s;
+    }
+    .switch input:checked + .slider { background: var(--dark); }
+    .switch input:checked + .slider::before { transform: translateX(16px); }
+
+    .skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skill-pill {
+      padding: 6px 11px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); font-size: 0.75rem; font-weight: 600; cursor: pointer;
+    }
+    .skill-pill.active { background: var(--dark); border-color: var(--dark); color: #fff; }
+
+    input[type="password"], input[type="text"], select, textarea.field {
+      width: 100%; min-height: 40px; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 11px; padding: 8px 12px; font-size: 14px; font-family: inherit; outline: none;
+    }
+    textarea.field { min-height: 70px; resize: vertical; }
+
+    .btn {
+      min-height: 38px; padding: 8px 15px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-weight: 600; font-size: 0.81rem; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-dark { background: var(--dark); border-color: var(--dark); color: #fff; }
+    .btn-sm { min-height: 30px; padding: 4px 11px; font-size: 0.74rem; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .row > .grow { flex: 1; min-width: 140px; }
+
+    /* Chat Area */
+    .chat-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 14px 28px; }
+    .chat-container { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+    .home-hero {
+      padding: 30px 10px 16px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .home-eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); font-weight: 600; }
+    .home-hero h1 { font-family: Georgia, serif; font-size: clamp(1.75rem, 5vw, 2.55rem); font-weight: 400; line-height: 1.18; max-width: 600px; }
+    .home-hero h1 em { font-style: italic; color: var(--gold); }
+    .home-sub { font-size: 0.88rem; color: var(--muted); max-width: 500px; }
+
+    .quick-grid { display: grid; grid-template-columns: 1fr; gap: 9px; width: 100%; max-width: 640px; margin-top: 6px; }
+    @media (min-width: 600px) { .quick-grid { grid-template-columns: repeat(2, 1fr); } }
+    .quick-chip {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 13px 15px; text-align: left; cursor: pointer; font-family: inherit;
+    }
+    .quick-chip:hover { border-color: var(--gold); }
+    .quick-chip strong { display: block; font-size: 0.85rem; margin-bottom: 2px; }
+    .quick-chip span { display: block; font-size: 0.75rem; color: var(--muted); }
+
+    .msg-row { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .msg-row.user { align-items: flex-end; }
+    .msg-row.ai { align-items: flex-start; }
+
+    .user-bubble {
+      max-width: min(88%, 600px); background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px 20px 6px 20px; padding: 11px 15px; font-size: 0.92rem;
+      display: flex; flex-direction: column; gap: 6px; word-break: break-word;
+    }
+    .user-media-tag {
+      font-size: 0.76rem; color: var(--muted); background: #fff;
+      border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px;
+    }
+
+    .ai-card {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 4px 18px rgba(23,23,23,0.03);
+    }
+    .ai-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .ai-card-label { font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+    .mini-badge {
+      font-size: 0.71rem; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border); color: var(--gold);
+    }
+
+    .tracker {
+      display: flex; flex-direction: column; gap: 5px; padding: 10px 12px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    }
+    .tracker-step { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--muted); }
+    .tracker-step.active { color: var(--text); font-weight: 600; }
+    .tracker-step.done { color: var(--ok); }
+    .tracker-step.err { color: var(--danger); }
+    .step-dot {
+      width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid #c7bfb2;
+      display: grid; place-items: center; font-size: 0.62rem; flex-shrink: 0;
+    }
+    .tracker-step.active .step-dot { border-color: var(--gold); border-top-color: transparent; animation: spin 0.8s linear infinite; }
+    .tracker-step.done .step-dot { border-color: var(--ok); background: var(--ok); color: #fff; }
+    .tracker-step.err .step-dot { border-color: var(--danger); background: var(--danger); color: #fff; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress-wrap { display: none; flex-direction: column; gap: 5px; }
+    .progress-wrap.show { display: flex; }
+    .progress-track { width: 100%; height: 7px; border-radius: 999px; background: #efeae2; border: 1px solid var(--border); overflow: hidden; }
+    .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gold), var(--dark)); transition: width 0.2s; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
+
+    .alert { padding: 10px 12px; border-radius: 12px; font-size: 0.82rem; display: none; word-break: break-word; }
+    .alert.show { display: block; }
+    .alert.error { background: var(--danger-bg); border: 1px solid var(--danger-bd); color: var(--danger); }
+    .alert.info { background: var(--info-bg); border: 1px solid var(--info-bd); color: var(--info); }
+
+    .md-body { font-size: 0.92rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .sources-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .source-pill {
+      padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); text-decoration: none; font-size: 0.74rem;
+    }
+
+    /* Video & Photo Stages */
+    .stage {
+      position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 50vh;
+      background: #111; border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stage video { width: 100%; height: 100%; object-fit: contain; }
+    .stage-title {
+      position: absolute; top: 8%; left: 50%; transform: translateX(-50%);
+      background: rgba(24,24,27,0.88); border: 1px solid var(--gold); color: #fff;
+      font-size: 0.8rem; font-weight: 600; padding: 4px 14px; border-radius: 999px;
+      pointer-events: none; display: none;
+    }
+    .stage-caption {
+      position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); max-width: 88%;
+      text-align: center; pointer-events: none; font-weight: 700; font-size: 1rem;
+      padding: 6px 12px; border-radius: 8px; background: rgba(0,0,0,0.65); color: #fde047; display: none;
+    }
+    .stage-vignette {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(circle, transparent 52%, rgba(0,0,0,0.65) 100%); display: none;
+    }
+
+    .captions-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+    .cap-item {
+      display: grid; grid-template-columns: 52px 52px 1fr; gap: 6px; align-items: center;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 6px;
+    }
+    .cap-item input { min-height: 32px; padding: 4px 6px; font-size: 0.78rem; background: #fff; border-radius: 6px; }
+
+    canvas.photo-out { max-width: 100%; max-height: 420px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 0 auto; }
+
+    /* Bottom Floating Gemini Bar */
+    .bottom-dock {
+      flex: 0 0 auto; padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+      background: var(--bg); border-top: 1px solid var(--border); position: relative; z-index: 25;
+    }
+    .dock-inner { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+    .attach-chip {
+      display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
+      background: var(--card); border: 1px solid var(--gold); border-radius: 999px;
+      padding: 4px 12px; font-size: 0.76rem; font-weight: 600;
+    }
+    .attach-chip button { background: none; border: none; color: var(--danger); font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+
+    .command-pill {
+      display: flex; align-items: flex-end; gap: 6px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 26px;
+      padding: 6px 8px; box-shadow: 0 4px 16px rgba(23,23,23,0.06); position: relative;
+    }
+    .circle-btn {
+      width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); display: grid; place-items: center;
+      cursor: pointer; flex-shrink: 0; font-size: 1.1rem;
+    }
+    .circle-btn.send { background: var(--dark); border-color: var(--dark); color: #fff; }
+    .circle-btn.listening { background: #dc2626; border-color: #dc2626; color: #fff; }
+    .command-pill textarea {
+      flex: 1; border: none; background: transparent; resize: none; outline: none;
+      font-family: inherit; font-size: 15px; line-height: 1.4; max-height: 110px;
+      padding: 8px 4px; color: var(--text);
+    }
+
+    .attach-menu {
+      position: absolute; bottom: 56px; left: 0; background: var(--card);
+      border: 1px solid var(--border); border-radius: 16px; padding: 6px;
+      box-shadow: 0 10px 30px rgba(23,23,23,0.14); display: none; flex-direction: column; gap: 4px; z-index: 40;
+    }
+    .attach-menu.open { display: flex; }
+    .attach-opt {
+      padding: 9px 14px; border-radius: 10px; border: none; background: transparent;
+      text-align: left; font-size: 0.84rem; font-weight: 600; color: var(--text); cursor: pointer;
+    }
+    .attach-opt:hover { background: var(--surface); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div class="header-left">
+        <button type="button" class="drawer-btn" id="openDrawerBtn" aria-label="Open Agents &amp; Skills Menu">☰</button>
+        <div class="brand">
+          <div class="monogram">P</div>
+          <div class="brand-name">Parmar AI Studio</div>
+        </div>
+      </div>
+      <button type="button" class="status-pill" id="headerStatusBtn">Set API Key</button>
+    </div>
+  </header>
+
+  <!-- Slide-out Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer-panel" id="drawerPanel">
+    <div class="drawer-head">
+      <div class="drawer-title">AI Agents &amp; Skills Hub</div>
+      <button type="button" class="btn btn-sm" id="closeDrawerBtn">Close</button>
+    </div>
+    <div class="drawer-body">
+      <!-- API Key & Model -->
+      <section class="drawer-section">
+        <div class="sec-title"><span>Gemini API &amp; Model</span><span class="sec-tag">Local Storage</span></div>
+        <div class="row">
+          <input type="password" id="apiKeyInput" class="grow" placeholder="Paste Gemini API key (AIza...)" />
+          <button type="button" class="btn btn-dark btn-sm" id="saveKeyBtn">Save</button>
+          <button type="button" class="btn btn-sm" id="clearKeyBtn">Clear</button>
+        </div>
+        <select id="modelSelect">
+          <option value="auto">Auto Fallback (3.9 → 3.8 → Lite)</option>
+          <option value="gemini-3.9-flash">gemini-3.9-flash</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+          <option value="gemini-3.8-flash-lite">gemini-3.8-flash-lite</option>
+        </select>
+      </section>
+
+      <!-- Connect AI Agents -->
+      <section class="drawer-section">
+        <div class="sec-title"><span>Connect AI Agents</span><span class="sec-tag" id="agentCountTag">4 Active</span></div>
+        <div class="agent-list" id="agentList"></div>
+      </section>
+
+      <!-- Built-In Skills -->
+      <section class="drawer-section">
+        <div class="sec-title"><span>Built-In Skills</span><span class="sec-tag">1-Tap Toggle</span></div>
+        <div class="skills-wrap" id="skillsWrap"></div>
+      </section>
+
+      <!-- Custom Skill Creator -->
+      <section class="drawer-section">
+        <div class="sec-title"><span>Import / Create Skill</span><span class="sec-tag">Custom</span></div>
+        <input type="text" id="customSkillName" placeholder="Skill name (e.g. Podcast Reels)" />
+        <textarea class="field" id="customSkillPrompt" placeholder="Paste skill instructions..."></textarea>
+        <button type="button" class="btn btn-dark btn-sm" id="addCustomSkillBtn">Save Custom Skill</button>
+        <div id="customSkillsList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </section>
+
+      <button type="button" class="btn" id="newChatBtn">+ Start New Chat</button>
+    </div>
+  </aside>
+
+  <!-- Chat Workspace -->
+  <main class="chat-scroll" id="chatScroll">
+    <div class="chat-container" id="chatContainer">
+      <div class="home-hero" id="homeHero">
+        <div class="home-eyebrow">Multi-Agent Atelier • Gemini 3.9 &amp; FFmpeg</div>
+        <h1>Create Your Vision <em class="gold-amp">&amp;</em> Command Your AI Crew</h1>
+        <p class="home-sub">Attach a raw video or photo with <strong>+</strong>, or ask any question. Open <strong>☰</strong> anytime to connect AI Agents and Skills.</p>
+        <div class="quick-grid">
+          <button type="button" class="quick-chip" data-prompt="Edit my video into a fast-paced vibrant 1.15x reel with bold yellow Hinglish captions and title Parmar AI Studio">
+            <strong>Edit Raw Reel</strong>
+            <span>Auto Hinglish captions + vibrant color + MP4</span>
+          </button>
+          <button type="button" class="quick-chip" data-prompt="Find 5 trending viral YouTube Shorts topics in tech and AI for India today with high-CTR titles">
+            <strong>Find Viral Topics</strong>
+            <span>Live Google Search + keyword strategy</span>
+          </button>
+          <button type="button" class="quick-chip" data-prompt="Retouch this photo with dramatic warm HDR contrast and add bold thumbnail title text">
+            <strong>Design Thumbnail / Photo</strong>
+            <span>AI color grade + PNG export</span>
+          </button>
+          <button type="button" class="quick-chip" data-prompt="Write a 30-second viral Hinglish hook, script, and SEO tags for a video about AI video editing">
+            <strong>YouTube Script &amp; SEO</strong>
+            <span>Multi-agent hook, script &amp; tags</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Floating Gemini Command Bar -->
+  <footer class="bottom-dock">
+    <div class="dock-inner">
+      <div class="attach-chip hidden" id="attachChip">
+        <span id="attachChipLabel">Attached</span>
+        <button type="button" id="removeAttachBtn" aria-label="Remove attachment">×</button>
+      </div>
+
+      <div class="command-pill">
+        <div class="attach-menu" id="attachMenu">
+          <button type="button" class="attach-opt" id="pickVideoBtn">Upload Raw Video (Up to 60s / 100 MB)</button>
+          <button type="button" class="attach-opt" id="pickPhotoBtn">Upload Photo (Retouch / Thumbnail)</button>
+        </div>
+        <button type="button" class="circle-btn" id="plusBtn" aria-label="Attach media">+</button>
+        <textarea id="promptBox" rows="1" placeholder="Ask anything, or drop a video/photo to edit..."></textarea>
+        <button type="button" class="circle-btn" id="micBtn" aria-label="Voice prompt">🎙</button>
+        <button type="button" class="circle-btn send" id="sendBtn" aria-label="Send">↑</button>
+      </div>
+    </div>
+  </footer>
+
+  <input type="file" id="videoInput" accept="video/*" class="hidden" />
+  <input type="file" id="photoInput" accept="image/*" class="hidden" />
+</div>
+
+<script type="module">
+  const STORAGE_KEY = "parmar_studio_gemini_key";
+  const STORAGE_SKILLS = "parmar_studio_custom_skills";
+
+  const AGENTS = [
+    { id: "video_dir", name: "Video Director Agent", desc: "Plans cuts, pacing & dynamic FFmpeg filters", on: true },
+    { id: "caption", name: "Hinglish Caption Agent", desc: "Hindi/Gujarati/English → Roman Hinglish", on: true },
+    { id: "photo", name: "Thumbnail & Photo Agent", desc: "HDR retouch, lighting & text overlays", on: true },
+    { id: "research", name: "Trend & Keyword Researcher", desc: "Live Google Search grounding for topics", on: true },
+    { id: "script", name: "Hook & Script Writer", desc: "3-second retention hooks & Hinglish scripts", on: false },
+    { id: "seo", name: "SEO Title & Tags Agent", desc: "High-CTR titles, descriptions & hashtags", on: false },
+    { id: "coder", name: "Web & Automation Architect", desc: "HTML/CSS/JS & FFmpeg script builder", on: false }
+  ];
+
+  const BUILTIN_SKILLS = [
+    { id: "viral_pacing", name: "Viral Reels Pacing", instr: "Trim dead silence, use 1.1x-1.25x pacing, vibrant contrast, and punchy 3-4 word captions.", on: true },
+    { id: "hinglish_pro", name: "Roman Hinglish Master", instr: "Always transcribe Hindi, Gujarati, or English speech into clean, natural Roman Hinglish.", on: true },
+    { id: "cinema_grade", name: "Cinema Film Color", instr: "Apply warm filmic contrast, subtle vignette, and optional 21:9 letterbox bars.", on: false },
+    { id: "ctr_thumb", name: "High-CTR Thumbnail", instr: "Boost subject contrast, warmth, and suggest short bold 2-4 word overlay headlines.", on: false }
+  ];
+
+  let customSkills = [];
+  let attachedFile = null; // { type: 'video'|'photo', file: File, duration: number }
+  let ffmpegInstance = null;
+
+  // DOM
+  const drawerBackdrop = document.getElementById("drawerBackdrop");
+  const drawerPanel = document.getElementById("drawerPanel");
+  const headerStatusBtn = document.getElementById("headerStatusBtn");
+  const apiKeyInput = document.getElementById("apiKeyInput");
+  const modelSelect = document.getElementById("modelSelect");
+  const chatContainer = document.getElementById("chatContainer");
+  const chatScroll = document.getElementById("chatScroll");
+  const homeHero = document.getElementById("homeHero");
+  const promptBox = document.getElementById("promptBox");
+  const attachMenu = document.getElementById("attachMenu");
+  const attachChip = document.getElementById("attachChip");
+  const attachChipLabel = document.getElementById("attachChipLabel");
+
+  function getApiKey() {
+    try { return localStorage.getItem(STORAGE_KEY) || ""; } catch { return ""; }
+  }
+
+  function refreshHeader() {
+    const key = getApiKey();
+    const activeCount = AGENTS.filter(a => a.on).length;
+    document.getElementById("agentCountTag").textContent = `${activeCount} Active`;
+    if (key) {
+      headerStatusBtn.textContent = `${activeCount} Agents • Key Ready`;
+      headerStatusBtn.classList.add("ready");
+    } else {
+      headerStatusBtn.textContent = "Set API Key";
+      headerStatusBtn.classList.remove("ready");
+    }
+  }
+
+  function renderDrawerControls() {
+    const aList = document.getElementById("agentList");
+    aList.innerHTML = AGENTS.map(a => `
+      <label class="agent-row">
+        <div class="agent-info"><strong>${a.name}</strong><small>${a.desc}</small></div>
+        <span class="switch"><input type="checkbox" data-agent="${a.id}" ${a.on ? "checked" : ""}><span class="slider"></span></span>
+      </label>
+    `).join("");
+
+    aList.querySelectorAll("input[data-agent]").forEach(inp => {
+      inp.addEventListener("change", () => {
+        const ag = AGENTS.find(x => x.id === inp.dataset.agent);
+        if (ag) ag.on = inp.checked;
+        refreshHeader();
+      });
+    });
+
+    const sWrap = document.getElementById("skillsWrap");
+    sWrap.innerHTML = BUILTIN_SKILLS.map(s => `
+      <button type="button" class="skill-pill ${s.on ? "active" : ""}" data-skill="${s.id}">${s.name}</button>
+    `).join("");
+    sWrap.querySelectorAll(".skill-pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sk = BUILTIN_SKILLS.find(x => x.id === btn.dataset.skill);
+        if (sk) { sk.on = !sk.on; btn.classList.toggle("active", sk.on); }
+      });
+    });
+
+    const cList = document.getElementById("customSkillsList");
+    cList.innerHTML = customSkills.map((cs, i) => `
+      <div class="custom-skill-item">
+        <span><strong>${cs.name}</strong></span>
+        <button type="button" class="btn btn-sm" data-del-skill="${i}">Remove</button>
+      </div>
+    `).join("");
+    cList.querySelectorAll("[data-del-skill]").forEach(b => {
+      b.addEventListener("click", () => {
+        customSkills.splice(parseInt(b.dataset.delSkill, 10), 1);
+        try { localStorage.setItem(STORAGE_SKILLS, JSON.stringify(customSkills)); } catch {}
+        renderDrawerControls();
+      });
+    });
+    refreshHeader();
+  }
+
+  function buildSystemInstruction() {
+    const activeAgents = AGENTS.filter(a => a.on).map(a => `- ${a.name}: ${a.desc}`).join("\n");
+    const activeSkills = [...BUILTIN_SKILLS.filter(s => s.on), ...customSkills].map(s => `- ${s.name}: ${s.instr}`).join("\n");
+    return `You are Parmar AI Studio, an elite multi-agent creative & technical assistant.\nActive Agents:\n${activeAgents}\nActive Skills:\n${activeSkills}`;
+  }
+
+  // Drawer open/close
+  function setDrawer(open) {
+    drawerPanel.classList.toggle("open", open);
+    drawerBackdrop.classList.toggle("open", open);
+  }
+  document.getElementById("openDrawerBtn").addEventListener("click", () => setDrawer(true));
+  document.getElementById("closeDrawerBtn").addEventListener("click", () => setDrawer(false));
+  drawerBackdrop.addEventListener("click", () => setDrawer(false));
+  headerStatusBtn.addEventListener("click", () => setDrawer(true));
+
+  // API Key Save/Clear
+  try {
+    const k = getApiKey();
+    if (k) apiKeyInput.value = k;
+    const savedSk = localStorage.getItem(STORAGE_SKILLS);
+    if (savedSk) customSkills = JSON.parse(savedSk);
+  } catch {}
+
+  document.getElementById("saveKeyBtn").addEventListener("click", () => {
+    const v = apiKeyInput.value.trim();
+    if (!v) return;
+    try { localStorage.setItem(STORAGE_KEY, v); } catch {}
+    refreshHeader();
+    setDrawer(false);
+  });
+  document.getElementById("clearKeyBtn").addEventListener("click", () => {
+    apiKeyInput.value = "";
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    refreshHeader();
+  });
+
+  document.getElementById("addCustomSkillBtn").addEventListener("click", () => {
+    const n = document.getElementById("customSkillName").value.trim();
+    const p = document.getElementById("customSkillPrompt").value.trim();
+    if (!n || !p) return;
+    customSkills.push({ name: n, instr: p });
+    try { localStorage.setItem(STORAGE_SKILLS, JSON.stringify(customSkills)); } catch {}
+    document.getElementById("customSkillName").value = "";
+    document.getElementById("customSkillPrompt").value = "";
+    renderDrawerControls();
+  });
+
+  document.getElementById("newChatBtn").addEventListener("click", () => {
+    chatContainer.innerHTML = "";
+    chatContainer.appendChild(homeHero);
+    homeHero.classList.remove("hidden");
+    setDrawer(false);
+  });
+
+  // Attachment Controls
+  document.getElementById("plusBtn").addEventListener("click", e => {
+    e.stopPropagation();
+    attachMenu.classList.toggle("open");
+  });
+  document.addEventListener("click", () => attachMenu.classList.remove("open"));
+  document.getElementById("pickVideoBtn").addEventListener("click", () => document.getElementById("videoInput").click());
+  document.getElementById("pickPhotoBtn").addEventListener("click", () => document.getElementById("photoInput").click());
+
+  document.getElementById("videoInput").addEventListener("change", e => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.src = URL.createObjectURL(f);
+    v.onloadedmetadata = () => {
+      attachedFile = { type: "video", file: f, duration: Math.min(60, v.duration || 15) };
+      attachChipLabel.textContent = `Video: ${f.name} (${(f.size / 1048576).toFixed(1)} MB)`;
+      attachChip.classList.remove("hidden");
+      URL.revokeObjectURL(v.src);
+    };
+  });
+
+  document.getElementById("photoInput").addEventListener("change", e => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    attachedFile = { type: "photo", file: f, duration: 0 };
+    attachChipLabel.textContent = `Photo: ${f.name}`;
+    attachChip.classList.remove("hidden");
+  });
+
+  document.getElementById("removeAttachBtn").addEventListener("click", () => {
+    attachedFile = null;
+    attachChip.classList.add("hidden");
+    document.getElementById("videoInput").value = "";
+    document.getElementById("photoInput").value = "";
+  });
+
+  // Voice Mic
+  document.getElementById("micBtn").addEventListener("click", () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = "en-IN";
+    const micBtn = document.getElementById("micBtn");
+    micBtn.classList.add("listening");
+    rec.onresult = ev => {
+      promptBox.value = (promptBox.value + " " + ev.results[0][0].transcript).trim();
+    };
+    rec.onend = () => micBtn.classList.remove("listening");
+    rec.onerror = () => micBtn.classList.remove("listening");
+    rec.start();
+  });
+
+  document.querySelectorAll(".quick-chip").forEach(c => {
+    c.addEventListener("click", () => {
+      promptBox.value = c.dataset.prompt;
+      promptBox.focus();
+    });
+  });
+
+  // Gemini Resumable File Upload (Android-Safe Streaming)
+  async function uploadToGeminiFiles(apiKey, file, onProgress) {
+    const mime = file.type || "video/mp4";
+    const initRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${encodeURIComponent(apiKey)}`, {
+      method: "POST",
+      headers: {
+        "X-Goog-Upload-Protocol": "resumable",
+        "X-Goog-Upload-Command": "start",
+        "X-Goog-Upload-Header-Content-Length": String(file.size),
+        "X-Goog-Upload-Header-Content-Type": mime,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ file: { display_name: file.name } })
+    });
+    if (!initRes.ok) throw new Error(`Upload init failed (${initRes.status})`);
+    const uploadUrl = initRes.headers.get("X-Goog-Upload-URL");
+    if (!uploadUrl) throw new Error("Missing upload URL from Gemini.");
+
+    onProgress(35, "Streaming video to Gemini...");
+    const upRes = await fetch(uploadUrl, {
+      method: "POST",
+      headers: {
+        "X-Goog-Upload-Offset": "0",
+        "X-Goog-Upload-Command": "upload, finalize"
+      },
+      body: file
+    });
+    if (!upRes.ok) throw new Error(`Video stream upload failed (${upRes.status})`);
+    const upData = await upRes.json();
+    const fileObj = upData.file || upData;
+    const fileUri = fileObj.uri;
+    const fileName = fileObj.name;
+
+    // Poll until ACTIVE
+    for (let i = 0; i < 30; i++) {
+      const check = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${encodeURIComponent(apiKey)}`);
+      const info = await check.json();
+      if (info.state === "ACTIVE") return { fileUri, mimeType: mime };
+      if (info.state === "FAILED") throw new Error("Gemini failed to process video.");
+      onProgress(55 + Math.min(25, i * 2), "Gemini processing video...");
+      await new Promise(r => setTimeout(r, 1500));
+    }
+    throw new Error("Video processing timed out.");
+  }
+
+  // Model Fallback Engine
+  async function callGeminiWithFallback(apiKey, bodyPayload, onStep) {
+    const preferred = modelSelect.value;
+    const chain = ["gemini-3.9-flash", "gemini-3.8-flash", "gemini-3.8-flash-lite", "gemini-2.5-flash-lite"];
+    const order = preferred === "auto" ? chain : [preferred, ...chain.filter(m => m !== preferred)];
+
+    let lastErr = null;
+    for (const model of order) {
+      try {
+        if (onStep) onStep(`Running ${model}...`);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bodyPayload)
+        });
+        const data = await res.json();
+        if (res.ok && data.candidates?.[0]) return { model, data };
+        const msg = data?.error?.message || `HTTP ${res.status}`;
+        if (res.status === 429 || res.status === 503 || msg.toLowerCase().includes("high demand") || msg.toLowerCase().includes("overloaded")) {
+          lastErr = new Error(`${model}: ${msg}`);
+          await new Promise(r => setTimeout(r, 1200));
+          continue;
+        }
+        if (res.status === 404) { lastErr = new Error(`${model}: ${msg}`); continue; }
+        throw new Error(msg);
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error("All Gemini models failed.");
+  }
+
+  // Photo Resize to Safe InlineData
+  async function fileToSafeJpegBase64(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const sc = Math.min(1, 1400 / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * sc);
+        c.height = Math.round(img.height * sc);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        const dataUrl = c.toDataURL("image/jpeg", 0.88);
+        resolve(dataUrl.split(",")[1]);
+      };
+      img.onerror = () => reject(new Error("Could not read photo."));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  // FFmpeg.wasm Loader (Single-thread Blob Worker Patch for GitHub Pages)
+  async function loadFFmpeg() {
+    if (ffmpegInstance) return ffmpegInstance;
+    const { FFmpeg } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js");
+    const { toBlobURL } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js");
+    const ff = new FFmpeg();
+    const base = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
+    await ff.load({
+      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm")
+    });
+    ffmpegInstance = ff;
+    return ff;
+  }
+
+  // Main Send Handler
+  async function handleSend() {
+    const text = promptBox.value.trim();
+    const apiKey = getApiKey();
+    if (!text && !attachedFile) return;
+
+    homeHero.classList.add("hidden");
+
+    // User Message Bubble
+    const uRow = document.createElement("div");
+    uRow.className = "msg-row user";
+    uRow.innerHTML = `<div class="user-bubble">
+      ${attachedFile ? `<div class="user-media-tag">${attachedFile.type.toUpperCase()}: ${attachedFile.file.name}</div>` : ""}
+      <div>${text || "(Media attached)"}</div>
+    </div>`;
+    chatContainer.appendChild(uRow);
+
+    const media = attachedFile;
+    promptBox.value = "";
+    attachedFile = null;
+    attachChip.classList.add("hidden");
+    document.getElementById("videoInput").value = "";
+    document.getElementById("photoInput").value = "";
+
+    // AI Response Card
+    const aRow = document.createElement("div");
+    aRow.className = "msg-row ai";
+    const card = document.createElement("div");
+    card.className = "ai-card";
+    card.innerHTML = `
+      <div class="ai-card-top">
+        <div class="ai-card-label">Parmar AI Studio</div>
+        <span class="mini-badge">Starting...</span>
+      </div>
+      <div class="tracker"></div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill"></div></div>
+        <div class="progress-label"><span class="p-msg">Working...</span><span class="p-pct">0%</span></div>
+      </div>
+      <div class="alert error"></div>
+      <div class="card-content"></div>
+    `;
+    aRow.appendChild(card);
+    chatContainer.appendChild(aRow);
+    chatScroll.scrollTop = chatScroll.scrollHeight;
+
+    const badge = card.querySelector(".mini-badge");
+    const tracker = card.querySelector(".tracker");
+    const progWrap = card.querySelector(".progress-wrap");
+    const progFill = card.querySelector(".progress-fill");
+    const pMsg = card.querySelector(".p-msg");
+    const pPct = card.querySelector(".p-pct");
+    const errBox = card.querySelector(".alert.error");
+    const content = card.querySelector(".card-content");
+
+    function setProgress(pct, msg) {
+      progWrap.classList.add("show");
+      progFill.style.width = `${pct}%`;
+      pMsg.textContent = msg;
+      pPct.textContent = `${pct}%`;
+    }
+    function addStep(id, label, state = "active") {
+      let el = tracker.querySelector(`[data-st="${id}"]`);
+      if (!el) {
+        el = document.createElement("div");
+        el.dataset.st = id;
+        tracker.appendChild(el);
+      }
+      el.className = `tracker-step ${state}`;
+      el.innerHTML = `<span class="step-dot">${state === "done" ? "✓" : state === "err" ? "!" : ""}</span><span>${label}</span>`;
+    }
+
+    if (!apiKey) {
+      addStep("key", "API Key Missing — Open ☰ Menu to paste your Gemini API Key", "err");
+      errBox.textContent = "Please set your free Gemini API key in the ☰ Menu first.";
+      errBox.classList.add("show");
+      badge.textContent = "Key Required";
+      return;
+    }
+
+    try {
+      const sysInstr = buildSystemInstruction();
+
+      // MODE B: VIDEO EDITING
+      if (media && media.type === "video") {
+        addStep("up", "Uploading raw video to Gemini...", "active");
+        setProgress(15, "Starting resumable upload...");
+        const { fileUri, mimeType } = await uploadToGeminiFiles(apiKey, media.file, setProgress);
+        addStep("up", "Video uploaded & ready", "done");
+
+        addStep("ai", "Analyzing video & generating Hinglish captions...", "active");
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            editSummary: { type: "STRING" },
+            trimStart: { type: "NUMBER" },
+            trimEnd: { type: "NUMBER" },
+            speed: { type: "NUMBER" },
+            brightness: { type: "NUMBER" },
+            contrast: { type: "NUMBER" },
+            saturation: { type: "NUMBER" },
+            vignette: { type: "BOOLEAN" },
+            letterbox: { type: "BOOLEAN" },
+            titleBanner: { type: "STRING" },
+            captions: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  start: { type: "NUMBER" },
+                  end: { type: "NUMBER" },
+                  text: { type: "STRING" }
+                },
+                required: ["start", "end", "text"]
+              }
+            }
+          },
+          required: ["editSummary", "trimStart", "trimEnd", "speed", "captions"]
+        };
+
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{
+            role: "user",
+            parts: [
+              { file_data: { mime_type: mimeType, file_uri: fileUri } },
+              { text: `Analyze this video and apply this edit prompt: "${text || "Make a vibrant reel with Hinglish captions"}". Transcribe any spoken Hindi, Gujarati, or English audio into clean, timed Roman Hinglish captions.` }
+            ]
+          }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
+
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; });
+        const plan = JSON.parse(data.candidates[0].content.parts[0].text);
+        addStep("ai", `Edit Plan & Hinglish Captions ready (${model})`, "done");
+        progWrap.classList.remove("show");
+        badge.textContent = model;
+
+        const vidUrl = URL.createObjectURL(media.file);
+        content.innerHTML = `
+          <div class="alert info show" style="margin-bottom:10px;">${plan.editSummary}</div>
+          <div class="stage">
+            <video controls playsinline src="${vidUrl}"></video>
+            <div class="stage-vignette"></div>
+            <div class="stage-title"></div>
+            <div class="stage-caption"></div>
+          </div>
+          <div class="captions-list" style="margin-top:10px;"></div>
+          <button type="button" class="btn btn-dark render-mp4-btn" style="width:100%;margin-top:10px;">Render &amp; Download Final MP4 (With Audio)</button>
+          <div class="mp4-out" style="margin-top:10px;"></div>
+        `;
+
+        const vEl = content.querySelector("video");
+        const capOverlay = content.querySelector(".stage-caption");
+        const titleOverlay = content.querySelector(".stage-title");
+        const vigOverlay = content.querySelector(".stage-vignette");
+        const capList = content.querySelector(".captions-list");
+
+        vEl.playbackRate = Math.min(2, Math.max(0.5, plan.speed || 1));
+        vEl.style.filter = `brightness(${plan.brightness || 1}) contrast(${plan.contrast || 1.1}) saturate(${plan.saturation || 1.2})`;
+        if (plan.vignette) vigOverlay.style.display = "block";
+        if (plan.titleBanner) { titleOverlay.textContent = plan.titleBanner; titleOverlay.style.display = "block"; }
+
+        const caps = plan.captions || [];
+        capList.innerHTML = caps.map((c, idx) => `
+          <div class="cap-item">
+            <input type="number" step="0.1" value="${c.start}" data-cap-start="${idx}" />
+            <input type="number" step="0.1" value="${c.end}" data-cap-end="${idx}" />
+            <input type="text" value="${c.text.replace(/"/g, "&quot;")}" data-cap-text="${idx}" />
+          </div>
+        `).join("");
+
+        capList.querySelectorAll("input").forEach(inp => {
+          inp.addEventListener("input", () => {
+            if (inp.dataset.capStart !== undefined) caps[inp.dataset.capStart].start = parseFloat(inp.value) || 0;
+            if (inp.dataset.capEnd !== undefined) caps[inp.dataset.capEnd].end = parseFloat(inp.value) || 0;
+            if (inp.dataset.capText !== undefined) caps[inp.dataset.capText].text = inp.value;
+          });
+        });
+
+        vEl.addEventListener("timeupdate", () => {
+          const ct = vEl.currentTime;
+          const active = caps.find(c => ct >= c.start && ct <= c.end);
+          if (active && active.text) {
+            capOverlay.textContent = active.text;
+            capOverlay.style.display = "block";
+          } else {
+            capOverlay.style.display = "none";
+          }
+        });
+
+        // FFmpeg Render MP4
+        content.querySelector(".render-mp4-btn").addEventListener("click", async function () {
+          this.disabled = true;
+          try {
+            setProgress(10, "Loading FFmpeg.wasm...");
+            const ff = await loadFFmpeg();
+            const { fetchFile } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js");
+            setProgress(35, "Writing video to FFmpeg...");
+            await ff.writeFile("input.mp4", await fetchFile(media.file));
+
+            const spd = Math.min(2, Math.max(0.5, plan.speed || 1));
+            const eq = `eq=brightness=${(plan.brightness || 1) - 1}:contrast=${plan.contrast || 1.1}:saturation=${plan.saturation || 1.2}`;
+            const vf = `scale=trunc(iw/2)*2:trunc(ih/2)*2,${eq},setpts=${(1 / spd).toFixed(3)}*PTS`;
+
+            setProgress(60, "Rendering MP4...");
+            await ff.exec([
+              "-i", "input.mp4",
+              "-vf", vf,
+              "-c:v", "libx264", "-preset", "ultrafast", "-crf", "23",
+              "-c:a", "aac",
+              "output.mp4"
+            ]);
+            const outData = await ff.readFile("output.mp4");
+            const outUrl = URL.createObjectURL(new Blob([outData.buffer], { type: "video/mp4" }));
+            setProgress(100, "MP4 Ready!");
+            content.querySelector(".mp4-out").innerHTML = `
+              <video controls playsinline src="${outUrl}" style="width:100%;border-radius:12px;max-height:300px;"></video>
+              <a href="${outUrl}" download="parmar-ai-edited.mp4" class="btn btn-dark" style="width:100%;margin-top:8px;">Download Edited MP4</a>
+            `;
+          } catch (fe) {
+            errBox.textContent = "MP4 Render error: " + (fe.message || fe);
+            errBox.classList.add("show");
+          } finally {
+            this.disabled = false;
+          }
+        });
+
+      // MODE C: PHOTO EDITING
+      } else if (media && media.type === "photo") {
+        addStep("ph", "Analyzing photo & planning edits...", "active");
+        const b64 = await fileToSafeJpegBase64(media.file);
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            summary: { type: "STRING" },
+            brightness: { type: "NUMBER" },
+            contrast: { type: "NUMBER" },
+            saturation: { type: "NUMBER" },
+            sepia: { type: "NUMBER" },
+            vignette: { type: "BOOLEAN" },
+            overlayText: { type: "STRING" }
+          },
+          required: ["summary", "brightness", "contrast", "saturation"]
+        };
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{
+            role: "user",
+            parts: [
+              { inline_data: { mime_type: "image/jpeg", data: b64 } },
+              { text: text || "Enhance photo with dramatic HDR contrast" }
+            ]
+          }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; });
+        const plan = JSON.parse(data.candidates[0].content.parts[0].text);
+        addStep("ph", `Photo edited (${model})`, "done");
+        badge.textContent = model;
+
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement("canvas");
+          c.className = "photo-out";
+          c.width = img.width; c.height = img.height;
+          const ctx = c.getContext("2d");
+          ctx.filter = `brightness(${plan.brightness || 1}) contrast(${plan.contrast || 1.15}) saturate(${plan.saturation || 1.2}) sepia(${plan.sepia || 0})`;
+          ctx.drawImage(img, 0, 0);
+          ctx.filter = "none";
+          if (plan.vignette) {
+            const g = ctx.createRadialGradient(c.width/2, c.height/2, c.width*0.25, c.width/2, c.height/2, c.width*0.75);
+            g.addColorStop(0, "transparent"); g.addColorStop(1, "rgba(0,0,0,0.55)");
+            ctx.fillStyle = g; ctx.fillRect(0, 0, c.width, c.height);
+          }
+          if (plan.overlayText) {
+            const fs = Math.round(c.width * 0.065);
+            ctx.font = `700 ${fs}px Georgia, serif`;
+            ctx.textAlign = "center"; ctx.fillStyle = "#fde047";
+            ctx.shadowColor = "rgba(0,0,0,0.8)"; ctx.shadowBlur = 12;
+            ctx.fillText(plan.overlayText, c.width / 2, c.height * 0.85, c.width * 0.88);
+          }
+          const pngUrl = c.toDataURL("image/png");
+          content.innerHTML = `<div class="alert info show" style="margin-bottom:10px;">${plan.summary}</div>`;
+          content.appendChild(c);
+          content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-photo.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Edited Photo (PNG)</a>`);
+        };
+        img.src = URL.createObjectURL(media.file);
+
+      // MODE A: Q&A + GOOGLE SEARCH
+      } else {
+        addStep("qa", "Thinking & searching with active AI Agents...", "active");
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{ role: "user", parts: [{ text }] }],
+          tools: [{ google_search: {} }]
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; });
+        const cand = data.candidates[0];
+        const reply = cand.content.parts.map(p => p.text || "").join("\n");
+        const chunks = cand.groundingMetadata?.groundingChunks || [];
+        addStep("qa", `Completed (${model})`, "done");
+        badge.textContent = model;
+
+        const sourcesHtml = chunks.filter(ch => ch.web?.uri).map(ch =>
+          `<a class="source-pill" href="${ch.web.uri}" target="_blank" rel="noopener">${ch.web.title || "Source"}</a>`
+        ).join("");
+
+        content.innerHTML = `
+          <div class="md-body">${reply.replace(/</g, "&lt;")}</div>
+          ${sourcesHtml ? `<div class="sources-wrap">${sourcesHtml}</div>` : ""}
+        `;
+      }
+    } catch (err) {
+      addStep("err", "Failed", "err");
+      errBox.textContent = err.message || "Unexpected error.";
+      errBox.classList.add("show");
+      progWrap.classList.remove("show");
+    }
+    chatScroll.scrollTop = chatScroll.scrollHeight;
+  }
+
+  document.getElementById("sendBtn").addEventListener("click", handleSend);
+  promptBox.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  });
+
+  renderDrawerControls();
+</script>
+</body>
+</html>
