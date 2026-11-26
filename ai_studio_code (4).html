@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Parmar AI Studio — Editorial Video &amp; Hinglish Captions</title>
+  <style>
+    :root {
+      --bg: #faf8f5;
+      --card: #ffffff;
+      --card-2: #f7f4ef;
+      --border: #e6e0d6;
+      --text: #171717;
+      --muted: #57534e;
+      --gold: #8c6d46;
+      --gold-soft: rgba(140, 109, 70, 0.12);
+      --dark: #18181b;
+      --success: #15803d;
+      --warn: #92400e;
+      --danger: #991b1b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 56px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Minimal Top Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(250, 248, 245, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+      color: var(--text);
+    }
+
+    .monogram {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--dark);
+      color: #ffffff;
+      border: 1px solid var(--gold);
+      display: grid;
+      place-items: center;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(24, 24, 27, 0.08);
+    }
+
+    .badge {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .badge.ok {
+      color: var(--gold);
+      background: #fdfbf7;
+      border-color: var(--gold);
+    }
+
+    /* Hero Editorial Header */
+    .hero {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 18px 8px;
+      text-align: left;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.75rem, 4.4vw, 2.55rem);
+      font-weight: 400;
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .hero h1 em.gold-amp {
+      font-style: italic;
+      color: var(--gold);
+      font-weight: 400;
+    }
+
+    .hero p {
+      margin-top: 8px;
+      font-size: 0.92rem;
+      color: var(--muted);
+      max-width: 600px;
+    }
+
+    /* Main Grid */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 900px) {
+      .hero { padding: 36px 28px 10px; }
+      .container {
+        grid-template-columns: 1fr 1.15fr;
+        align-items: start;
+        padding: 20px 28px 28px;
+        gap: 24px;
+      }
+      .full-span { grid-column: 1 / -1; }
+    }
+
+    .col-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Luxury Spacious Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 4px 20px rgba(23, 23, 23, 0.028);
+    }
+
+    .card-title {
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .step-num {
+      color: var(--gold);
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      margin-right: 4px;
+    }
+
+    .subtext {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Form Controls */
+    input[type="password"],
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      min-height: 44px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #8c857d;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gold);
+      background: #ffffff;
+    }
+
+    textarea {
+      min-height: 98px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .row > * { flex: 1; min-width: 150px; }
+    .row .shrink { flex: 0 0 auto; min-width: auto; }
+
+    /* Pill Buttons */
+    .btn {
+      min-height: 44px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.18s, border-color 0.18s, transform 0.1s, opacity 0.15s;
+      text-decoration: none;
+      letter-spacing: 0.01em;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: var(--gold);
+      background: var(--card-2);
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.985); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary,
+    .btn-success {
+      background: var(--dark);
+      border: 1px solid var(--dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled),
+    .btn-success:hover:not(:disabled) {
+      background: #27272a;
+      border-color: var(--gold);
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 1.5px dashed #d4cbbd;
+      border-radius: 14px;
+      padding: 26px 16px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--bg);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--gold);
+      background: #fdfbf7;
+    }
+
+    .upload-zone strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.94rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Alerts & Progress */
+    .alert {
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      display: none;
+      word-break: break-word;
+      line-height: 1.45;
+    }
+    .alert.show { display: block; }
+    .alert.error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: var(--danger);
+    }
+    .alert.info {
+      background: #faf6f0;
+      border: 1px solid #e6dccb;
+      color: #5c4529;
+    }
+    .alert.warn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: var(--warn);
+    }
+
+    .progress-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .progress-wrap.show { display: flex; }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #efeae2;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--dark));
+      transition: width 0.2s ease;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* Live Preview Stage */
+    .stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 62vh;
+      background: #111111;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stage video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+    }
+
+    .stage-empty {
+      color: #a8a29e;
+      font-size: 0.88rem;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .vignette-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle, transparent 52%, rgba(0, 0, 0, 0.65) 100%);
+      display: none;
+    }
+
+    .title-banner {
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(24, 24, 27, 0.88);
+      border: 1px solid var(--gold);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.84rem;
+      padding: 5px 15px;
+      border-radius: 999px;
+      pointer-events: none;
+      display: none;
+      max-width: 88%;
+      text-align: center;
+    }
+
+    .caption-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 88%;
+      text-align: center;
+      pointer-events: none;
+      font-weight: 700;
+      font-size: clamp(0.95rem, 2.8vw, 1.25rem);
+      line-height: 1.3;
+      padding: 6px 14px;
+      border-radius: 8px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .caption-overlay.pos-bottom { bottom: 10%; top: auto; }
+    .caption-overlay.pos-center { top: 50%; transform: translate(-50%, -50%); }
+    .caption-overlay.pos-top { top: 14%; bottom: auto; }
+
+    .caption-overlay.style-box { background: rgba(0, 0, 0, 0.72); color: #ffffff; }
+    .caption-overlay.style-minimal { background: transparent; color: #ffffff; text-shadow: 0 2px 6px rgba(0,0,0,0.95); }
+    .caption-overlay.style-bold-yellow { background: rgba(0, 0, 0, 0.55); color: #fde047; text-shadow: 0 2px 4px rgba(0,0,0,0.9); }
+
+    /* Plan Chips & Editable Captions */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .stat small {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .stat span {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .captions-list {
+      max-height: 240px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 2px;
+    }
+
+    .cap-item {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: 58px 58px 1fr;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .cap-item input {
+      min-height: 36px;
+      padding: 6px 8px;
+      font-size: 0.82rem;
+      background: #ffffff;
+      border-radius: 8px;
+      min-width: 0;
+    }
+
+    .export-preview {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .export-preview.show { display: flex; }
+
+    .export-preview video {
+      width: 100%;
+      max-height: 320px;
+      border-radius: 12px;
+      background: #111111;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="monogram">P</div>
+      <span>Parmar AI Studio</span>
+    </div>
+    <span id="keyBadge" class="badge">API Key Required</span>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">Atelier Edition • Gemini 3.8 Flash &amp; FFmpeg</div>
+    <h1>AI Video Editing <em class="gold-amp">&amp;</em> Hinglish Captions</h1>
+    <p>Upload raw footage up to 60s (100 MB), direct the AI in plain words, preview synced Roman Hinglish subtitles, and render a studio-ready MP4 directly in your browser.</p>
+  </section>
+
+  <main class="container">
+    <div id="fileProtocolWarn" class="alert warn full-span">
+      Running from <code>file://</code> detected. Some browsers restrict Web Workers for <code>ffmpeg.wasm</code> on <code>file://</code>. If MP4 export fails to initialize, serve this file via <code>python3 -m http.server 8000</code> or <code>npx serve</code>.
+    </div>
+
+    <!-- LEFT COLUMN: Setup, Upload, Prompt -->
+    <div class="col-stack">
+      <!-- 1. Gemini API Key -->
+      <section class="card">
+        <div class="card-title">
+          <span><span class="step-num">01.</span> Gemini API Key</span>
+          <span class="subtext">Stored locally in browser</span>
+        </div>
+        <div class="row">
+          <input type="password" id="apiKeyInput" placeholder="Paste your Gemini API key (AIza...)" autocomplete="off" />
+          <button class="btn shrink" id="saveKeyBtn" type="button">Save</button>
+          <button class="btn shrink" id="clearKeyBtn" type="button">Clear</button>
+        </div>
+      </section>
+
+      <!-- 2. Upload Raw Video -->
+      <section class="card">
+        <div class="card-title">
+          <span><span class="step-num">02.</span> Upload Raw Video</span>
+          <span id="videoMeta" class="subtext">No file selected</span>
+        </div>
+        <label class="upload-zone" for="videoInput">
+          <strong>Tap to select raw footage</strong>
+          <span class="subtext">MP4, MOV, WebM • Up to 60s / 100 MB • Hindi, Gujarati, or English</span>
+          <input type="file" id="videoInput" accept="video/*" hidden />
+        </label>
+        <div id="videoWarn" class="alert warn"></div>
+      </section>
+
+      <!-- 3. Prompt Box -->
+      <section class="card">
+        <div class="card-title">
+          <span><span class="step-num">03.</span> AI Editing Prompt</span>
+          <span class="badge">gemini-3.8-flash</span>
+        </div>
+        <textarea id="promptInput" placeholder="Example: Make it a fast-paced 1.25x vibrant reel, trim silence from start/end, add Hinglish captions at bottom in bold yellow, and add title 'Day in My Life'."></textarea>
+        <button class="btn btn-primary" id="analyzeBtn" type="button" disabled>
+          Analyze Video &amp; Generate Edit Plan
+        </button>
+
+        <div id="aiProgress" class="progress-wrap">
+          <div class="progress-track"><div id="aiProgressBar" class="progress-fill"></div></div>
+          <div class="progress-label"><span id="aiStatusText">Preparing...</span><span id="aiPctText">0%</span></div>
+        </div>
+        <div id="aiError" class="alert error"></div>
+        <div id="aiSummaryAlert" class="alert info"></div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN: Live Preview, AI Edit Plan, Export MP4 -->
+    <div class="col-stack">
+      <!-- 4. Live Preview -->
+      <section class="card">
+        <div class="card-title">
+          <span><span class="step-num">04.</span> Live Preview</span>
+          <span id="previewTime" class="subtext">0.0s / 0.0s</span>
+        </div>
+
+        <div class="stage">
+          <div id="stageEmpty" class="stage-empty">Upload a video to preview color grading, pacing &amp; live Hinglish captions.</div>
+          <video id="previewVideo" playsinline controls></video>
+          <div id="vignetteOverlay" class="vignette-overlay"></div>
+          <div id="titleBanner" class="title-banner"></div>
+          <div id="captionOverlay" class="caption-overlay pos-bottom style-box"></div>
+        </div>
+
+        <div class="plan-grid" id="planSummary" style="display:none;">
+          <div class="stat"><small>Color Filter</small><span id="statFilter">none</span></div>
+          <div class="stat"><small>Speed</small><span id="statSpeed">1.0x</span></div>
+          <div class="stat"><small>Trim Window</small><span id="statTrim">0.0s - 0.0s</span></div>
+          <div class="stat"><small>Effects</small><span id="statEffects">Standard</span></div>
+        </div>
+
+        <div id="captionsSection" style="display:none;">
+          <div class="card-title" style="margin-bottom:8px;">
+            <span>Hinglish Captions (Editable)</span>
+            <span class="subtext" id="capCount">0 lines</span>
+          </div>
+          <div class="captions-list" id="captionsList"></div>
+        </div>
+      </section>
+
+      <!-- 5. Export MP4 -->
+      <section class="card">
+        <div class="card-title">
+          <span><span class="step-num">05.</span> Render &amp; Export MP4</span>
+          <span class="subtext">ffmpeg.wasm in-browser</span>
+        </div>
+        <button class="btn btn-success" id="exportBtn" type="button" disabled>
+          Render Final MP4 (Burned Captions &amp; Audio)
+        </button>
+
+        <div id="ffmpegProgress" class="progress-wrap">
+          <div class="progress-track"><div id="ffmpegProgressBar" class="progress-fill"></div></div>
+          <div class="progress-label"><span id="ffmpegStatusText">Waiting...</span><span id="ffmpegPctText">0%</span></div>
+        </div>
+        <div id="ffmpegError" class="alert error"></div>
+
+        <div id="exportPreview" class="export-preview">
+          <video id="exportedVideo" playsinline controls></video>
+          <a id="downloadLink" class="btn btn-primary" download="hinglishcut-edited.mp4">
+            Download Edited MP4
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ==============================
+    // State & DOM Elements
+    // ==============================
+    const STORAGE_KEY = "hinglishcut_gemini_api_key";
+    const GEMINI_MODEL = "gemini-3.8-flash";
+
+    const apiKeyInput = document.getElementById("apiKeyInput");
+    const saveKeyBtn = document.getElementById("saveKeyBtn");
+    const clearKeyBtn = document.getElementById("clearKeyBtn");
+    const keyBadge = document.getElementById("keyBadge");
+
+    const videoInput = document.getElementById("videoInput");
+    const videoMeta = document.getElementById("videoMeta");
+    const videoWarn = document.getElementById("videoWarn");
+    const promptInput = document.getElementById("promptInput");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+
+    const aiProgress = document.getElementById("aiProgress");
+    const aiProgressBar = document.getElementById("aiProgressBar");
+    const aiStatusText = document.getElementById("aiStatusText");
+    const aiPctText = document.getElementById("aiPctText");
+    const aiError = document.getElementById("aiError");
+    const aiSummaryAlert = document.getElementById("aiSummaryAlert");
+
+    const stageEmpty = document.getElementById("stageEmpty");
+    const previewVideo = document.getElementById("previewVideo");
+    const vignetteOverlay = document.getElementById("vignetteOverlay");
+    const titleBanner = document.getElementById("titleBanner");
+    const captionOverlay = document.getElementById("captionOverlay");
+    const previewTime = document.getElementById("previewTime");
+
+    const planSummary = document.getElementById("planSummary");
+    const statFilter = document.getElementById("statFilter");
+    const statSpeed = document.getElementById("statSpeed");
+    const statTrim = document.getElementById("statTrim");
+    const statEffects = document.getElementById("statEffects");
+
+    const captionsSection = document.getElementById("captionsSection");
+    const captionsList = document.getElementById("captionsList");
+    const capCount = document.getElementById("capCount");
+
+    const exportBtn = document.getElementById("exportBtn");
+    const ffmpegProgress = document.getElementById("ffmpegProgress");
+    const ffmpegProgressBar = document.getElementById("ffmpegProgressBar");
+    const ffmpegStatusText = document.getElementById("ffmpegStatusText");
+    const ffmpegPctText = document.getElementById("ffmpegPctText");
+    const ffmpegError = document.getElementById("ffmpegError");
+
+    const exportPreview = document.getElementById("exportPreview");
+    const exportedVideo = document.getElementById("exportedVideo");
+    const downloadLink = document.getElementById("downloadLink");
+
+    if (window.location.protocol === "file:") {
+      document.getElementById("fileProtocolWarn").classList.add("show");
+    }
+
+    let rawFile = null;
+    let rawObjectUrl = null;
+    let exportObjectUrl = null;
+    let videoDuration = 0;
+    let uploadToken = 0;
+    let mountCounter = 0;
+
+    let editPlan = {
+      summary: "",
+      colorFilter: "none",
+      playbackSpeed: 1.0,
+      trimStart: 0,
+      trimEnd: 0,
+      styleEffects: {
+        captionStyle: "box",
+        captionPosition: "bottom",
+        vignette: false,
+        sharpen: false,
+        titleBanner: ""
+      },
+      captions: []
+    };
+
+    // ==============================
+    // 1. API Key Management
+    // ==============================
+    function refreshKeyUI() {
+      const saved = localStorage.getItem(STORAGE_KEY) || "";
+      apiKeyInput.value = saved;
+      if (saved.trim()) {
+        keyBadge.textContent = "API Key Ready";
+        keyBadge.classList.add("ok");
+      } else {
+        keyBadge.textContent = "API Key Required";
+        keyBadge.classList.remove("ok");
+      }
+      updateActionButtons();
+    }
+
+    saveKeyBtn.addEventListener("click", () => {
+      const val = apiKeyInput.value.trim();
+      if (!val) {
+        showAlert(aiError, "Please paste a valid Gemini API key before saving.");
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, val);
+      hideAlert(aiError);
+      refreshKeyUI();
+    });
+
+    clearKeyBtn.addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      apiKeyInput.value = "";
+      refreshKeyUI();
+    });
+
+    function getApiKey() {
+      const typed = apiKeyInput.value.trim();
+      if (typed) {
+        localStorage.setItem(STORAGE_KEY, typed);
+        return typed;
+      }
+      return (localStorage.getItem(STORAGE_KEY) || "").trim();
+    }
+
+    function updateActionButtons() {
+      const hasFile = Boolean(rawFile && videoDuration > 0);
+      analyzeBtn.disabled = !hasFile;
+      exportBtn.disabled = !hasFile;
+    }
+
+    // ==============================
+    // 2. Safe OPFS Streaming Cache & Preview Setup
+    // ==============================
+    // Streams file in small 4 MB File.slice() chunks into Origin Private File System
+    // so Android Chrome content:// URIs never expire or blow RAM on 60s / 100 MB videos.
+    async function cacheFileSafelyInOPFS(file) {
+      if (!navigator.storage || typeof navigator.storage.getDirectory !== "function") {
+        return file;
+      }
+      if (file.size === 0 || file.size > 150 * 1024 * 1024) {
+        return file;
+      }
+      try {
+        const root = await navigator.storage.getDirectory();
+        const cacheName = "parmar_studio_active_video";
+        const handle = await root.getFileHandle(cacheName, { create: true });
+        if (typeof handle.createWritable !== "function") {
+          return file;
+        }
+        const writable = await handle.createWritable();
+        const CHUNK_SIZE = 4 * 1024 * 1024;
+        try {
+          for (let offset = 0; offset < file.size; offset += CHUNK_SIZE) {
+            const chunk = file.slice(offset, Math.min(offset + CHUNK_SIZE, file.size));
+            await writable.write(chunk);
+          }
+          await writable.close();
+        } catch (writeErr) {
+          try { await writable.abort(); } catch (_) {}
+          throw writeErr;
+        }
+        const persistedFile = await handle.getFile();
+        return new File([persistedFile], file.name, {
+          type: file.type || persistedFile.type || "video/mp4"
+        });
+      } catch (err) {
+        console.warn("OPFS streaming cache unavailable, using direct File handle:", err);
+        return file;
+      }
+    }
+
+    videoInput.addEventListener("change", async (e) => {
+      const pickedFile = e.target.files[0];
+      if (!pickedFile) return;
+
+      const myToken = ++uploadToken;
+      rawFile = null;
+      videoDuration = 0;
+      updateActionButtons();
+
+      hideAlert(aiError);
+      hideAlert(aiSummaryAlert);
+      hideAlert(ffmpegError);
+      hideAlert(videoWarn);
+      exportPreview.classList.remove("show");
+
+      const mb = (pickedFile.size / (1024 * 1024)).toFixed(1);
+      videoMeta.textContent = `Preparing ${pickedFile.name} (${mb} MB)...`;
+
+      const safeFile = await cacheFileSafelyInOPFS(pickedFile);
+      if (myToken !== uploadToken) return;
+
+      rawFile = safeFile;
+      if (rawObjectUrl) URL.revokeObjectURL(rawObjectUrl);
+      rawObjectUrl = URL.createObjectURL(safeFile);
+
+      previewVideo.src = rawObjectUrl;
+      previewVideo.style.display = "block";
+      stageEmpty.style.display = "none";
+
+      previewVideo.onloadedmetadata = () => {
+        if (myToken !== uploadToken) return;
+        videoDuration = Number.isFinite(previewVideo.duration) && previewVideo.duration > 0
+          ? previewVideo.duration
+          : 0;
+        videoMeta.textContent = `${safeFile.name} (${mb} MB • ${videoDuration.toFixed(1)}s)`;
+
+        if (safeFile.size > 100 * 1024 * 1024 || videoDuration > 65) {
+          showAlert(
+            videoWarn,
+            `Large file detected (${mb} MB, ${videoDuration.toFixed(1)}s). Gemini streaming supports it, and we recommend keeping the final trim window within 60s for smooth mobile MP4 rendering.`
+          );
+        }
+
+        editPlan = {
+          summary: "",
+          colorFilter: "none",
+          playbackSpeed: 1.0,
+          trimStart: 0,
+          trimEnd: videoDuration,
+          styleEffects: {
+            captionStyle: "box",
+            captionPosition: "bottom",
+            vignette: false,
+            sharpen: false,
+            titleBanner: ""
+          },
+          captions: []
+        };
+        applyPlanToPreview();
+        updateActionButtons();
+      };
+
+      previewVideo.onerror = () => {
+        if (myToken !== uploadToken) return;
+        showAlert(aiError, "Could not decode this video in your browser. Try an MP4, MOV, or WebM file.");
+      };
+    });
+
+    const CSS_FILTERS = {
+      none: "none",
+      cinematic: "contrast(1.18) brightness(0.98) saturate(1.22)",
+      bw: "grayscale(100%) contrast(1.22)",
+      vintage: "sepia(0.6) contrast(1.08) saturate(0.85)",
+      vibrant: "saturate(1.65) contrast(1.08) brightness(1.02)",
+      warm: "sepia(0.25) saturate(1.2) brightness(1.03)",
+      cool: "hue-rotate(-10deg) saturate(1.1) contrast(1.06)"
+    };
+
+    function applyPlanToPreview() {
+      previewVideo.style.filter = CSS_FILTERS[editPlan.colorFilter] || "none";
+      previewVideo.playbackRate = editPlan.playbackSpeed;
+
+      vignetteOverlay.style.display = editPlan.styleEffects.vignette ? "block" : "none";
+
+      const banner = (editPlan.styleEffects.titleBanner || "").trim();
+      if (banner) {
+        titleBanner.textContent = banner;
+        titleBanner.style.display = "block";
+      } else {
+        titleBanner.style.display = "none";
+      }
+
+      captionOverlay.className = `caption-overlay pos-${editPlan.styleEffects.captionPosition} style-${editPlan.styleEffects.captionStyle}`;
+
+      statFilter.textContent = editPlan.colorFilter;
+      statSpeed.textContent = `${editPlan.playbackSpeed.toFixed(2).replace(/\.00$/, ".0")}x`;
+      statTrim.textContent = `${editPlan.trimStart.toFixed(1)}s - ${editPlan.trimEnd.toFixed(1)}s`;
+
+      const fx = [];
+      if (editPlan.styleEffects.vignette) fx.push("Vignette");
+      if (editPlan.styleEffects.sharpen) fx.push("Sharpen");
+      if (banner) fx.push("Banner");
+      statEffects.textContent = fx.length ? fx.join(", ") : "Clean";
+
+      planSummary.style.display = "grid";
+      renderEditableCaptions();
+      syncPreviewOverlays();
+    }
+
+    function renderEditableCaptions() {
+      captionsList.innerHTML = "";
+      capCount.textContent = `${editPlan.captions.length} lines`;
+      captionsSection.style.display = editPlan.captions.length ? "block" : "none";
+
+      editPlan.captions.forEach((cap, idx) => {
+        const row = document.createElement("div");
+        row.className = "cap-item";
+
+        const startIn = document.createElement("input");
+        startIn.type = "number";
+        startIn.step = "0.1";
+        startIn.min = "0";
+        startIn.value = cap.start.toFixed(1);
+        startIn.title = "Start (sec)";
+        startIn.addEventListener("change", () => {
+          editPlan.captions[idx].start = Math.max(0, parseFloat(startIn.value) || 0);
+        });
+
+        const endIn = document.createElement("input");
+        endIn.type = "number";
+        endIn.step = "0.1";
+        endIn.min = "0";
+        endIn.value = cap.end.toFixed(1);
+        endIn.title = "End (sec)";
+        endIn.addEventListener("change", () => {
+          editPlan.captions[idx].end = Math.max(editPlan.captions[idx].start + 0.1, parseFloat(endIn.value) || 0.5);
+        });
+
+        const txtIn = document.createElement("input");
+        txtIn.type = "text";
+        txtIn.value = cap.text;
+        txtIn.addEventListener("input", () => {
+          editPlan.captions[idx].text = txtIn.value;
+          syncPreviewOverlays();
+        });
+
+        row.append(startIn, endIn, txtIn);
+        captionsList.appendChild(row);
+      });
+    }
+
+    function syncPreviewOverlays() {
+      const t = previewVideo.currentTime || 0;
+      previewTime.textContent = `${t.toFixed(1)}s / ${videoDuration.toFixed(1)}s`;
+
+      const active = editPlan.captions.find(c => t >= c.start && t <= c.end);
+      if (active && active.text.trim()) {
+        captionOverlay.textContent = active.text.trim();
+        captionOverlay.style.display = "block";
+      } else {
+        captionOverlay.style.display = "none";
+      }
+    }
+
+    previewVideo.addEventListener("timeupdate", () => {
+      if (editPlan.trimEnd > editPlan.trimStart + 0.2) {
+        if (previewVideo.currentTime < editPlan.trimStart) {
+          previewVideo.currentTime = editPlan.trimStart;
+        } else if (previewVideo.currentTime >= editPlan.trimEnd) {
+          previewVideo.pause();
+          previewVideo.currentTime = editPlan.trimStart;
+        }
+      }
+      syncPreviewOverlays();
+    });
+
+    // ==============================
+    // 3. Real Gemini API Chunked Video Streaming (No RAM Spike)
+    // ==============================
+    function setProgress(wrap, bar, statusEl, pctEl, pct, text) {
+      wrap.classList.add("show");
+      const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+      bar.style.width = `${clamped}%`;
+      pctEl.textContent = `${clamped}%`;
+      statusEl.textContent = text;
+    }
+
+    function showAlert(el, msg) {
+      el.textContent = msg;
+      el.classList.add("show");
+    }
+
+    function hideAlert(el) {
+      el.classList.remove("show");
+      el.textContent = "";
+    }
+
+    function smallBlobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const commaIdx = result.indexOf(",");
+          resolve(commaIdx >= 0 ? result.slice(commaIdx + 1) : result);
+        };
+        reader.onerror = () => reject(new Error("Could not read small clip slice for inline fallback."));
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function uploadToGeminiFilesChunked(file, apiKey) {
+      if (!file || file.size <= 0) {
+        throw new Error("Selected video file is empty (0 bytes).");
+      }
+
+      const mimeType = file.type || "video/mp4";
+
+      // Step 1: Start Resumable Upload session
+      const startRes = await fetch(
+        `https://generativelanguage.googleapis.com/upload/v1beta/files?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: "POST",
+          headers: {
+            "X-Goog-Upload-Protocol": "resumable",
+            "X-Goog-Upload-Command": "start",
+            "X-Goog-Upload-Header-Content-Length": String(file.size),
+            "X-Goog-Upload-Header-Content-Type": mimeType,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ file: { displayName: file.name } })
+        }
+      );
+
+      if (!startRes.ok) {
+        const errBody = await startRes.text();
+        const err = new Error(`Gemini File API init failed (${startRes.status}): ${errBody}`);
+        if (startRes.status >= 400 && startRes.status < 500) err.isClientError = true;
+        throw err;
+      }
+
+      const uploadUrl = startRes.headers.get("x-goog-upload-url") || startRes.headers.get("X-Goog-Upload-URL");
+      let fileMeta = null;
+
+      if (uploadUrl) {
+        // Step 2A: Stream in 8 MiB File.slice() chunks (multiple of 256 KiB required by Google Resumable Upload)
+        const CHUNK_SIZE = 8 * 1024 * 1024;
+        let offset = 0;
+
+        while (offset < file.size) {
+          const end = Math.min(offset + CHUNK_SIZE, file.size);
+          const chunk = file.slice(offset, end);
+          const isLast = end >= file.size;
+          const command = isLast ? "upload, finalize" : "upload";
+
+          const chunkRes = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+              "X-Goog-Upload-Offset": String(offset),
+              "X-Goog-Upload-Command": command,
+              "Content-Type": mimeType
+            },
+            body: chunk
+          });
+
+          if (!chunkRes.ok) {
+            const errBody = await chunkRes.text();
+            throw new Error(`Gemini chunk upload failed (${chunkRes.status}): ${errBody}`);
+          }
+
+          if (isLast) {
+            const json = await chunkRes.json();
+            fileMeta = json.file || json;
+          }
+
+          offset = end;
+          const uploadedMB = (offset / (1024 * 1024)).toFixed(1);
+          const totalMB = (file.size / (1024 * 1024)).toFixed(1);
+          const pct = 8 + (offset / file.size) * 44;
+          setProgress(
+            aiProgress,
+            aiProgressBar,
+            aiStatusText,
+            aiPctText,
+            pct,
+            `Streaming video to Gemini (${uploadedMB} / ${totalMB} MB)...`
+          );
+        }
+      } else {
+        // Step 2B: Multipart Upload fallback (Blob wraps File directly without copying to RAM)
+        const boundary = "----parmarstudio_" + Math.random().toString(36).slice(2);
+        const metaPart = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ file: { displayName: file.name } })}\r\n`;
+        const fileHeader = `--${boundary}\r\nContent-Type: ${mimeType}\r\n\r\n`;
+        const closing = `\r\n--${boundary}--`;
+        const multipartBody = new Blob([metaPart, fileHeader, file, closing]);
+
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 30, "Uploading video stream to Gemini...");
+        const mpRes = await fetch(
+          `https://generativelanguage.googleapis.com/upload/v1beta/files?uploadType=multipart&key=${encodeURIComponent(apiKey)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
+            body: multipartBody
+          }
+        );
+        if (!mpRes.ok) {
+          const errBody = await mpRes.text();
+          const err = new Error(`Gemini multipart upload failed (${mpRes.status}): ${errBody}`);
+          if (mpRes.status >= 400 && mpRes.status < 500) err.isClientError = true;
+          throw err;
+        }
+        const json = await mpRes.json();
+        fileMeta = json.file || json;
+      }
+
+      if (!fileMeta || !fileMeta.name || !fileMeta.uri) {
+        throw new Error("Gemini File API returned incomplete file metadata.");
+      }
+
+      // Step 3: Poll until remote video state is ACTIVE
+      let current = fileMeta;
+      let attempts = 0;
+      while (current.state === "PROCESSING") {
+        if (++attempts > 90) throw new Error("Timed out waiting for Gemini to process the video.");
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 58, "Gemini is processing video frames & audio...");
+        await new Promise(r => setTimeout(r, 2000));
+        const pollRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/${current.name}?key=${encodeURIComponent(apiKey)}`
+        );
+        if (!pollRes.ok) {
+          const errBody = await pollRes.text();
+          throw new Error(`File status check failed (${pollRes.status}): ${errBody}`);
+        }
+        current = await pollRes.json();
+      }
+
+      if (current.state === "FAILED") {
+        throw new Error("Gemini failed to process this video format.");
+      }
+      return current;
+    }
+
+    async function deleteGeminiFile(fileName, apiKey) {
+      if (!fileName) return;
+      try {
+        await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${encodeURIComponent(apiKey)}`,
+          { method: "DELETE" }
+        );
+      } catch (_) {}
+    }
+
+    analyzeBtn.addEventListener("click", async () => {
+      hideAlert(aiError);
+      hideAlert(aiSummaryAlert);
+
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        showAlert(aiError, "Please enter and save your Gemini API key first.");
+        return;
+      }
+      if (!rawFile || videoDuration <= 0) {
+        showAlert(aiError, "Please upload a valid video first.");
+        return;
+      }
+
+      const userPrompt = promptInput.value.trim() ||
+        "Transcribe spoken audio into clean Hinglish captions, pick the best color filter, trim dead silence, and optimize pacing.";
+
+      analyzeBtn.disabled = true;
+      exportBtn.disabled = true;
+      let uploadedFileMeta = null;
+
+      try {
+        let mediaPart = null;
+
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 5, "Connecting to Gemini Resumable File API...");
+        try {
+          uploadedFileMeta = await uploadToGeminiFilesChunked(rawFile, apiKey);
+          mediaPart = {
+            fileData: {
+              mimeType: uploadedFileMeta.mimeType || rawFile.type || "video/mp4",
+              fileUri: uploadedFileMeta.uri
+            }
+          };
+        } catch (uploadErr) {
+          // Only use small-clip inline fallback when not an API key/4xx error and <= 14 MB
+          if (!uploadErr.isClientError && rawFile.size <= 14 * 1024 * 1024) {
+            setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 35, "Using inline fallback for small clip...");
+            const b64 = await smallBlobToBase64(rawFile);
+            mediaPart = {
+              inlineData: {
+                mimeType: rawFile.type || "video/mp4",
+                data: b64
+              }
+            };
+          } else {
+            throw uploadErr;
+          }
+        }
+
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 72, `Analyzing audio, visuals & Hinglish speech with ${GEMINI_MODEL}...`);
+
+        const systemInstruction = `You are an expert AI video editor.
+Analyze the attached video (exact duration: ${videoDuration.toFixed(2)} seconds) and follow the user's editing request: "${userPrompt}".
+
+Requirements:
+1. Transcribe ALL spoken audio (whether Hindi, Gujarati, English, or mixed) into clean, natural Roman-script Hinglish captions (ASCII Latin letters only—no Devanagari/Gujarati script and no emojis).
+2. Break captions into short, readable phrases (2 to 5 seconds each) with accurate timestamps inside [0, ${videoDuration.toFixed(2)}]. If there is no speech, return an empty captions array [].
+3. Recommend:
+   - colorFilter: one of "none", "cinematic", "bw", "vintage", "vibrant", "warm", "cool"
+   - playbackSpeed: number between 0.5 and 2.0 (default 1.0 unless user asks for faster/slower/reel pacing)
+   - trimStart & trimEnd: timestamps in seconds within [0, ${videoDuration.toFixed(2)}] with trimEnd > trimStart
+   - styleEffects: captionStyle ("box" | "minimal" | "bold-yellow"), captionPosition ("bottom" | "center" | "top"), vignette (boolean), sharpen (boolean), titleBanner (short ASCII title string or "" if not needed).`;
+
+        const payload = {
+          contents: [
+            {
+              parts: [
+                mediaPart,
+                { text: systemInstruction }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.2,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                summary: { type: "STRING" },
+                colorFilter: {
+                  type: "STRING",
+                  enum: ["none", "cinematic", "bw", "vintage", "vibrant", "warm", "cool"]
+                },
+                playbackSpeed: { type: "NUMBER" },
+                trimStart: { type: "NUMBER" },
+                trimEnd: { type: "NUMBER" },
+                styleEffects: {
+                  type: "OBJECT",
+                  properties: {
+                    captionStyle: { type: "STRING", enum: ["box", "minimal", "bold-yellow"] },
+                    captionPosition: { type: "STRING", enum: ["bottom", "center", "top"] },
+                    vignette: { type: "BOOLEAN" },
+                    sharpen: { type: "BOOLEAN" },
+                    titleBanner: { type: "STRING" }
+                  },
+                  required: ["captionStyle", "captionPosition", "vignette", "sharpen", "titleBanner"]
+                },
+                captions: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      start: { type: "NUMBER" },
+                      end: { type: "NUMBER" },
+                      text: { type: "STRING" }
+                    },
+                    required: ["start", "end", "text"]
+                  }
+                }
+              },
+              required: ["summary", "colorFilter", "playbackSpeed", "trimStart", "trimEnd", "styleEffects", "captions"]
+            }
+          }
+        };
+
+        const genRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        const genJson = await genRes.json();
+        if (!genRes.ok) {
+          throw new Error(genJson?.error?.message || `Gemini API error (${genRes.status})`);
+        }
+
+        const rawText = genJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) {
+          throw new Error("Gemini returned an empty response.");
+        }
+
+        const parsed = JSON.parse(rawText);
+        editPlan = sanitizePlan(parsed, videoDuration);
+        applyPlanToPreview();
+
+        previewVideo.currentTime = editPlan.trimStart;
+        setProgress(aiProgress, aiProgressBar, aiStatusText, aiPctText, 100, "AI edit plan ready!");
+        showAlert(aiSummaryAlert, `Gemini Plan: ${editPlan.summary}`);
+      } catch (err) {
+        console.error(err);
+        aiProgress.classList.remove("show");
+        showAlert(aiError, err.message || "Unexpected error communicating with Gemini API.");
+      } finally {
+        if (uploadedFileMeta?.name) {
+          deleteGeminiFile(uploadedFileMeta.name, apiKey);
+        }
+        refreshKeyUI();
+      }
+    });
+
+    function sanitizePlan(raw, dur) {
+      const validFilters = ["none", "cinematic", "bw", "vintage", "vibrant", "warm", "cool"];
+      const validStyles = ["box", "minimal", "bold-yellow"];
+      const validPos = ["bottom", "center", "top"];
+
+      let trimStart = Number(raw.trimStart);
+      let trimEnd = Number(raw.trimEnd);
+      if (!Number.isFinite(trimStart) || trimStart < 0 || trimStart >= dur) trimStart = 0;
+      if (!Number.isFinite(trimEnd) || trimEnd <= trimStart + 0.3 || trimEnd > dur) trimEnd = dur;
+
+      let speed = Number(raw.playbackSpeed);
+      if (!Number.isFinite(speed)) speed = 1.0;
+      speed = Math.min(2.0, Math.max(0.5, speed));
+
+      const fx = raw.styleEffects || {};
+      const captions = Array.isArray(raw.captions)
+        ? raw.captions
+            .map(c => ({
+              start: Math.max(0, Math.min(dur, Number(c.start) || 0)),
+              end: Math.max(0, Math.min(dur, Number(c.end) || 0)),
+              text: String(c.text || "").trim()
+            }))
+            .filter(c => c.text && c.end > c.start + 0.05)
+            .sort((a, b) => a.start - b.start)
+        : [];
+
+      return {
+        summary: String(raw.summary || "Applied AI color, pacing, and Hinglish captions."),
+        colorFilter: validFilters.includes(raw.colorFilter) ? raw.colorFilter : "none",
+        playbackSpeed: speed,
+        trimStart,
+        trimEnd,
+        styleEffects: {
+          captionStyle: validStyles.includes(fx.captionStyle) ? fx.captionStyle : "box",
+          captionPosition: validPos.includes(fx.captionPosition) ? fx.captionPosition : "bottom",
+          vignette: Boolean(fx.vignette),
+          sharpen: Boolean(fx.sharpen),
+          titleBanner: String(fx.titleBanner || "").trim()
+        },
+        captions
+      };
+    }
+
+    // ==============================
+    // 4. Real MP4 Rendering (ffmpeg.wasm + WORKERFS Zero-Copy Input)
+    // ==============================
+    let ffmpegInstance = null;
+    let fontLoaded = false;
+
+    async function fetchBufferWithFallback(urls) {
+      let lastErr = null;
+      for (const url of urls) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+          return await res.arrayBuffer();
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      throw lastErr || new Error("Failed to fetch required FFmpeg asset.");
+    }
+
+    async function toBlobURLFallback(urls, mime) {
+      const buf = await fetchBufferWithFallback(urls);
+      return URL.createObjectURL(new Blob([buf], { type: mime }));
+    }
+
+    async function getFFmpeg() {
+      if (ffmpegInstance) return ffmpegInstance;
+
+      setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 5, "Downloading FFmpeg WebAssembly engine (~31 MB)...");
+
+      if (!window.FFmpegWASM) {
+        const ffmpegJsBuf = await fetchBufferWithFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js",
+          "https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js"
+        ]);
+        const rawJs = new TextDecoder().decode(ffmpegJsBuf);
+        // Patch UMD worker loader so classic worker blob (814.ffmpeg.js) runs without type:module importScripts error
+        const patchedJs = rawJs.replace(/\{\s*type\s*:\s*["']module["']\s*\}/g, "{}");
+        (0, eval)(patchedJs);
+      }
+
+      const [classWorkerURL, coreURL, wasmURL] = await Promise.all([
+        toBlobURLFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js",
+          "https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js"
+        ], "text/javascript"),
+        toBlobURLFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js",
+          "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js"
+        ], "text/javascript"),
+        toBlobURLFallback([
+          "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm",
+          "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm"
+        ], "application/wasm")
+      ]);
+
+      setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 18, "Booting FFmpeg engine...");
+      const ffmpeg = new window.FFmpegWASM.FFmpeg();
+      await ffmpeg.load({ classWorkerURL, coreURL, wasmURL });
+
+      if (!fontLoaded) {
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 24, "Loading caption font...");
+        const fontBuf = await fetchBufferWithFallback([
+          "https://cdn.jsdelivr.net/gh/ffmpegwasm/testdata@master/arial.ttf",
+          "https://cdn.jsdelivr.net/gh/openmaptiles/fonts@master/roboto/Roboto-Regular.ttf"
+        ]);
+        await ffmpeg.writeFile("font.ttf", new Uint8Array(fontBuf));
+        fontLoaded = true;
+      }
+
+      ffmpegInstance = ffmpeg;
+      return ffmpeg;
+    }
+
+    function toAsciiPrintable(str) {
+      return String(str || "")
+        .normalize("NFKD")
+        .replace(/[^\x20-\x7E\n]/g, "")
+        .trim();
+    }
+
+    function wrapCaption(text, maxChars = 30) {
+      const clean = toAsciiPrintable(text);
+      if (!clean) return "";
+      const words = clean.split(/\s+/);
+      const lines = [];
+      let current = "";
+      for (const word of words) {
+        if ((current + " " + word).trim().length <= maxChars) {
+          current = (current + " " + word).trim();
+        } else {
+          if (current) lines.push(current);
+          current = word;
+        }
+      }
+      if (current) lines.push(current);
+      return lines.join("\n");
+    }
+
+    const FFMPEG_COLOR_FILTERS = {
+      none: "",
+      cinematic: "eq=contrast=1.18:brightness=-0.02:saturation=1.22,colorbalance=rs=-0.03:gs=0.0:bs=0.04",
+      bw: "hue=s=0,eq=contrast=1.22",
+      vintage: "colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131,eq=contrast=1.08:saturation=0.85",
+      vibrant: "eq=saturation=1.65:contrast=1.08:brightness=0.02",
+      warm: "colorbalance=rs=0.08:gs=0.02:bs=-0.08,eq=saturation=1.15",
+      cool: "colorbalance=rs=-0.08:gs=0.0:bs=0.10,eq=contrast=1.06"
+    };
+
+    exportBtn.addEventListener("click", async () => {
+      hideAlert(ffmpegError);
+      exportPreview.classList.remove("show");
+
+      if (!rawFile) {
+        showAlert(ffmpegError, "Please upload a video first.");
+        return;
+      }
+
+      analyzeBtn.disabled = true;
+      exportBtn.disabled = true;
+
+      const tempFiles = ["output.mp4"];
+      let mountDir = null;
+      let logHandler = null;
+      let progressHandler = null;
+
+      try {
+        const ffmpeg = await getFFmpeg();
+        const extMatch = (rawFile.name || "").match(/\.[a-zA-Z0-9]+$/);
+        const safeName = "source" + (extMatch ? extMatch[0].toLowerCase() : ".mp4");
+        const mountFile = new File([rawFile], safeName, { type: rawFile.type || "video/mp4" });
+
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 27, "Mounting video via WORKERFS (zero RAM copy)...");
+        mountDir = `/mnt_${++mountCounter}`;
+        await ffmpeg.createDir(mountDir);
+        await ffmpeg.mount("WORKERFS", { files: [mountFile] }, mountDir);
+        const inputPath = `${mountDir}/${safeName}`;
+
+        // Probe mounted stream logs to detect audio presence without copying file to MEMFS
+        let hasAudioStream = false;
+        let lastLines = [];
+        logHandler = ({ message }) => {
+          if (/Stream\s+#0:\d+.*Audio:/i.test(message)) hasAudioStream = true;
+          lastLines.push(message);
+          if (lastLines.length > 25) lastLines.shift();
+        };
+        ffmpeg.on("log", logHandler);
+        try {
+          await ffmpeg.exec(["-i", inputPath]);
+        } catch (_) {}
+
+        const trimStart = Math.max(0, editPlan.trimStart || 0);
+        const trimEnd = editPlan.trimEnd > trimStart + 0.2 ? editPlan.trimEnd : videoDuration;
+        const trimDur = Math.max(0.3, trimEnd - trimStart);
+        const speed = Math.min(2.0, Math.max(0.5, editPlan.playbackSpeed || 1.0));
+        const expectedOutDur = trimDur / speed;
+
+        // Cap longest edge at 1280px with guaranteed even dimensions to prevent Android OOM on 4K clips
+        const vf = [
+          "scale=w='if(gt(iw,ih),min(1280,trunc(iw/2)*2),-2)':h='if(gt(iw,ih),-2,min(1280,trunc(ih/2)*2))'",
+          "setpts=PTS-STARTPTS"
+        ];
+
+        const colorExpr = FFMPEG_COLOR_FILTERS[editPlan.colorFilter];
+        if (colorExpr) vf.push(colorExpr);
+        if (editPlan.styleEffects.vignette) vf.push("vignette=PI/4");
+        if (editPlan.styleEffects.sharpen) vf.push("unsharp=5:5:0.8:5:5:0.0");
+
+        // Optional Title Banner
+        const cleanBanner = toAsciiPrintable(editPlan.styleEffects.titleBanner);
+        if (cleanBanner) {
+          await ffmpeg.writeFile("title.txt", new TextEncoder().encode(cleanBanner));
+          tempFiles.push("title.txt");
+          vf.push(
+            "drawtext=fontfile=/font.ttf:textfile=/title.txt:expansion=none:fontcolor=white:fontsize=h*0.036:box=1:boxcolor=0x8c6d46@0.92:boxborderw=10:x=(w-text_w)/2:y=h*0.05"
+          );
+        }
+
+        // Burn timestamped Hinglish captions (using trimmed pre-speed timeline)
+        const posY =
+          editPlan.styleEffects.captionPosition === "top" ? "h*0.14" :
+          editPlan.styleEffects.captionPosition === "center" ? "(h-text_h)/2" :
+          "h-text_h-(h*0.09)";
+
+        const capColor = editPlan.styleEffects.captionStyle === "bold-yellow" ? "yellow" : "white";
+        const capBox = editPlan.styleEffects.captionStyle === "minimal"
+          ? "box=0:shadowcolor=black@0.9:shadowx=2:shadowy=2"
+          : "box=1:boxcolor=black@0.68:boxborderw=10";
+
+        let capIndex = 0;
+        for (const cap of editPlan.captions) {
+          const s = Math.max(0, cap.start - trimStart);
+          const e = Math.min(trimDur, cap.end - trimStart);
+          if (e <= s + 0.05) continue;
+
+          const wrapped = wrapCaption(cap.text, 30);
+          if (!wrapped) continue;
+
+          const capFile = `cap_${capIndex++}.txt`;
+          await ffmpeg.writeFile(capFile, new TextEncoder().encode(wrapped));
+          tempFiles.push(capFile);
+
+          vf.push(
+            `drawtext=fontfile=/font.ttf:textfile=/${capFile}:expansion=none:fontcolor=${capColor}:fontsize=h*0.044:${capBox}:x=(w-text_w)/2:y=${posY}:enable='between(t,${s.toFixed(2)},${e.toFixed(2)})'`
+          );
+        }
+
+        if (Math.abs(speed - 1.0) > 0.01) {
+          vf.push(`setpts=PTS/${speed.toFixed(3)}`);
+        }
+        vf.push("format=yuv420p");
+
+        const args = [];
+        if (trimStart > 0.05) args.push("-ss", trimStart.toFixed(3));
+        args.push("-i", inputPath);
+        if (trimEnd < videoDuration - 0.05 || trimStart > 0.05) {
+          args.push("-t", trimDur.toFixed(3));
+        }
+
+        args.push("-vf", vf.join(","));
+
+        if (hasAudioStream) {
+          if (Math.abs(speed - 1.0) > 0.01) {
+            args.push("-af", `atempo=${speed.toFixed(3)}`);
+          }
+          args.push("-c:a", "aac", "-b:a", "128k");
+        } else {
+          args.push("-an");
+        }
+
+        args.push(
+          "-c:v", "libx264",
+          "-preset", "ultrafast",
+          "-crf", "24",
+          "-threads", "1",
+          "-movflags", "+faststart",
+          "-y",
+          "output.mp4"
+        );
+
+        progressHandler = ({ progress, time }) => {
+          let ratio = Number.isFinite(progress) && progress >= 0 && progress <= 1 ? progress : 0;
+          if (Number.isFinite(time) && time > 0 && expectedOutDur > 0) {
+            ratio = Math.max(ratio, Math.min(0.99, (time / 1_000_000) / expectedOutDur));
+          }
+          const pct = 30 + ratio * 68;
+          setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, pct, "Rendering MP4 with captions & audio...");
+        };
+        ffmpeg.on("progress", progressHandler);
+
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 30, "Starting FFmpeg render...");
+        const exitCode = await ffmpeg.exec(args);
+        if (exitCode !== 0) {
+          throw new Error(`FFmpeg render failed (code ${exitCode}). Tail log: ${lastLines.slice(-4).join(" | ")}`);
+        }
+
+        let outData = await ffmpeg.readFile("output.mp4");
+        if (!outData || outData.byteLength === 0) {
+          throw new Error("Rendered MP4 file was empty.");
+        }
+
+        if (exportObjectUrl) URL.revokeObjectURL(exportObjectUrl);
+        exportObjectUrl = URL.createObjectURL(new Blob([outData], { type: "video/mp4" }));
+        outData = null;
+
+        exportedVideo.src = exportObjectUrl;
+        downloadLink.href = exportObjectUrl;
+        downloadLink.download = `parmar-studio-${Date.now()}.mp4`;
+        exportPreview.classList.add("show");
+
+        setProgress(ffmpegProgress, ffmpegProgressBar, ffmpegStatusText, ffmpegPctText, 100, "MP4 ready for download!");
+      } catch (err) {
+        console.error(err);
+        ffmpegProgress.classList.remove("show");
+        showAlert(ffmpegError, err.message || "Failed to render MP4 in browser.");
+      } finally {
+        if (ffmpegInstance) {
+          if (logHandler) ffmpegInstance.off("log", logHandler);
+          if (progressHandler) ffmpegInstance.off("progress", progressHandler);
+          if (mountDir) {
+            try { await ffmpegInstance.unmount(mountDir); } catch (_) {}
+            try { await ffmpegInstance.deleteDir(mountDir); } catch (_) {}
+          }
+          for (const f of tempFiles) {
+            try { await ffmpegInstance.deleteFile(f); } catch (_) {}
+          }
+        }
+        updateActionButtons();
+      }
+    });
+
+    // Init
+    refreshKeyUI();
+  </script>
+</body>
+</html>
