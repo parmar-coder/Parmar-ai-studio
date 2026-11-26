@@ -72,7 +72,6 @@
       font-family: Georgia, serif; font-size: 0.98rem; font-weight: 700; flex-shrink: 0;
     }
     .brand-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .status-pill {
       flex-shrink: 0; font-size: 0.72rem; font-weight: 600; padding: 6px 12px;
       border-radius: 999px; background: var(--card); border: 1px solid var(--border);
@@ -87,7 +86,7 @@
     }
     .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
     .drawer-panel {
-      position: fixed; top: 0; left: 0; bottom: 0; width: min(92vw, 400px);
+      position: fixed; top: 0; left: 0; bottom: 0; width: min(90vw, 390px);
       background: var(--bg); border-right: 1px solid var(--border); z-index: 70;
       transform: translateX(-104%); transition: transform 0.28s cubic-bezier(0.22,1,0.36,1);
       display: flex; flex-direction: column; height: 100dvh;
@@ -107,7 +106,7 @@
       background: var(--card); border: 1px solid var(--border); border-radius: 16px;
       padding: 14px; display: flex; flex-direction: column; gap: 10px;
     }
-    .sec-title { font-size: 0.84rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .sec-title { font-size: 0.84rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
     .sec-tag { font-family: Georgia, serif; font-style: italic; color: var(--gold); font-weight: 400; font-size: 0.78rem; }
 
     .agent-row {
@@ -136,7 +135,7 @@
     }
     .skill-pill.active { background: var(--dark); border-color: var(--dark); color: #fff; }
 
-    input[type="password"], input[type="text"], input[type="number"], select, textarea.field {
+    input[type="password"], input[type="text"], select, textarea.field {
       width: 100%; min-height: 40px; background: var(--surface); border: 1px solid var(--border);
       color: var(--text); border-radius: 11px; padding: 8px 12px; font-size: 14px; font-family: inherit; outline: none;
     }
@@ -151,7 +150,6 @@
     .btn:active:not(:disabled) { transform: scale(0.96); }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-dark { background: var(--dark); border-color: var(--dark); color: #fff; }
-    .btn-gold { background: var(--gold); border-color: var(--gold); color: #fff; }
     .btn-sm { min-height: 32px; padding: 4px 12px; font-size: 0.75rem; }
     .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .row > .grow { flex: 1; min-width: 140px; }
@@ -161,16 +159,16 @@
     .chat-container { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
     .home-hero {
-      padding: 24px 10px 14px; text-align: center;
+      padding: 30px 10px 16px; text-align: center;
       display: flex; flex-direction: column; align-items: center; gap: 12px;
       animation: msgIn 0.35s ease;
     }
     .home-eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); font-weight: 600; }
-    .home-hero h1 { font-family: Georgia, serif; font-size: clamp(1.7rem, 5vw, 2.45rem); font-weight: 400; line-height: 1.18; max-width: 620px; }
+    .home-hero h1 { font-family: Georgia, serif; font-size: clamp(1.75rem, 5vw, 2.55rem); font-weight: 400; line-height: 1.18; max-width: 600px; }
     .home-hero h1 em { font-style: italic; color: var(--gold); }
-    .home-sub { font-size: 0.88rem; color: var(--muted); max-width: 540px; }
+    .home-sub { font-size: 0.88rem; color: var(--muted); max-width: 500px; }
 
-    .quick-grid { display: grid; grid-template-columns: 1fr; gap: 9px; width: 100%; max-width: 680px; margin-top: 6px; }
+    .quick-grid { display: grid; grid-template-columns: 1fr; gap: 9px; width: 100%; max-width: 640px; margin-top: 6px; }
     @media (min-width: 600px) { .quick-grid { grid-template-columns: repeat(2, 1fr); } }
     .quick-chip {
       background: var(--card); border: 1px solid var(--border); border-radius: 16px;
@@ -239,11 +237,9 @@
     .sources-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; border-top: 1px solid var(--border); }
     .source-pill {
       padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); text-decoration: none; font-size: 0.74rem; font-weight: 500;
-      transition: border-color 0.15s;
+      color: var(--text); text-decoration: none; font-size: 0.74rem;
     }
-    .source-pill:hover { border-color: var(--gold); }
-    .tts-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--border); }
+    .tts-row { display: flex; align-items: center; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 
     /* Video, Photo & Poster Stages */
     .stage {
@@ -256,7 +252,7 @@
       position: absolute; top: 7%; left: 50%; transform: translateX(-50%);
       background: rgba(24,24,27,0.88); border: 1px solid var(--gold); color: #fff;
       font-size: 0.78rem; font-weight: 600; padding: 4px 13px; border-radius: 999px;
-      pointer-events: none; display: none; z-index: 4; max-width: 88%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      pointer-events: none; display: none; z-index: 4;
     }
     .stage-caption {
       position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); max-width: 86%;
@@ -269,48 +265,21 @@
       background: radial-gradient(circle, transparent 54%, rgba(0,0,0,0.52) 100%); display: none;
     }
 
-    .studio-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px;
-    }
-    .ctrl-box { display: flex; flex-direction: column; gap: 4px; font-size: 0.74rem; color: var(--muted); font-weight: 600; }
-    .ctrl-box input[type="range"] { width: 100%; accent-color: var(--gold); cursor: pointer; }
-    .ctrl-box select, .ctrl-box input[type="text"], .ctrl-box input[type="number"] {
-      min-height: 32px; padding: 4px 8px; font-size: 0.78rem; background: #fff; border-radius: 8px;
-    }
-
     .captions-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
     .cap-item {
-      display: grid; grid-template-columns: 56px 56px 1fr 28px; gap: 6px; align-items: center;
+      display: grid; grid-template-columns: 52px 52px 1fr; gap: 6px; align-items: center;
       background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 6px;
     }
     .cap-item input { min-height: 32px; padding: 4px 6px; font-size: 0.78rem; background: #fff; border-radius: 6px; }
 
-    .photo-stage {
-      width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-      padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px;
-    }
-    canvas.photo-out { max-width: 100%; max-height: 440px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 0 auto; background: #18181b; }
-    img.gen-out { max-width: 100%; max-height: 460px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 0 auto; }
-
-    /* Mode Selector Pills above dock */
-    .mode-strip {
-      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none;
-    }
-    .mode-strip::-webkit-scrollbar { display: none; }
-    .mode-tab {
-      flex-shrink: 0; font-size: 0.74rem; font-weight: 600; padding: 5px 11px;
-      border-radius: 999px; border: 1px solid var(--border); background: var(--card);
-      color: var(--muted); cursor: pointer; transition: all 0.15s ease;
-    }
-    .mode-tab.active { background: var(--dark); border-color: var(--dark); color: #fff; }
+    canvas.photo-out { max-width: 100%; max-height: 440px; border-radius: 12px; border: 1px solid var(--border); display: block; margin: 0 auto; }
 
     /* Bottom Floating Gemini Bar */
     .bottom-dock {
       flex: 0 0 auto; padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
       background: var(--bg); border-top: 1px solid var(--border); position: relative; z-index: 25;
     }
-    .dock-inner { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 7px; }
+    .dock-inner { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
     .attach-chip {
       display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
       background: var(--card); border: 1px solid var(--gold); border-radius: 999px;
@@ -355,7 +324,7 @@
       border: 1px solid var(--border); border-radius: 16px; padding: 6px;
       box-shadow: 0 10px 30px rgba(23,23,23,0.14); display: flex; flex-direction: column; gap: 4px; z-index: 40;
       opacity: 0; transform: translateY(8px) scale(0.96); pointer-events: none;
-      transition: all 0.2s cubic-bezier(0.22,1,0.36,1); min-width: 220px;
+      transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
     }
     .attach-menu.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
     .attach-opt {
@@ -363,14 +332,6 @@
       text-align: left; font-size: 0.84rem; font-weight: 600; color: var(--text); cursor: pointer;
     }
     .attach-opt:hover { background: var(--surface); }
-
-    .toast {
-      position: fixed; top: 64px; left: 50%; transform: translateX(-50%) translateY(-10px);
-      background: var(--dark); color: #fff; padding: 8px 16px; border-radius: 999px;
-      font-size: 0.78rem; font-weight: 600; z-index: 90; opacity: 0; pointer-events: none;
-      transition: all 0.22s ease; border: 1px solid var(--gold);
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -384,16 +345,11 @@
           <div class="brand-name">Parmar AI Studio</div>
         </div>
       </div>
-      <div class="header-right">
-        <button type="button" class="btn btn-sm" id="clearChatBtn" title="New Session">New Chat</button>
-        <button type="button" class="status-pill" id="headerStatusBtn">Set API Key</button>
-      </div>
+      <button type="button" class="status-pill" id="headerStatusBtn">Set API Key</button>
     </div>
   </header>
 
-  <div class="toast" id="toastEl"></div>
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
-
   <aside class="drawer-panel" id="drawerPanel">
     <div class="drawer-head">
       <div class="drawer-title">AI Agents &amp; Skills Hub</div>
@@ -409,69 +365,56 @@
         </div>
         <select id="modelSelect">
           <option value="auto">Auto Smart Routing (Fastest)</option>
-          <option value="gemini-2.5-flash">gemini-2.5-flash (Multimodal + Search)</option>
-          <option value="gemini-2.5-pro">gemini-2.5-pro (Deep Reasoning)</option>
-          <option value="gemini-2.0-flash">gemini-2.0-flash (Low Latency)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+          <option value="gemini-3.5-flash">gemini-3.5-flash</option>
         </select>
-        <div class="ctrl-box">
-          <span>Image Generation Engine</span>
-          <select id="imageEngineSelect">
-            <option value="auto">Auto (Gemini Imagen / Pollinations / Studio Canvas)</option>
-            <option value="gemini">Gemini / Imagen API (Requires Key)</option>
-            <option value="pollinations">Pollinations AI (No Key Needed)</option>
-            <option value="canvas">Offline Studio Poster Engine</option>
-          </select>
-        </div>
       </section>
 
       <section class="drawer-section">
-        <div class="sec-title"><span>Connect AI Agents</span><span class="sec-tag" id="agentCountTag">8/8 Active</span></div>
-        <div id="agentsContainer" style="display:flex;flex-direction:column;gap:7px;"></div>
+        <div class="sec-title"><span>Connect AI Agents</span><span class="sec-tag" id="agentCountTag">5 Active</span></div>
+        <div id="agentList" style="display:flex;flex-direction:column;gap:7px;"></div>
       </section>
 
       <section class="drawer-section">
-        <div class="sec-title"><span>Studio Skills</span><span class="sec-tag" id="skillsCountTag">6 Active</span></div>
-        <div class="skills-wrap" id="skillsContainer"></div>
+        <div class="sec-title"><span>Built-In Skills</span><span class="sec-tag">1-Tap Toggle</span></div>
+        <div class="skills-wrap" id="skillsWrap"></div>
       </section>
 
       <section class="drawer-section">
-        <div class="sec-title"><span>Search Engines Hub</span><span class="sec-tag">Multi-Engine</span></div>
-        <div class="skills-wrap" id="searchEnginesContainer"></div>
-        <div class="row">
-          <input type="text" id="quickSearchInput" class="grow" placeholder="Instant multi-engine search..." />
-          <button type="button" class="btn btn-dark btn-sm" id="quickSearchBtn">Search</button>
-        </div>
+        <div class="sec-title"><span>Import / Create Skill</span><span class="sec-tag">Custom</span></div>
+        <input type="text" id="customSkillName" placeholder="Skill name (e.g. Podcast Reels)" />
+        <textarea class="field" id="customSkillPrompt" placeholder="Paste skill instructions..."></textarea>
+        <button type="button" class="btn btn-dark btn-sm" id="addCustomSkillBtn">Save Custom Skill</button>
+        <div id="customSkillsList" style="display:flex;flex-direction:column;gap:6px;"></div>
       </section>
 
-      <section class="drawer-section">
-        <div class="sec-title"><span>Custom Studio System Prompt</span><span class="sec-tag">Optional</span></div>
-        <textarea id="customSystemPrompt" class="field" placeholder="Add brand tone, language preference (e.g. Hinglish), or editing rules..."></textarea>
-      </section>
+      <button type="button" class="btn" id="newChatBtn">+ Start New Chat</button>
     </div>
   </aside>
 
   <main class="chat-scroll" id="chatScroll">
     <div class="chat-container" id="chatContainer">
       <div class="home-hero" id="homeHero">
-        <div class="home-eyebrow">Multi-Agent Video, Photo &amp; Design Atelier</div>
-        <h1>Direct raw video, retouch photos &amp; <em>generate</em> studio art.</h1>
-        <p class="home-sub">Upload a raw video to trim, color-grade, caption &amp; export WebM; attach a photo to retouch on Canvas; or describe any visual to generate instantly.</p>
+        <div class="home-eyebrow">Multi-Agent Atelier • Gemini AI &amp; Studio</div>
+        <h1>Create Your Vision <em class="gold-amp">&amp;</em> Command Your AI Crew</h1>
+        <p class="home-sub">Attach any video or photo with <strong>+</strong> at any time, or ask anything. Open <strong>☰</strong> to connect AI Agents &amp; Skills.</p>
         <div class="quick-grid">
           <button type="button" class="quick-chip" data-action="video">
-            <strong>🎬 Edit Raw Video</strong>
-            <span>Upload MP4/MOV/WebM → AI color grade, trim, captions &amp; WebM export</span>
+            <strong>Edit Any Raw Video</strong>
+            <span>Attach video with + and describe any style</span>
           </button>
-          <button type="button" class="quick-chip" data-action="photo-edit">
-            <strong>🖼️ Retouch &amp; Edit Photo</strong>
-            <span>Upload JPG/PNG → AI filters, contrast, warmth, vignette &amp; text overlay</span>
+          <button type="button" class="quick-chip" data-action="photo">
+            <strong>Retouch Photo / Thumbnail</strong>
+            <span>Attach photo with + for HDR or custom edits</span>
           </button>
-          <button type="button" class="quick-chip" data-prompt="Generate a luxury golden hour editorial portrait of a classic café in Paris, 4k cinematic photography">
-            <strong>✨ Generate Photo / Poster</strong>
-            <span>Create high-res AI images or studio posters in 16:9, 1:1, or 9:16</span>
+          <button type="button" class="quick-chip" data-prompt="Design a luxury minimalist poster for my business Parmar AI Studio with bold typography and gold accents">
+            <strong>Design Business Poster</strong>
+            <span>Generate custom poster &amp; download PNG</span>
           </button>
-          <button type="button" class="quick-chip" data-prompt="Search the web for the latest AI video editing trends in 2026 and summarize with sources">
-            <strong>🔎 Deep Search &amp; Research</strong>
-            <span>Multi-engine search + Gemini grounded answers with source pills</span>
+          <button type="button" class="quick-chip" data-prompt="Find 5 trending viral YouTube Shorts topics in tech and AI for India today with high-CTR titles">
+            <strong>Find Viral Topics</strong>
+            <span>Fast Q&amp;A + Google Search + Listen mode</span>
           </button>
         </div>
       </div>
@@ -480,1342 +423,974 @@
 
   <footer class="bottom-dock">
     <div class="dock-inner">
-      <div class="mode-strip" id="modeStrip">
-        <button type="button" class="mode-tab active" data-mode="auto">⚡ Auto Route</button>
-        <button type="button" class="mode-tab" data-mode="video">🎬 Video Edit</button>
-        <button type="button" class="mode-tab" data-mode="photo-edit">🖼️ Photo Edit</button>
-        <button type="button" class="mode-tab" data-mode="photo-gen">✨ Generate Image</button>
-        <button type="button" class="mode-tab" data-mode="search">🔎 Web Search</button>
-        <button type="button" class="mode-tab" data-mode="code">💻 Code Architect</button>
+      <div class="attach-chip hidden" id="attachChip">
+        <span id="attachChipLabel">Attached</span>
+        <button type="button" id="removeAttachBtn" aria-label="Remove attachment">×</button>
       </div>
-      <div id="attachChipWrap"></div>
+
       <div class="command-pill">
         <div class="attach-menu" id="attachMenu">
-          <button type="button" class="attach-opt" id="optUploadVideo">🎬 Upload Raw Video</button>
-          <button type="button" class="attach-opt" id="optUploadPhoto">🖼️ Upload Photo to Edit</button>
-          <button type="button" class="attach-opt" id="optUploadDoc">📄 Upload Text / Code / CSV</button>
+          <button type="button" class="attach-opt" id="pickVideoBtn">Upload Raw Video (Up to 60s / 100 MB)</button>
+          <button type="button" class="attach-opt" id="pickPhotoBtn">Upload Photo (HDR / Retouch / Edit)</button>
         </div>
-        <button type="button" class="circle-btn" id="attachBtn" title="Attach Media">+</button>
-        <textarea id="promptInput" rows="1" placeholder="Describe your video edit, photo retouch, image to generate, or question..."></textarea>
-        <button type="button" class="circle-btn" id="micBtn" title="Voice Input">
-          <svg class="mic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        <button type="button" class="circle-btn" id="plusBtn" aria-label="Attach media">+</button>
+        <textarea id="promptBox" rows="1" placeholder="Ask anything, design a poster, or attach video/photo..."></textarea>
+        <button type="button" class="circle-btn" id="micBtn" aria-label="Voice prompt">
+          <svg class="mic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" x2="12" y1="19" y2="22"></line>
+          </svg>
           <div class="mic-waves"><span></span><span></span><span></span></div>
         </button>
-        <button type="button" class="circle-btn send" id="sendBtn" title="Send">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
+        <button type="button" class="circle-btn send" id="sendBtn" aria-label="Send">↑</button>
       </div>
     </div>
   </footer>
 
-  <input type="file" id="videoFileInput" accept="video/*" class="hidden" />
-  <input type="file" id="photoFileInput" accept="image/*" class="hidden" />
-  <input type="file" id="docFileInput" accept=".txt,.md,.json,.csv,.js,.html,.css,.py" class="hidden" />
+  <input type="file" id="videoInput" accept="video/*" class="hidden" />
+  <input type="file" id="photoInput" accept="image/*" class="hidden" />
 </div>
 
-<script>
-(() => {
-  'use strict';
+<script type="module">
+  const STORAGE_KEY = "parmar_studio_gemini_key";
+  const STORAGE_SKILLS = "parmar_studio_custom_skills";
 
-  /* ==================== SAFE STORAGE ==================== */
-  const store = {
-    get(k, d = '') { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
-    del(k) { try { localStorage.removeItem(k); } catch {} }
-  };
-
-  /* ==================== AGENTS, SKILLS & SEARCH ENGINES ==================== */
   const AGENTS = [
-    { id: 'video', name: 'Video Director & Raw Editor', desc: 'Trim, speed, LUT color grade, captions & WebM export', on: true },
-    { id: 'photoEdit', name: 'Photo Retouch & AI Colorist', desc: 'Real-time Canvas filters, crop, vignette & text overlay', on: true },
-    { id: 'photoGen', name: 'Image & Poster Generator', desc: 'Gemini Imagen, Pollinations AI & Studio Canvas art', on: true },
-    { id: 'research', name: 'Deep Web Research Agent', desc: 'Gemini Search Grounding & multi-engine web lookups', on: true },
-    { id: 'code', name: 'Code & Web Architect', desc: 'Full-stack HTML/JS/Python generation & debugging', on: true },
-    { id: 'copy', name: 'Viral Script & Copywriter', desc: 'Reels hooks, captions, SEO titles & ad copy', on: true },
-    { id: 'voice', name: 'Voice & Narrator Agent', desc: 'Speech-to-text mic & read-aloud TTS playback', on: true },
-    { id: 'analyst', name: 'Document & Data Analyst', desc: 'Summarize uploaded files, JSON, CSV & logs', on: true }
+    { id: "video_dir", name: "Video Director Agent", desc: "Dynamic edits, pacing, color & motion", on: true },
+    { id: "caption", name: "Hinglish Caption Agent", desc: "Hindi/Gujarati/English → Roman Hinglish", on: true },
+    { id: "photo", name: "Thumbnail & Photo Agent", desc: "HDR retouch, lighting & text overlays", on: true },
+    { id: "poster", name: "Poster & Graphic Designer", desc: "Business posters, flyers & banners", on: true },
+    { id: "research", name: "Trend & Keyword Researcher", desc: "Fast Q&A + Google Search grounding", on: true },
+    { id: "script", name: "Hook & Script Writer", desc: "3-second retention hooks & scripts", on: false },
+    { id: "seo", name: "SEO Title & Tags Agent", desc: "High-CTR titles, descriptions & tags", on: false }
   ];
 
-  const SKILLS = [
-    { id: 'cinematic', label: 'Cinematic LUT', on: true },
-    { id: 'captions', label: 'Auto-Captions', on: true },
-    { id: 'reels', label: 'Viral Reels Hook', on: true },
-    { id: 'portrait', label: 'Portrait Pop', on: false },
-    { id: 'poster', label: 'Editorial Typography', on: true },
-    { id: 'hinglish', label: 'Hinglish / Hindi', on: true },
-    { id: 'citations', label: 'Web Citations', on: true },
-    { id: 'seo', label: 'SEO & Hashtags', on: false },
-    { id: 'brand', label: 'Parmar Gold Brand', on: false },
-    { id: 'debug', label: 'Code Debugger', on: false }
+  const BUILTIN_SKILLS = [
+    { id: "viral_pacing", name: "Viral Reels Pacing", instr: "Keep edits punchy with 3-4 word captions and vibrant contrast.", on: true },
+    { id: "hinglish_pro", name: "Roman Hinglish Master", instr: "Transcribe spoken Hindi, Gujarati, or English into clean Roman Hinglish.", on: true },
+    { id: "cinema_grade", name: "Cinema Film Color", instr: "Apply filmic contrast, warm tones, subtle vignette, and optional letterbox.", on: false },
+    { id: "hdr_photo", name: "HDR & Thumbnail Pro", instr: "Enhance lighting, clarity, saturation, and sharp contrast on photos.", on: false }
   ];
 
-  const SEARCH_ENGINES = [
-    { id: 'google', name: 'Google', url: q => `https://www.google.com/search?q=${encodeURIComponent(q)}`, on: true },
-    { id: 'youtube', name: 'YouTube', url: q => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`, on: true },
-    { id: 'duckduckgo', name: 'DuckDuckGo', url: q => `https://duckduckgo.com/?q=${encodeURIComponent(q)}`, on: true },
-    { id: 'bing', name: 'Bing', url: q => `https://www.bing.com/search?q=${encodeURIComponent(q)}`, on: false },
-    { id: 'wikipedia', name: 'Wikipedia', url: q => `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(q)}`, on: true },
-    { id: 'github', name: 'GitHub', url: q => `https://github.com/search?q=${encodeURIComponent(q)}`, on: true },
-    { id: 'unsplash', name: 'Unsplash', url: q => `https://unsplash.com/s/photos/${encodeURIComponent(q)}`, on: false },
-    { id: 'scholar', name: 'Google Scholar', url: q => `https://scholar.google.com/scholar?q=${encodeURIComponent(q)}`, on: false }
-  ];
+  let customSkills = [];
+  let attachedFile = null;
 
-  const FILTER_PRESETS = {
-    none: { label: 'Original', filter: 'none', b: 100, c: 100, s: 100, sepia: 0, hue: 0, blur: 0, vig: 0 },
-    cinematic: { label: 'Cinematic Teal & Gold', filter: 'contrast(118%) saturate(112%) brightness(96%) sepia(12%)', b: 96, c: 118, s: 112, sepia: 12, hue: 0, blur: 0, vig: 45 },
-    warm: { label: 'Golden Hour Warm', filter: 'brightness(106%) contrast(108%) saturate(125%) sepia(22%)', b: 106, c: 108, s: 125, sepia: 22, hue: 0, blur: 0, vig: 25 },
-    vivid: { label: 'Vibrant Pop', filter: 'brightness(105%) contrast(116%) saturate(142%)', b: 105, c: 116, s: 142, sepia: 0, hue: 0, blur: 0, vig: 10 },
-    noir: { label: 'Classic Noir B&W', filter: 'grayscale(100%) contrast(132%) brightness(98%)', b: 98, c: 132, s: 0, sepia: 0, hue: 0, blur: 0, vig: 55 },
-    vintage: { label: '90s Analog Film', filter: 'contrast(94%) brightness(104%) saturate(85%) sepia(32%)', b: 104, c: 94, s: 85, sepia: 32, hue: 0, blur: 0, vig: 35 },
-    cool: { label: 'Nordic Cool', filter: 'brightness(102%) contrast(110%) saturate(92%) hue-rotate(190deg)', b: 102, c: 110, s: 92, sepia: 0, hue: 12, blur: 0, vig: 20 }
-  };
+  const drawerBackdrop = document.getElementById("drawerBackdrop");
+  const drawerPanel = document.getElementById("drawerPanel");
+  const headerStatusBtn = document.getElementById("headerStatusBtn");
+  const apiKeyInput = document.getElementById("apiKeyInput");
+  const modelSelect = document.getElementById("modelSelect");
+  const chatContainer = document.getElementById("chatContainer");
+  const chatScroll = document.getElementById("chatScroll");
+  const homeHero = document.getElementById("homeHero");
+  const promptBox = document.getElementById("promptBox");
+  const attachMenu = document.getElementById("attachMenu");
+  const attachChip = document.getElementById("attachChip");
+  const attachChipLabel = document.getElementById("attachChipLabel");
 
-  /* ==================== STATE ==================== */
-  const state = {
-    apiKey: store.get('parmar_gemini_key', ''),
-    model: store.get('parmar_model', 'auto'),
-    imageEngine: store.get('parmar_img_engine', 'auto'),
-    customPrompt: store.get('parmar_sys_prompt', ''),
-    mode: 'auto',
-    attachment: null, // { type: 'video'|'photo'|'doc', file, url, name, textContent, dataUrl }
-    history: [],
-    isBusy: false,
-    recognition: null,
-    isListening: false
-  };
-
-  /* ==================== DOM REFS ==================== */
-  const $ = id => document.getElementById(id);
-  const chatScroll = $('chatScroll');
-  const chatContainer = $('chatContainer');
-  const homeHero = $('homeHero');
-  const promptInput = $('promptInput');
-  const attachMenu = $('attachMenu');
-  const attachChipWrap = $('attachChipWrap');
-  const drawerBackdrop = $('drawerBackdrop');
-  const drawerPanel = $('drawerPanel');
-  const headerStatusBtn = $('headerStatusBtn');
-  const apiKeyInput = $('apiKeyInput');
-  const modelSelect = $('modelSelect');
-  const imageEngineSelect = $('imageEngineSelect');
-  const customSystemPrompt = $('customSystemPrompt');
-  const toastEl = $('toastEl');
-
-  function showToast(msg) {
-    toastEl.textContent = msg;
-    toastEl.classList.add('show');
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toastEl.classList.remove('show'), 2600);
+  function getApiKey() {
+    try { return localStorage.getItem(STORAGE_KEY) || ""; } catch { return ""; }
   }
 
-  function scrollChatBottom() {
-    requestAnimationFrame(() => { chatScroll.scrollTop = chatScroll.scrollHeight; });
-  }
-
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-  }
-
-  /* ==================== DRAWER & CONFIG INIT ==================== */
-  function syncKeyUI() {
-    apiKeyInput.value = state.apiKey;
-    if (state.apiKey) {
-      headerStatusBtn.textContent = 'API Ready';
-      headerStatusBtn.classList.add('ready');
+  function refreshHeader() {
+    const key = getApiKey();
+    const activeCount = AGENTS.filter(a => a.on).length;
+    document.getElementById("agentCountTag").textContent = `${activeCount} Active`;
+    if (key) {
+      headerStatusBtn.textContent = `${activeCount} Agents • Key Ready`;
+      headerStatusBtn.classList.add("ready");
     } else {
-      headerStatusBtn.textContent = 'Local + Free AI';
-      headerStatusBtn.classList.remove('ready');
+      headerStatusBtn.textContent = "Set API Key";
+      headerStatusBtn.classList.remove("ready");
     }
   }
 
-  function renderAgents() {
-    const wrap = $('agentsContainer');
-    wrap.innerHTML = '';
-    let activeCount = 0;
-    AGENTS.forEach(ag => {
-      if (ag.on) activeCount++;
-      const row = document.createElement('label');
-      row.className = 'agent-row';
-      row.innerHTML = `
-        <div class="agent-info">
-          <strong>${escapeHtml(ag.name)}</strong>
-          <small>${escapeHtml(ag.desc)}</small>
-        </div>
-        <span class="switch">
-          <input type="checkbox" ${ag.on ? 'checked' : ''} data-agent="${ag.id}" />
-          <span class="slider"></span>
-        </span>
-      `;
-      row.querySelector('input').addEventListener('change', e => {
-        ag.on = e.target.checked;
-        $('agentCountTag').textContent = `${AGENTS.filter(x => x.on).length}/${AGENTS.length} Active`;
+  function renderDrawerControls() {
+    const aList = document.getElementById("agentList");
+    aList.innerHTML = AGENTS.map(a => `
+      <label class="agent-row">
+        <div class="agent-info"><strong>${a.name}</strong><small>${a.desc}</small></div>
+        <span class="switch"><input type="checkbox" data-agent="${a.id}" ${a.on ? "checked" : ""}><span class="slider"></span></span>
+      </label>
+    `).join("");
+    aList.querySelectorAll("input[data-agent]").forEach(inp => {
+      inp.addEventListener("change", () => {
+        const ag = AGENTS.find(x => x.id === inp.dataset.agent);
+        if (ag) ag.on = inp.checked;
+        refreshHeader();
       });
-      wrap.appendChild(row);
     });
-    $('agentCountTag').textContent = `${activeCount}/${AGENTS.length} Active`;
-  }
 
-  function renderSkills() {
-    const wrap = $('skillsContainer');
-    wrap.innerHTML = '';
-    SKILLS.forEach(sk => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'skill-pill' + (sk.on ? ' active' : '');
-      btn.textContent = sk.label;
-      btn.addEventListener('click', () => {
-        sk.on = !sk.on;
-        btn.classList.toggle('active', sk.on);
-        $('skillsCountTag').textContent = `${SKILLS.filter(x => x.on).length} Active`;
+    const sWrap = document.getElementById("skillsWrap");
+    sWrap.innerHTML = BUILTIN_SKILLS.map(s => `
+      <button type="button" class="skill-pill ${s.on ? "active" : ""}" data-skill="${s.id}">${s.name}</button>
+    `).join("");
+    sWrap.querySelectorAll(".skill-pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sk = BUILTIN_SKILLS.find(x => x.id === btn.dataset.skill);
+        if (sk) { sk.on = !sk.on; btn.classList.toggle("active", sk.on); }
       });
-      wrap.appendChild(btn);
     });
-    $('skillsCountTag').textContent = `${SKILLS.filter(x => x.on).length} Active`;
-  }
 
-  function renderSearchEngines() {
-    const wrap = $('searchEnginesContainer');
-    wrap.innerHTML = '';
-    SEARCH_ENGINES.forEach(se => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'skill-pill' + (se.on ? ' active' : '');
-      btn.textContent = se.name;
-      btn.addEventListener('click', () => {
-        se.on = !se.on;
-        btn.classList.toggle('active', se.on);
-      });
-      wrap.appendChild(btn);
-    });
-  }
-
-  function openDrawer() { drawerBackdrop.classList.add('open'); drawerPanel.classList.add('open'); }
-  function closeDrawer() { drawerBackdrop.classList.remove('open'); drawerPanel.classList.remove('open'); }
-
-  $('openDrawerBtn').addEventListener('click', openDrawer);
-  $('headerStatusBtn').addEventListener('click', openDrawer);
-  $('closeDrawerBtn').addEventListener('click', closeDrawer);
-  drawerBackdrop.addEventListener('click', closeDrawer);
-
-  $('saveKeyBtn').addEventListener('click', () => {
-    const val = apiKeyInput.value.trim();
-    state.apiKey = val;
-    store.set('parmar_gemini_key', val);
-    syncKeyUI();
-    showToast(val ? 'Gemini API key saved locally' : 'Key cleared — running Local + Free AI mode');
-  });
-  $('clearKeyBtn').addEventListener('click', () => {
-    state.apiKey = '';
-    store.del('parmar_gemini_key');
-    syncKeyUI();
-    showToast('API key removed');
-  });
-
-  modelSelect.value = state.model;
-  modelSelect.addEventListener('change', () => {
-    state.model = modelSelect.value;
-    store.set('parmar_model', state.model);
-  });
-  imageEngineSelect.value = state.imageEngine;
-  imageEngineSelect.addEventListener('change', () => {
-    state.imageEngine = imageEngineSelect.value;
-    store.set('parmar_img_engine', state.imageEngine);
-  });
-  customSystemPrompt.value = state.customPrompt;
-  customSystemPrompt.addEventListener('input', () => {
-    state.customPrompt = customSystemPrompt.value;
-    store.set('parmar_sys_prompt', state.customPrompt);
-  });
-
-  $('quickSearchBtn').addEventListener('click', () => {
-    const q = $('quickSearchInput').value.trim();
-    if (!q) return showToast('Enter a search query first');
-    closeDrawer();
-    promptInput.value = q;
-    setMode('search');
-    handleSend();
-  });
-
-  $('clearChatBtn').addEventListener('click', () => {
-    state.history = [];
-    clearAttachment();
-    chatContainer.innerHTML = '';
-    chatContainer.appendChild(homeHero);
-    homeHero.classList.remove('hidden');
-    showToast('Started fresh session');
-  });
-
-  /* ==================== MODE STRIP & ATTACHMENTS ==================== */
-  function setMode(m) {
-    state.mode = m;
-    document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === m));
-  }
-  document.querySelectorAll('.mode-tab').forEach(t => {
-    t.addEventListener('click', () => setMode(t.dataset.mode));
-  });
-
-  $('attachBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    attachMenu.classList.toggle('open');
-  });
-  document.addEventListener('click', e => {
-    if (!attachMenu.contains(e.target) && e.target !== $('attachBtn')) attachMenu.classList.remove('open');
-  });
-
-  $('optUploadVideo').addEventListener('click', () => { attachMenu.classList.remove('open'); $('videoFileInput').click(); });
-  $('optUploadPhoto').addEventListener('click', () => { attachMenu.classList.remove('open'); $('photoFileInput').click(); });
-  $('optUploadDoc').addEventListener('click', () => { attachMenu.classList.remove('open'); $('docFileInput').click(); });
-
-  function clearAttachment() {
-    if (state.attachment?.url) URL.revokeObjectURL(state.attachment.url);
-    state.attachment = null;
-    attachChipWrap.innerHTML = '';
-  }
-
-  function renderAttachChip(label) {
-    attachChipWrap.innerHTML = `
-      <div class="attach-chip">
-        <span>${escapeHtml(label)}</span>
-        <button type="button" id="removeAttachBtn" title="Remove">×</button>
+    const cList = document.getElementById("customSkillsList");
+    cList.innerHTML = customSkills.map((cs, i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:0.78rem;">
+        <strong>${cs.name}</strong>
+        <button type="button" class="btn btn-sm" data-del-skill="${i}">Remove</button>
       </div>
-    `;
-    $('removeAttachBtn').addEventListener('click', clearAttachment);
+    `).join("");
+    cList.querySelectorAll("[data-del-skill]").forEach(b => {
+      b.addEventListener("click", () => {
+        customSkills.splice(parseInt(b.dataset.delSkill, 10), 1);
+        try { localStorage.setItem(STORAGE_SKILLS, JSON.stringify(customSkills)); } catch {}
+        renderDrawerControls();
+      });
+    });
+    refreshHeader();
   }
 
-  $('videoFileInput').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    clearAttachment();
-    const url = URL.createObjectURL(file);
-    state.attachment = { type: 'video', file, url, name: file.name };
-    renderAttachChip(`🎬 Video: ${file.name}`);
-    setMode('video');
-    if (!promptInput.value.trim()) promptInput.value = 'Edit this raw video with cinematic color grade, vignette, title card, and auto-captions';
-    e.target.value = '';
+  function buildSystemInstruction() {
+    const activeAgents = AGENTS.filter(a => a.on).map(a => `- ${a.name}: ${a.desc}`).join("\n");
+    const activeSkills = [...BUILTIN_SKILLS.filter(s => s.on), ...customSkills].map(s => `- ${s.name}: ${s.instr}`).join("\n");
+    return `You are Parmar AI Studio, a fast, elite multi-agent creative & technical assistant.\nActive Agents:\n${activeAgents}\nActive Skills:\n${activeSkills}`;
+  }
+
+  function setDrawer(open) {
+    drawerPanel.classList.toggle("open", open);
+    drawerBackdrop.classList.toggle("open", open);
+  }
+  document.getElementById("openDrawerBtn").addEventListener("click", () => setDrawer(true));
+  document.getElementById("closeDrawerBtn").addEventListener("click", () => setDrawer(false));
+  drawerBackdrop.addEventListener("click", () => setDrawer(false));
+  headerStatusBtn.addEventListener("click", () => setDrawer(true));
+
+  try {
+    const k = getApiKey();
+    if (k) apiKeyInput.value = k;
+    const savedSk = localStorage.getItem(STORAGE_SKILLS);
+    if (savedSk) customSkills = JSON.parse(savedSk);
+  } catch {}
+
+  document.getElementById("saveKeyBtn").addEventListener("click", () => {
+    const v = apiKeyInput.value.trim();
+    if (!v) return;
+    try { localStorage.setItem(STORAGE_KEY, v); } catch {}
+    refreshHeader();
+    setDrawer(false);
+  });
+  document.getElementById("clearKeyBtn").addEventListener("click", () => {
+    apiKeyInput.value = "";
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    refreshHeader();
+  });
+  document.getElementById("addCustomSkillBtn").addEventListener("click", () => {
+    const n = document.getElementById("customSkillName").value.trim();
+    const p = document.getElementById("customSkillPrompt").value.trim();
+    if (!n || !p) return;
+    customSkills.push({ name: n, instr: p });
+    try { localStorage.setItem(STORAGE_SKILLS, JSON.stringify(customSkills)); } catch {}
+    document.getElementById("customSkillName").value = "";
+    document.getElementById("customSkillPrompt").value = "";
+    renderDrawerControls();
+  });
+  document.getElementById("newChatBtn").addEventListener("click", () => {
+    chatContainer.innerHTML = "";
+    chatContainer.appendChild(homeHero);
+    homeHero.classList.remove("hidden");
+    setDrawer(false);
   });
 
-  $('photoFileInput').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    clearAttachment();
-    const url = URL.createObjectURL(file);
-    const reader = new FileReader();
-    reader.onload = () => {
-      state.attachment = { type: 'photo', file, url, name: file.name, dataUrl: reader.result };
-      renderAttachChip(`🖼️ Photo: ${file.name}`);
-      setMode('photo-edit');
-      if (!promptInput.value.trim()) promptInput.value = 'Retouch this photo with golden hour warmth, crisp contrast, subtle vignette, and studio polish';
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+  // Attachment Controls (works in ANY existing chat immediately!)
+  document.getElementById("plusBtn").addEventListener("click", e => {
+    e.stopPropagation();
+    attachMenu.classList.toggle("open");
   });
+  document.addEventListener("click", () => attachMenu.classList.remove("open"));
+  document.getElementById("pickVideoBtn").addEventListener("click", () => document.getElementById("videoInput").click());
+  document.getElementById("pickPhotoBtn").addEventListener("click", () => document.getElementById("photoInput").click());
 
-  $('docFileInput').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    clearAttachment();
-    const reader = new FileReader();
-    reader.onload = () => {
-      state.attachment = { type: 'doc', file, name: file.name, textContent: String(reader.result).slice(0, 24000) };
-      renderAttachChip(`📄 File: ${file.name}`);
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  });
+  document.getElementById("videoInput").addEventListener("change", e => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    // Set synchronously so user can hit Send immediately in any chat!
+    attachedFile = { type: "video", file: f, duration: 15 };
+    attachChipLabel.textContent = `Video: ${f.name} (${(f.size / 1048576).toFixed(1)} MB)`;
+    attachChip.classList.remove("hidden");
 
-  /* ==================== QUICK CHIPS ==================== */
-  document.querySelectorAll('.quick-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const act = chip.dataset.action;
-      if (act === 'video') { $('videoFileInput').click(); return; }
-      if (act === 'photo-edit') { $('photoFileInput').click(); return; }
-      if (chip.dataset.prompt) {
-        promptInput.value = chip.dataset.prompt;
-        if (chip.dataset.prompt.toLowerCase().includes('generate')) setMode('photo-gen');
-        else if (chip.dataset.prompt.toLowerCase().includes('search')) setMode('search');
-        handleSend();
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.src = URL.createObjectURL(f);
+    v.onloadedmetadata = () => {
+      if (attachedFile && attachedFile.file === f) {
+        attachedFile.duration = Math.min(60, v.duration || 15);
       }
-    });
+      URL.revokeObjectURL(v.src);
+    };
   });
 
-  /* ==================== VOICE INPUT (WEB SPEECH API) ==================== */
-  $('micBtn').addEventListener('click', () => {
+  document.getElementById("photoInput").addEventListener("change", e => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    attachedFile = { type: "photo", file: f, duration: 0, dataUrl: null };
+    attachChipLabel.textContent = `Photo: ${f.name}`;
+    attachChip.classList.remove("hidden");
+    const fr = new FileReader();
+    fr.onload = () => { if (attachedFile && attachedFile.file === f) attachedFile.dataUrl = fr.result; };
+    fr.readAsDataURL(f);
+  });
+
+  document.getElementById("removeAttachBtn").addEventListener("click", () => {
+    attachedFile = null;
+    attachChip.classList.add("hidden");
+    document.getElementById("videoInput").value = "";
+    document.getElementById("photoInput").value = "";
+  });
+
+  // Gemini-Style Mic with Animated Sound Waves
+  document.getElementById("micBtn").addEventListener("click", () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return showToast('Voice input not supported in this browser');
-    if (state.isListening && state.recognition) {
-      state.recognition.stop();
-      return;
-    }
+    if (!SR) return;
+    const micBtn = document.getElementById("micBtn");
+    if (micBtn.classList.contains("listening")) return;
     const rec = new SR();
-    rec.lang = SKILLS.find(s => s.id === 'hinglish' && s.on) ? 'en-IN' : 'en-US';
-    rec.interimResults = true;
-    state.recognition = rec;
-    state.isListening = true;
-    $('micBtn').classList.add('listening');
-    const base = promptInput.value ? promptInput.value + ' ' : '';
+    rec.lang = "en-IN";
+    micBtn.classList.add("listening");
     rec.onresult = ev => {
-      const txt = Array.from(ev.results).map(r => r[0].transcript).join('');
-      promptInput.value = base + txt;
+      promptBox.value = (promptBox.value + " " + ev.results[0][0].transcript).trim();
     };
-    rec.onerror = () => { state.isListening = false; $('micBtn').classList.remove('listening'); };
-    rec.onend = () => { state.isListening = false; $('micBtn').classList.remove('listening'); };
+    rec.onend = () => micBtn.classList.remove("listening");
+    rec.onerror = () => micBtn.classList.remove("listening");
     rec.start();
   });
 
-  /* ==================== GEMINI API HELPER ==================== */
-  function getActiveModel() {
-    return state.model === 'auto' ? 'gemini-2.5-flash' : state.model;
-  }
-
-  function buildSystemInstruction(taskHint = '') {
-    const activeSkills = SKILLS.filter(s => s.on).map(s => s.label).join(', ');
-    const activeAgents = AGENTS.filter(a => a.on).map(a => a.name).join(', ');
-    return [
-      'You are Parmar AI Studio, a versatile multi-agent creative, video, photo, code, and research assistant.',
-      `Active Agents: ${activeAgents || 'General Assistant'}.`,
-      `Active Skills: ${activeSkills || 'Standard'}.`,
-      taskHint,
-      state.customPrompt ? `User Studio Guidelines: ${state.customPrompt}` : ''
-    ].filter(Boolean).join('\n');
-  }
-
-  async function callGemini({ parts, systemText = '', useSearch = false, jsonMode = false }) {
-    if (!state.apiKey) throw new Error('NO_KEY');
-    const model = getActiveModel();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
-    const body = {
-      contents: [{ role: 'user', parts }],
-      ...(systemText ? { systemInstruction: { parts: [{ text: systemText }] } } : {}),
-      ...(useSearch ? { tools: [{ google_search: {} }] } : {}),
-      ...(jsonMode ? { generationConfig: { responseMimeType: 'application/json' } } : {})
-    };
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+  document.querySelectorAll(".quick-chip").forEach(c => {
+    c.addEventListener("click", () => {
+      if (c.dataset.action === "video") { document.getElementById("videoInput").click(); return; }
+      if (c.dataset.action === "photo") { document.getElementById("photoInput").click(); return; }
+      if (c.dataset.prompt) { promptBox.value = c.dataset.prompt; promptBox.focus(); }
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error?.message || `Gemini HTTP ${res.status}`);
-    const cand = data.candidates?.[0];
-    const text = cand?.content?.parts?.map(p => p.text || '').join('') || '';
-    const chunks = cand?.groundingMetadata?.groundingChunks || [];
-    const sources = chunks.map(c => c.web).filter(w => w?.uri).map(w => ({ title: w.title || w.uri, uri: w.uri }));
-    return { text, sources, raw: data };
+  });
+
+  // Auto-expand textarea smoothly
+  promptBox.addEventListener("input", () => {
+    promptBox.style.height = "auto";
+    promptBox.style.height = Math.min(110, promptBox.scrollHeight) + "px";
+  });
+
+  // XHR Resumable Video Upload (Zero 400 chunk error + real progress)
+  async function uploadToGeminiFiles(apiKey, file, onProgress) {
+    const mime = file.type || "video/mp4";
+    const initRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${encodeURIComponent(apiKey)}`, {
+      method: "POST",
+      headers: {
+        "X-Goog-Upload-Protocol": "resumable",
+        "X-Goog-Upload-Command": "start",
+        "X-Goog-Upload-Header-Content-Length": String(file.size),
+        "X-Goog-Upload-Header-Content-Type": mime,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ file: { display_name: file.name } })
+    });
+    if (!initRes.ok) throw new Error(`Upload init failed (${initRes.status})`);
+    const uploadUrl = initRes.headers.get("X-Goog-Upload-URL");
+    if (!uploadUrl) throw new Error("Missing upload URL from Gemini.");
+
+    const fileObj = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", uploadUrl, true);
+      xhr.setRequestHeader("X-Goog-Upload-Offset", "0");
+      xhr.setRequestHeader("X-Goog-Upload-Command", "upload, finalize");
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const pct = 15 + Math.round((e.loaded / e.total) * 55);
+          onProgress(pct, `Uploading video (${(e.loaded / 1048576).toFixed(1)} / ${(e.total / 1048576).toFixed(1)} MB)...`);
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { const d = JSON.parse(xhr.responseText); resolve(d.file || d); }
+          catch { reject(new Error("Invalid JSON from Gemini upload.")); }
+        } else {
+          reject(new Error(`Video upload failed (${xhr.status})`));
+        }
+      };
+      xhr.onerror = () => reject(new Error("Network error while uploading video."));
+      xhr.send(file);
+    });
+
+    for (let i = 0; i < 35; i++) {
+      const check = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileObj.name}?key=${encodeURIComponent(apiKey)}`);
+      const info = await check.json();
+      if (info.state === "ACTIVE") return { fileUri: fileObj.uri, mimeType: mime };
+      if (info.state === "FAILED") throw new Error("Gemini failed to process video.");
+      onProgress(72 + Math.min(20, i * 2), "Gemini processing video...");
+      await new Promise(r => setTimeout(r, 1500));
+    }
+    throw new Error("Video processing timed out.");
   }
 
-  /* ==================== UI CARD BUILDERS ==================== */
-  function appendUserBubble(text, mediaLabel) {
-    homeHero.classList.add('hidden');
-    const row = document.createElement('div');
-    row.className = 'msg-row user';
-    row.innerHTML = `
-      <div class="user-bubble">
-        ${mediaLabel ? `<div class="user-media-tag">${escapeHtml(mediaLabel)}</div>` : ''}
-        <div>${escapeHtml(text)}</div>
-      </div>
-    `;
-    chatContainer.appendChild(row);
-    scrollChatBottom();
+  // Fast Task-Routed Model Fallback
+  async function callGeminiWithFallback(apiKey, bodyPayload, onStep, taskType = "chat") {
+    const preferred = modelSelect.value;
+    const fastChatChain = ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-4-hydrogen", "gemini-3.5-flash"];
+    const mediaChain = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-4-hydrogen", "gemini-3.5-flash-lite"];
+    const baseChain = taskType === "chat" ? fastChatChain : mediaChain;
+    const order = preferred === "auto" ? baseChain : [preferred, ...baseChain.filter(m => m !== preferred)];
+
+    let lastErr = null;
+    for (const model of order) {
+      for (const useTools of (bodyPayload.tools ? [true, false] : [false])) {
+        try {
+          if (onStep) onStep(`Running ${model}...`);
+          const payloadCopy = useTools ? bodyPayload : { ...bodyPayload, tools: undefined };
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 30000);
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payloadCopy),
+            signal: ctrl.signal
+          });
+          clearTimeout(tid);
+          const data = await res.json();
+          if (res.ok && data.candidates?.[0]) return { model, data };
+          const msg = data?.error?.message || `HTTP ${res.status}`;
+          lastErr = new Error(`${model}: ${msg}`);
+          if (res.status === 404) break;
+          if (res.status === 429 || res.status === 503 || res.status === 400 || msg.toLowerCase().includes("high demand") || msg.toLowerCase().includes("quota")) {
+            await new Promise(r => setTimeout(r, 350));
+            continue;
+          }
+          throw new Error(msg);
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+    }
+    throw lastErr || new Error("All Gemini models failed.");
   }
 
-  function createAICard(title, badge, steps = []) {
-    homeHero.classList.add('hidden');
-    const row = document.createElement('div');
-    row.className = 'msg-row ai';
-    const card = document.createElement('div');
-    card.className = 'ai-card';
+  async function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(fr.result);
+      fr.onerror = () => reject(new Error("Could not read photo from device."));
+      fr.readAsDataURL(file);
+    });
+  }
+
+  async function fileToSafeJpegBase64(mediaObj) {
+    const dataUrl = mediaObj.dataUrl || await readFileAsDataUrl(mediaObj.file);
+    mediaObj.dataUrl = dataUrl;
+    const img = new Image();
+    img.src = dataUrl;
+    await img.decode();
+    const sc = Math.min(1, 1400 / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * sc);
+    c.height = Math.round(img.height * sc);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return { b64: c.toDataURL("image/jpeg", 0.88).split(",")[1], dataUrl };
+  }
+
+  function renderPosterCanvas(spec) {
+    const c = document.createElement("canvas");
+    c.className = "photo-out";
+    c.width = 1080; c.height = 1350;
+    const ctx = c.getContext("2d");
+
+    const bg1 = spec.bgStart || "#faf8f5";
+    const bg2 = spec.bgEnd || "#efe7da";
+    const accent = spec.accentColor || "#8c6d46";
+    const ink = spec.textColor || "#171717";
+
+    const g = ctx.createLinearGradient(0, 0, 1080, 1350);
+    g.addColorStop(0, bg1); g.addColorStop(1, bg2);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1350);
+
+    // Editorial border frame
+    ctx.strokeStyle = accent; ctx.lineWidth = 6;
+    ctx.strokeRect(56, 56, 1080 - 112, 1350 - 112);
+
+    // Decorative top badge
+    ctx.fillStyle = accent;
+    ctx.font = '600 28px -apple-system, sans-serif';
+    ctx.textAlign = "center";
+    ctx.fillText((spec.eyebrow || "SPECIAL EDITION").toUpperCase(), 540, 190);
+
+    // Main Headline
+    ctx.fillStyle = ink;
+    ctx.font = '700 84px Georgia, serif';
+    const words = (spec.headline || "Parmar AI Studio").split(/\s+/);
+    let line = "", y = 370;
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > 840) {
+        ctx.fillText(line, 540, y); line = w; y += 100;
+      } else { line = test; }
+    }
+    if (line) ctx.fillText(line, 540, y);
+
+    // Subtitle
+    ctx.fillStyle = ink;
+    ctx.globalAlpha = 0.78;
+    ctx.font = '400 38px -apple-system, sans-serif';
+    ctx.fillText(spec.subheadline || "", 540, y + 110, 840);
+    ctx.globalAlpha = 1;
+
+    // Bullet highlights
+    const pts = (spec.highlights || []).slice(0, 4);
+    let py = y + 230;
+    ctx.textAlign = "left";
+    ctx.font = '600 34px -apple-system, sans-serif';
+    for (const pt of pts) {
+      ctx.fillStyle = accent;
+      ctx.fillRect(140, py - 24, 16, 16);
+      ctx.fillStyle = ink;
+      ctx.fillText(pt, 180, py, 760);
+      py += 76;
+    }
+
+    // Bottom CTA Pill
+    if (spec.cta) {
+      ctx.fillStyle = ink;
+      ctx.beginPath();
+      ctx.roundRect(290, 1100, 500, 96, 48);
+      ctx.fill();
+      ctx.fillStyle = bg1;
+      ctx.textAlign = "center";
+      ctx.font = '700 34px -apple-system, sans-serif';
+      ctx.fillText(spec.cta, 540, 1160);
+    }
+    return c;
+  }
+
+  async function handleSend() {
+    const text = promptBox.value.trim();
+    const apiKey = getApiKey();
+    if (!text && !attachedFile) return;
+
+    homeHero.classList.add("hidden");
+
+    const uRow = document.createElement("div");
+    uRow.className = "msg-row user";
+    uRow.innerHTML = `<div class="user-bubble">
+      ${attachedFile ? `<div class="user-media-tag">${attachedFile.type.toUpperCase()}: ${attachedFile.file.name}</div>` : ""}
+      <div>${text || "(Media attached)"}</div>
+    </div>`;
+    chatContainer.appendChild(uRow);
+
+    const media = attachedFile;
+    promptBox.value = "";
+    promptBox.style.height = "auto";
+    attachedFile = null;
+    attachChip.classList.add("hidden");
+    document.getElementById("videoInput").value = "";
+    document.getElementById("photoInput").value = "";
+
+    const aRow = document.createElement("div");
+    aRow.className = "msg-row ai";
+    const card = document.createElement("div");
+    card.className = "ai-card";
     card.innerHTML = `
       <div class="ai-card-top">
-        <div class="ai-card-label"><span>◆</span><span>${escapeHtml(title)}</span></div>
-        <span class="mini-badge">${escapeHtml(badge)}</span>
+        <div class="ai-card-label">Parmar AI Studio</div>
+        <span class="mini-badge">Starting...</span>
       </div>
-      ${steps.length ? `<div class="tracker">${steps.map((s, i) => `
-        <div class="tracker-step ${i === 0 ? 'active' : ''}" data-step="${i}">
-          <span class="step-dot">${i === 0 ? '' : '•'}</span>
-          <span>${escapeHtml(s)}</span>
-        </div>`).join('')}</div>` : ''}
-      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill"></div></div><div class="progress-label"><span class="p-msg">Working...</span><span class="p-pct">0%</span></div></div>
+      <div class="tracker"></div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill"></div></div>
+        <div class="progress-label"><span class="p-msg">Working...</span><span class="p-pct">0%</span></div>
+      </div>
       <div class="alert error"></div>
-      <div class="alert info"></div>
-      <div class="card-body"></div>
+      <div class="card-content"></div>
     `;
-    row.appendChild(card);
-    chatContainer.appendChild(row);
-    scrollChatBottom();
+    aRow.appendChild(card);
+    chatContainer.appendChild(aRow);
+    chatScroll.scrollTop = chatScroll.scrollHeight;
 
-    return {
-      card,
-      body: card.querySelector('.card-body'),
-      setStep(idx, status = 'active') {
-        const el = card.querySelector(`.tracker-step[data-step="${idx}"]`);
-        if (!el) return;
-        el.classList.remove('active', 'done', 'err');
-        el.classList.add(status);
-        el.querySelector('.step-dot').textContent = status === 'done' ? '✓' : status === 'err' ? '!' : '';
-      },
-      setProgress(pct, msg) {
-        const pw = card.querySelector('.progress-wrap');
-        pw.classList.add('show');
-        card.querySelector('.progress-fill').style.width = `${Math.min(100, Math.max(0, pct))}%`;
-        if (msg) card.querySelector('.p-msg').textContent = msg;
-        card.querySelector('.p-pct').textContent = `${Math.round(pct)}%`;
-      },
-      hideProgress() { card.querySelector('.progress-wrap').classList.remove('show'); },
-      showError(msg) { const a = card.querySelector('.alert.error'); a.textContent = msg; a.classList.add('show'); },
-      showInfo(msg) { const a = card.querySelector('.alert.info'); a.textContent = msg; a.classList.add('show'); }
-    };
-  }
+    const badge = card.querySelector(".mini-badge");
+    const tracker = card.querySelector(".tracker");
+    const progWrap = card.querySelector(".progress-wrap");
+    const progFill = card.querySelector(".progress-fill");
+    const pMsg = card.querySelector(".p-msg");
+    const pPct = card.querySelector(".p-pct");
+    const errBox = card.querySelector(".alert.error");
+    const content = card.querySelector(".card-content");
 
-  /* ==================== 1. RAW VIDEO EDITOR ENGINE (FIXED!) ==================== */
-  function parseVideoEditLocal(prompt, duration) {
-    const p = prompt.toLowerCase();
-    let preset = 'cinematic';
-    if (p.includes('warm') || p.includes('golden') || p.includes('sunset')) preset = 'warm';
-    else if (p.includes('black') || p.includes('b&w') || p.includes('noir') || p.includes('mono')) preset = 'noir';
-    else if (p.includes('vintage') || p.includes('retro') || p.includes('90s')) preset = 'vintage';
-    else if (p.includes('vivid') || p.includes('bright') || p.includes('pop')) preset = 'vivid';
-    else if (p.includes('cool') || p.includes('blue') || p.includes('nordic')) preset = 'cool';
-    else if (p.includes('original') || p.includes('no filter')) preset = 'none';
-
-    let speed = 1;
-    if (p.includes('slow') || p.includes('0.5x')) speed = 0.5;
-    else if (p.includes('fast') || p.includes('1.5x') || p.includes('timelapse')) speed = 1.5;
-    else if (p.includes('2x')) speed = 2;
-
-    const vignette = !p.includes('no vignette');
-    const titleMatch = prompt.match(/title[:\s]+"([^"]+)"/i);
-    const title = titleMatch ? titleMatch[1] : (p.includes('reel') ? 'Parmar Studio Reel' : 'Edited Cut');
-    const dur = Math.max(2, duration || 8);
-    const captions = [
-      { start: 0, end: Math.min(2.5, dur * 0.35), text: 'Opening Scene — Studio Grade' },
-      { start: Math.min(2.5, dur * 0.35), end: Math.min(5.5, dur * 0.72), text: 'Enhanced Detail & Dynamic Contrast' },
-      { start: Math.min(5.5, dur * 0.72), end: dur, text: 'Parmar AI Studio Cut' }
-    ];
-    return { preset, speed, vignette, title, trimStart: 0, trimEnd: dur, captions };
-  }
-
-  async function sampleVideoFrames(videoEl, count = 3) {
-    const frames = [];
-    const c = document.createElement('canvas');
-    c.width = 320; c.height = 180;
-    const ctx = c.getContext('2d');
-    const dur = videoEl.duration || 4;
-    for (let i = 0; i < count; i++) {
-      const t = Math.min(dur - 0.1, (dur / (count + 1)) * (i + 1));
-      await new Promise(r => {
-        const onSeek = () => { videoEl.removeEventListener('seeked', onSeek); r(); };
-        videoEl.addEventListener('seeked', onSeek);
-        videoEl.currentTime = Math.max(0, t);
-      });
-      ctx.drawImage(videoEl, 0, 0, c.width, c.height);
-      frames.push(c.toDataURL('image/jpeg', 0.65).split(',')[1]);
+    function setProgress(pct, msg) {
+      progWrap.classList.add("show");
+      progFill.style.width = `${pct}%`;
+      pMsg.textContent = msg;
+      pPct.textContent = `${pct}%`;
     }
-    videoEl.currentTime = 0;
-    return frames;
-  }
+    function addStep(id, label, state = "active") {
+      let el = tracker.querySelector(`[data-st="${id}"]`);
+      if (!el) { el = document.createElement("div"); el.dataset.st = id; tracker.appendChild(el); }
+      el.className = `tracker-step ${state}`;
+      el.innerHTML = `<span class="step-dot">${state === "done" ? "✓" : state === "err" ? "!" : ""}</span><span>${label}</span>`;
+    }
 
-  async function runVideoEditor(prompt, attachment) {
-    const ui = createAICard('Video Director & Raw Editor', 'Canvas + WebM Studio', [
-      'Loading raw video metadata & frames',
-      'Generating AI edit plan, color LUT & captions',
-      'Mounting live interactive studio timeline'
-    ]);
+    if (!apiKey) {
+      addStep("key", "API Key Missing — Open ☰ Menu to paste your Gemini API Key", "err");
+      errBox.textContent = "Please set your free Gemini API key in the ☰ Menu first.";
+      errBox.classList.add("show");
+      badge.textContent = "Key Required";
+      return;
+    }
 
-    const videoUrl = attachment.url;
-    const tempVid = document.createElement('video');
-    tempVid.src = videoUrl;
-    tempVid.muted = true;
-    tempVid.playsInline = true;
+    try {
+      const sysInstr = buildSystemInstruction();
+      const isPosterReq = !media && /\b(poster|pamphlet|flyer|banner|brochure)\b/i.test(text);
 
-    await new Promise((res, rej) => {
-      tempVid.onloadedmetadata = () => res();
-      tempVid.onerror = () => rej(new Error('Could not decode this video format in browser.'));
-    });
+      // MODE 1: VIDEO EDITING
+      if (media && media.type === "video") {
+        addStep("up", "Uploading raw video to Gemini...", "active");
+        setProgress(12, "Starting resumable upload...");
+        const { fileUri, mimeType } = await uploadToGeminiFiles(apiKey, media.file, setProgress);
+        addStep("up", "Video uploaded & ready", "done");
 
-    const duration = Number.isFinite(tempVid.duration) && tempVid.duration > 0 ? tempVid.duration : 10;
-    ui.setStep(0, 'done');
-    ui.setStep(1, 'active');
+        addStep("ai", "Analyzing video & generating smooth Hinglish captions...", "active");
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            editSummary: { type: "STRING" },
+            speed: { type: "NUMBER" },
+            brightness: { type: "NUMBER" },
+            contrast: { type: "NUMBER" },
+            saturation: { type: "NUMBER" },
+            vignette: { type: "BOOLEAN" },
+            letterbox: { type: "BOOLEAN" },
+            titleBanner: { type: "STRING" },
+            captions: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, text: { type: "STRING" } },
+                required: ["start", "end", "text"]
+              }
+            }
+          },
+          required: ["editSummary", "speed", "captions"]
+        };
 
-    let plan = parseVideoEditLocal(prompt, duration);
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{
+            role: "user",
+            parts: [
+              { file_data: { mime_type: mimeType, file_uri: fileUri } },
+              { text: `Edit this video according to: "${text || "Make a clean vibrant reel with Hinglish captions"}". Return brightness around 1.0 (0.9-1.2), contrast around 1.15, saturation around 1.25. Transcribe Hindi/Gujarati/English speech into short 3-4 word Roman Hinglish captions.` }
+            ]
+          }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
 
-    if (state.apiKey) {
-      try {
-        const frames = await sampleVideoFrames(tempVid, 3);
-        const parts = [
-          { text: `Analyze these 3 video frames and the user edit instruction: "${prompt}". Video duration is ${duration.toFixed(1)}s. Return JSON ONLY with keys: preset (one of: none, cinematic, warm, vivid, noir, vintage, cool), speed (0.5 to 2), vignette (boolean), title (short 2-4 word badge), captions (array of {start, end, text} within 0 to ${duration.toFixed(1)}).` },
-          ...frames.map(b64 => ({ inlineData: { mimeType: 'image/jpeg', data: b64 } }))
-        ];
-        const res = await callGemini({ parts, systemText: buildSystemInstruction('Video Editor JSON Director'), jsonMode: true });
-        const parsed = JSON.parse(res.text);
-        if (parsed && typeof parsed === 'object') {
-          plan = {
-            preset: FILTER_PRESETS[parsed.preset] ? parsed.preset : plan.preset,
-            speed: Math.min(2, Math.max(0.5, Number(parsed.speed) || 1)),
-            vignette: parsed.vignette !== false,
-            title: String(parsed.title || plan.title).slice(0, 42),
-            trimStart: 0,
-            trimEnd: duration,
-            captions: Array.isArray(parsed.captions) && parsed.captions.length ? parsed.captions : plan.captions
-          };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "media");
+        const plan = JSON.parse(data.candidates[0].content.parts[0].text);
+        addStep("ai", `Edit Plan & Hinglish Captions ready (${model})`, "done");
+        progWrap.classList.remove("show");
+        badge.textContent = model;
+
+        const normB = (plan.brightness !== undefined && plan.brightness < 0.5) ? (1 + plan.brightness) : (plan.brightness || 1);
+        const safeB = Math.min(1.35, Math.max(0.88, normB));
+        const safeC = Math.min(1.45, Math.max(0.88, plan.contrast || 1.12));
+        const safeS = Math.min(1.75, Math.max(0.75, plan.saturation || 1.2));
+        const safeSpd = Math.min(2, Math.max(0.5, plan.speed || 1));
+
+        // Chunk any long caption into 3-4 word smooth lines
+        const caps = [];
+        for (const rawC of (plan.captions || [])) {
+          const words = (rawC.text || "").trim().split(/\s+/).filter(Boolean);
+          if (words.length <= 4) {
+            if (words.length) caps.push({ start: rawC.start, end: rawC.end, text: words.join(" ") });
+          } else {
+            const chunks = [];
+            for (let i = 0; i < words.length; i += 4) chunks.push(words.slice(i, i + 4).join(" "));
+            const dur = Math.max(0.4, (rawC.end || 1) - (rawC.start || 0));
+            const step = dur / chunks.length;
+            chunks.forEach((ch, idx) => {
+              caps.push({
+                start: Number(((rawC.start || 0) + idx * step).toFixed(2)),
+                end: Number(((rawC.start || 0) + (idx + 1) * step).toFixed(2)),
+                text: ch
+              });
+            });
+          }
         }
-      } catch (err) {
-        ui.showInfo(`AI Director fallback applied (${err.message}). All timeline & export controls remain fully active.`);
-      }
-    } else {
-      ui.showInfo('Running Local AI Video Director (no API key required). You can adjust every filter, trim, speed & caption below and export WebM.');
-    }
 
-    ui.setStep(1, 'done');
-    ui.setStep(2, 'active');
-
-    const body = ui.body;
-    body.innerHTML = `
-      <div class="stage">
-        <video controls playsinline preload="auto"></video>
-        <div class="stage-vignette"></div>
-        <div class="stage-title"></div>
-        <div class="stage-caption"></div>
-      </div>
-      <div class="studio-grid">
-        <div class="ctrl-box">
-          <span>Color Grade Preset</span>
-          <select class="v-preset">${Object.entries(FILTER_PRESETS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('')}</select>
-        </div>
-        <div class="ctrl-box">
-          <span>Playback Speed (<b class="v-spd-lbl">${plan.speed}x</b>)</span>
-          <input type="range" class="v-speed" min="0.5" max="2" step="0.25" value="${plan.speed}" />
-        </div>
-        <div class="ctrl-box">
-          <span>Trim Start (s)</span>
-          <input type="number" class="v-tstart" min="0" max="${duration.toFixed(1)}" step="0.1" value="0" />
-        </div>
-        <div class="ctrl-box">
-          <span>Trim End (s)</span>
-          <input type="number" class="v-tend" min="0.5" max="${duration.toFixed(1)}" step="0.1" value="${duration.toFixed(1)}" />
-        </div>
-        <div class="ctrl-box">
-          <span>Title Badge Overlay</span>
-          <input type="text" class="v-title" value="${escapeHtml(plan.title)}" placeholder="Optional title..." />
-        </div>
-        <div class="ctrl-box">
-          <span>Vignette &amp; Captions</span>
-          <div class="row" style="padding-top:4px;">
-            <label style="font-size:0.75rem;display:flex;align-items:center;gap:4px;"><input type="checkbox" class="v-vig" ${plan.vignette ? 'checked' : ''}/> Vignette</label>
-            <label style="font-size:0.75rem;display:flex;align-items:center;gap:4px;"><input type="checkbox" class="v-cap-on" checked/> Captions</label>
+        const vidUrl = URL.createObjectURL(media.file);
+        content.innerHTML = `
+          <div class="alert info show" style="margin-bottom:10px;">${plan.editSummary}</div>
+          <div class="stage">
+            <video controls playsinline preload="auto" src="${vidUrl}"></video>
+            <div class="stage-vignette"></div>
+            <div class="stage-title"></div>
+            <div class="stage-caption"></div>
           </div>
-        </div>
-      </div>
-      <div class="sec-title"><span>Timed Captions</span><button type="button" class="btn btn-sm v-add-cap">+ Add Caption</button></div>
-      <div class="captions-list"></div>
-      <div class="row">
-        <button type="button" class="btn btn-dark v-export-btn">⬇ Render &amp; Export Edited Video (.webm)</button>
-        <a class="btn btn-gold hidden v-dl-link" download="parmar-edited-video.webm">Download Rendered WebM</a>
-      </div>
-    `;
-
-    const videoEl = body.querySelector('video');
-    const titleEl = body.querySelector('.stage-title');
-    const capEl = body.querySelector('.stage-caption');
-    const vigEl = body.querySelector('.stage-vignette');
-    const presetSel = body.querySelector('.v-preset');
-    const speedInp = body.querySelector('.v-speed');
-    const tStartInp = body.querySelector('.v-tstart');
-    const tEndInp = body.querySelector('.v-tend');
-    const titleInp = body.querySelector('.v-title');
-    const vigChk = body.querySelector('.v-vig');
-    const capChk = body.querySelector('.v-cap-on');
-    const capList = body.querySelector('.captions-list');
-
-    videoEl.src = videoUrl;
-    presetSel.value = plan.preset;
-
-    function applyStageVisuals() {
-      const pObj = FILTER_PRESETS[presetSel.value] || FILTER_PRESETS.none;
-      videoEl.style.filter = pObj.filter;
-      videoEl.playbackRate = Number(speedInp.value) || 1;
-      body.querySelector('.v-spd-lbl').textContent = `${videoEl.playbackRate}x`;
-      vigEl.style.display = vigChk.checked ? 'block' : 'none';
-      const tTxt = titleInp.value.trim();
-      titleEl.textContent = tTxt;
-      titleEl.style.display = tTxt ? 'block' : 'none';
-    }
-
-    function renderCaptionsEditor() {
-      capList.innerHTML = '';
-      plan.captions.forEach((c, idx) => {
-        const item = document.createElement('div');
-        item.className = 'cap-item';
-        item.innerHTML = `
-          <input type="number" step="0.1" value="${Number(c.start).toFixed(1)}" class="c-s" />
-          <input type="number" step="0.1" value="${Number(c.end).toFixed(1)}" class="c-e" />
-          <input type="text" value="${escapeHtml(c.text)}" class="c-t" />
-          <button type="button" class="btn btn-sm" style="min-height:28px;padding:0;" title="Remove">×</button>
+          <div class="captions-list" style="margin-top:10px;"></div>
+          <button type="button" class="btn btn-dark render-mp4-btn" style="width:100%;margin-top:10px;">Render &amp; Download Edited Video (With Sound)</button>
+          <div class="mp4-out" style="margin-top:10px;"></div>
         `;
-        item.querySelector('.c-s').addEventListener('input', e => { c.start = Number(e.target.value) || 0; });
-        item.querySelector('.c-e').addEventListener('input', e => { c.end = Number(e.target.value) || 0; });
-        item.querySelector('.c-t').addEventListener('input', e => { c.text = e.target.value; });
-        item.querySelector('button').addEventListener('click', () => { plan.captions.splice(idx, 1); renderCaptionsEditor(); });
-        capList.appendChild(item);
-      });
-    }
 
-    videoEl.addEventListener('timeupdate', () => {
-      const t = videoEl.currentTime;
-      const ts = Number(tStartInp.value) || 0;
-      const te = Number(tEndInp.value) || duration;
-      if (t < ts) videoEl.currentTime = ts;
-      if (t > te && !videoEl.paused) {
-        videoEl.pause();
-        videoEl.currentTime = ts;
-      }
-      if (capChk.checked) {
-        const active = plan.captions.find(c => t >= Number(c.start) && t <= Number(c.end));
-        if (active && active.text.trim()) {
-          capEl.textContent = active.text;
-          capEl.style.display = 'block';
-        } else {
-          capEl.style.display = 'none';
-        }
-      } else {
-        capEl.style.display = 'none';
-      }
-    });
+        const vEl = content.querySelector("video");
+        const capOverlay = content.querySelector(".stage-caption");
+        const titleOverlay = content.querySelector(".stage-title");
+        const vigOverlay = content.querySelector(".stage-vignette");
+        const capList = content.querySelector(".captions-list");
 
-    [presetSel, speedInp, titleInp, vigChk, capChk].forEach(el => el.addEventListener('input', applyStageVisuals));
-    body.querySelector('.v-add-cap').addEventListener('click', () => {
-      const t = videoEl.currentTime || 0;
-      plan.captions.push({ start: t, end: Math.min(duration, t + 2.5), text: 'New Studio Caption' });
-      renderCaptionsEditor();
-    });
+        vEl.onloadedmetadata = () => {
+          vEl.playbackRate = safeSpd;
+          vEl.currentTime = 0.05;
+        };
+        vEl.style.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`;
+        if (plan.vignette) vigOverlay.style.display = "block";
+        if (plan.titleBanner) { titleOverlay.textContent = plan.titleBanner; titleOverlay.style.display = "block"; }
 
-    applyStageVisuals();
-    renderCaptionsEditor();
-
-    /* Real Canvas + MediaRecorder WebM Export */
-    const exportBtn = body.querySelector('.v-export-btn');
-    const dlLink = body.querySelector('.v-dl-link');
-    exportBtn.addEventListener('click', async () => {
-      if (typeof MediaRecorder === 'undefined') {
-        return ui.showError('MediaRecorder is not supported in this browser for video export.');
-      }
-      exportBtn.disabled = true;
-      dlLink.classList.add('hidden');
-      const ts = Math.max(0, Number(tStartInp.value) || 0);
-      const te = Math.min(duration, Math.max(ts + 0.5, Number(tEndInp.value) || duration));
-
-      const recVid = document.createElement('video');
-      recVid.src = videoUrl;
-      recVid.muted = false;
-      recVid.playsInline = true;
-      await new Promise(r => { recVid.onloadedmetadata = r; });
-
-      const cw = Math.min(1280, recVid.videoWidth || 1280);
-      const ch = Math.min(720, recVid.videoHeight || 720);
-      const offCanvas = document.createElement('canvas');
-      offCanvas.width = cw; offCanvas.height = ch;
-      const ctx = offCanvas.getContext('2d');
-
-      const stream = offCanvas.captureStream(30);
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const srcNode = audioCtx.createMediaElementSource(recVid);
-        const dest = audioCtx.createMediaStreamDestination();
-        srcNode.connect(dest);
-        dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
-      } catch {}
-
-      const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
-      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 3500000 });
-      const chunks = [];
-      recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const outUrl = URL.createObjectURL(blob);
-        dlLink.href = outUrl;
-        dlLink.classList.remove('hidden');
-        exportBtn.disabled = false;
-        ui.setProgress(100, 'Render complete!');
-        showToast('Edited WebM video ready to download!');
-      };
-
-      recVid.currentTime = ts;
-      recVid.playbackRate = Number(speedInp.value) || 1;
-      await new Promise(r => { recVid.onseeked = r; });
-
-      recorder.start(250);
-      recVid.play();
-
-      const pObj = FILTER_PRESETS[presetSel.value] || FILTER_PRESETS.none;
-      function drawFrame() {
-        if (recVid.paused || recVid.ended || recVid.currentTime >= te) {
-          recVid.pause();
-          if (recorder.state === 'recording') recorder.stop();
-          return;
-        }
-        ctx.save();
-        ctx.filter = pObj.filter;
-        ctx.drawImage(recVid, 0, 0, cw, ch);
-        ctx.restore();
-
-        if (vigChk.checked) {
-          const grad = ctx.createRadialGradient(cw / 2, ch / 2, cw * 0.25, cw / 2, ch / 2, cw * 0.72);
-          grad.addColorStop(0, 'rgba(0,0,0,0)');
-          grad.addColorStop(1, 'rgba(0,0,0,0.55)');
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, cw, ch);
-        }
-
-        const tTxt = titleInp.value.trim();
-        if (tTxt) {
-          ctx.font = `600 ${Math.round(ch * 0.032)}px Inter, sans-serif`;
-          const tw = ctx.measureText(tTxt).width + 36;
-          ctx.fillStyle = 'rgba(24,24,27,0.88)';
-          ctx.beginPath();
-          ctx.roundRect((cw - tw) / 2, ch * 0.05, tw, ch * 0.065, 999);
-          ctx.fill();
-          ctx.strokeStyle = '#8c6d46';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.fillStyle = '#ffffff';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(tTxt, cw / 2, ch * 0.05 + ch * 0.0325);
-        }
-
-        if (capChk.checked) {
-          const curT = recVid.currentTime;
-          const active = plan.captions.find(c => curT >= Number(c.start) && curT <= Number(c.end));
-          if (active && active.text.trim()) {
-            ctx.font = `700 ${Math.round(ch * 0.04)}px Inter, sans-serif`;
-            const cwTxt = Math.min(cw * 0.86, ctx.measureText(active.text).width + 28);
-            ctx.fillStyle = 'rgba(0,0,0,0.75)';
-            ctx.beginPath();
-            ctx.roundRect((cw - cwTxt) / 2, ch * 0.84, cwTxt, ch * 0.075, 10);
-            ctx.fill();
-            ctx.fillStyle = '#fde047';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(active.text, cw / 2, ch * 0.84 + ch * 0.0375, cw * 0.82);
-          }
-        }
-
-        const pct = ((recVid.currentTime - ts) / Math.max(0.1, te - ts)) * 100;
-        ui.setProgress(pct, 'Rendering video frames...');
-        requestAnimationFrame(drawFrame);
-      }
-      requestAnimationFrame(drawFrame);
-    });
-
-    ui.setStep(2, 'done');
-    scrollChatBottom();
-  }
-
-  /* ==================== 2. PHOTO RETOUCH & AI EDITOR ENGINE (FIXED!) ==================== */
-  function parsePhotoEditLocal(prompt) {
-    const p = prompt.toLowerCase();
-    let cfg = { brightness: 104, contrast: 110, saturate: 112, sepia: 0, grayscale: 0, blur: 0, vignette: 20, rotate: 0, overlayText: '' };
-    if (p.includes('warm') || p.includes('golden') || p.includes('sun')) { cfg.brightness = 107; cfg.saturate = 128; cfg.sepia = 24; cfg.vignette = 28; }
-    else if (p.includes('black') || p.includes('b&w') || p.includes('noir') || p.includes('mono')) { cfg.grayscale = 100; cfg.contrast = 135; cfg.vignette = 50; }
-    else if (p.includes('vintage') || p.includes('retro')) { cfg.contrast = 94; cfg.saturate = 84; cfg.sepia = 35; cfg.vignette = 38; }
-    else if (p.includes('bright') || p.includes('pop') || p.includes('vivid')) { cfg.brightness = 112; cfg.contrast = 118; cfg.saturate = 140; }
-    else if (p.includes('cinematic') || p.includes('dramatic')) { cfg.brightness = 96; cfg.contrast = 124; cfg.saturate = 115; cfg.vignette = 48; }
-    if (p.includes('rotate')) cfg.rotate = 90;
-    const txtM = prompt.match(/text[:\s]+"([^"]+)"/i);
-    if (txtM) cfg.overlayText = txtM[1];
-    return cfg;
-  }
-
-  async function runPhotoEditor(prompt, attachment) {
-    const ui = createAICard('Photo Retouch & AI Colorist', 'High-Res Canvas Editor', [
-      'Decoding source photograph',
-      'Applying AI retouch & color grade',
-      'Rendering interactive Canvas studio'
-    ]);
-
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    await new Promise((res, rej) => {
-      img.onload = res;
-      img.onerror = () => rej(new Error('Could not load uploaded image.'));
-      img.src = attachment.dataUrl || attachment.url;
-    });
-
-    ui.setStep(0, 'done');
-    ui.setStep(1, 'active');
-
-    let cfg = parsePhotoEditLocal(prompt);
-    let aiNote = '';
-
-    if (state.apiKey) {
-      try {
-        const b64 = (attachment.dataUrl || '').split(',')[1];
-        if (b64) {
-          const parts = [
-            { text: `You are a professional photo retoucher. User asked: "${prompt}". Return JSON ONLY with numeric sliders: brightness (60-150), contrast (60-160), saturate (0-180), sepia (0-100), grayscale (0-100), blur (0-8), vignette (0-80), rotate (0,90,180,270), overlayText (string, empty unless user asked for text), note (short 1-sentence summary of edits).` },
-            { inlineData: { mimeType: attachment.file?.type || 'image/jpeg', data: b64 } }
-          ];
-          const res = await callGemini({ parts, systemText: buildSystemInstruction('Photo Colorist JSON'), jsonMode: true });
-          const parsed = JSON.parse(res.text);
-          if (parsed && typeof parsed === 'object') {
-            cfg = {
-              brightness: Number(parsed.brightness) || cfg.brightness,
-              contrast: Number(parsed.contrast) || cfg.contrast,
-              saturate: Number(parsed.saturate) ?? cfg.saturate,
-              sepia: Number(parsed.sepia) || 0,
-              grayscale: Number(parsed.grayscale) || 0,
-              blur: Number(parsed.blur) || 0,
-              vignette: Number(parsed.vignette) ?? cfg.vignette,
-              rotate: Number(parsed.rotate) || 0,
-              overlayText: String(parsed.overlayText || cfg.overlayText)
-            };
-            aiNote = parsed.note || '';
-          }
-        }
-      } catch (err) {
-        ui.showInfo(`AI Colorist fallback used (${err.message}). Fine-tune any slider below.`);
-      }
-    }
-
-    ui.setStep(1, 'done');
-    ui.setStep(2, 'active');
-
-    const body = ui.body;
-    body.innerHTML = `
-      ${aiNote ? `<div class="md-body" style="margin-bottom:8px;">${escapeHtml(aiNote)}</div>` : ''}
-      <div class="photo-stage">
-        <canvas class="photo-out"></canvas>
-      </div>
-      <div class="studio-grid">
-        <div class="ctrl-box"><span>Brightness (<b class="lbl-b">${cfg.brightness}%</b>)</span><input type="range" class="p-b" min="50" max="160" value="${cfg.brightness}" /></div>
-        <div class="ctrl-box"><span>Contrast (<b class="lbl-c">${cfg.contrast}%</b>)</span><input type="range" class="p-c" min="50" max="170" value="${cfg.contrast}" /></div>
-        <div class="ctrl-box"><span>Saturation (<b class="lbl-s">${cfg.saturate}%</b>)</span><input type="range" class="p-s" min="0" max="200" value="${cfg.saturate}" /></div>
-        <div class="ctrl-box"><span>Warmth / Sepia (<b class="lbl-sep">${cfg.sepia}%</b>)</span><input type="range" class="p-sep" min="0" max="100" value="${cfg.sepia}" /></div>
-        <div class="ctrl-box"><span>Vignette (<b class="lbl-vig">${cfg.vignette}%</b>)</span><input type="range" class="p-vig" min="0" max="90" value="${cfg.vignette}" /></div>
-        <div class="ctrl-box"><span>Soft Blur (<b class="lbl-bl">${cfg.blur}px</b>)</span><input type="range" class="p-bl" min="0" max="10" step="0.5" value="${cfg.blur}" /></div>
-        <div class="ctrl-box"><span>Overlay Text</span><input type="text" class="p-txt" value="${escapeHtml(cfg.overlayText)}" placeholder="Add watermark or title..." /></div>
-        <div class="ctrl-box"><span>Quick Actions</span>
-          <div class="row">
-            <button type="button" class="btn btn-sm p-rot">↻ Rotate 90°</button>
-            <button type="button" class="btn btn-sm p-compare">Hold: Original</button>
+        capList.innerHTML = caps.map((c, idx) => `
+          <div class="cap-item">
+            <input type="number" step="0.1" value="${c.start}" data-cap-start="${idx}" />
+            <input type="number" step="0.1" value="${c.end}" data-cap-end="${idx}" />
+            <input type="text" value="${c.text.replace(/"/g, "&quot;")}" data-cap-text="${idx}" />
           </div>
-        </div>
-      </div>
-      <div class="row">
-        <button type="button" class="btn btn-dark p-dl-png">⬇ Download Edited PNG</button>
-        <button type="button" class="btn p-dl-jpg">Download JPG</button>
-      </div>
-    `;
-
-    const canvas = body.querySelector('canvas.photo-out');
-    const ctx = canvas.getContext('2d');
-    let showOriginal = false;
-
-    function renderPhoto() {
-      const rot = ((cfg.rotate % 360) + 360) % 360;
-      const swap = rot === 90 || rot === 270;
-      const maxDim = 1600;
-      const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
-      const iw = Math.round(img.naturalWidth * scale);
-      const ih = Math.round(img.naturalHeight * scale);
-      canvas.width = swap ? ih : iw;
-      canvas.height = swap ? iw : ih;
-
-      ctx.save();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!showOriginal) {
-        ctx.filter = `brightness(${cfg.brightness}%) contrast(${cfg.contrast}%) saturate(${cfg.saturate}%) sepia(${cfg.sepia}%) grayscale(${cfg.grayscale}%) blur(${cfg.blur}px)`;
-      }
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate((rot * Math.PI) / 180);
-      ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
-      ctx.restore();
-
-      if (!showOriginal && cfg.vignette > 0) {
-        const g = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.25, canvas.width / 2, canvas.height / 2, canvas.width * 0.72);
-        g.addColorStop(0, 'rgba(0,0,0,0)');
-        g.addColorStop(1, `rgba(0,0,0,${(cfg.vignette / 100).toFixed(2)})`);
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
-
-      if (!showOriginal && cfg.overlayText.trim()) {
-        const fs = Math.max(20, Math.round(canvas.height * 0.05));
-        ctx.font = `700 ${fs}px Georgia, serif`;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = 'rgba(0,0,0,0.55)';
-        ctx.fillText(cfg.overlayText, canvas.width / 2 + 2, canvas.height * 0.9 + 2);
-        ctx.fillStyle = '#faf8f5';
-        ctx.fillText(cfg.overlayText, canvas.width / 2, canvas.height * 0.9);
-      }
-
-      body.querySelector('.lbl-b').textContent = `${cfg.brightness}%`;
-      body.querySelector('.lbl-c').textContent = `${cfg.contrast}%`;
-      body.querySelector('.lbl-s').textContent = `${cfg.saturate}%`;
-      body.querySelector('.lbl-sep').textContent = `${cfg.sepia}%`;
-      body.querySelector('.lbl-vig').textContent = `${cfg.vignette}%`;
-      body.querySelector('.lbl-bl').textContent = `${cfg.blur}px`;
-    }
-
-    const bind = (cls, key) => {
-      body.querySelector(cls).addEventListener('input', e => {
-        cfg[key] = key === 'overlayText' ? e.target.value : Number(e.target.value);
-        renderPhoto();
-      });
-    };
-    bind('.p-b', 'brightness');
-    bind('.p-c', 'contrast');
-    bind('.p-s', 'saturate');
-    bind('.p-sep', 'sepia');
-    bind('.p-vig', 'vignette');
-    bind('.p-bl', 'blur');
-    bind('.p-txt', 'overlayText');
-
-    body.querySelector('.p-rot').addEventListener('click', () => { cfg.rotate = (cfg.rotate + 90) % 360; renderPhoto(); });
-    const cmpBtn = body.querySelector('.p-compare');
-    cmpBtn.addEventListener('pointerdown', () => { showOriginal = true; renderPhoto(); });
-    cmpBtn.addEventListener('pointerup', () => { showOriginal = false; renderPhoto(); });
-    cmpBtn.addEventListener('pointerleave', () => { if (showOriginal) { showOriginal = false; renderPhoto(); } });
-
-    const downloadCanvas = (mime, ext) => {
-      const a = document.createElement('a');
-      a.download = `parmar-edited-photo.${ext}`;
-      a.href = canvas.toDataURL(mime, 0.94);
-      a.click();
-    };
-    body.querySelector('.p-dl-png').addEventListener('click', () => downloadCanvas('image/png', 'png'));
-    body.querySelector('.p-dl-jpg').addEventListener('click', () => downloadCanvas('image/jpeg', 'jpg'));
-
-    renderPhoto();
-    ui.setStep(2, 'done');
-    scrollChatBottom();
-  }
-
-  /* ==================== 3. PHOTO & POSTER GENERATOR ENGINE (FIXED!) ==================== */
-  function renderStudioCanvasPoster(canvas, prompt, ratio = '1:1') {
-    const dims = ratio === '16:9' ? [1280, 720] : ratio === '9:16' ? [720, 1280] : [1024, 1024];
-    canvas.width = dims[0]; canvas.height = dims[1];
-    const ctx = canvas.getContext('2d');
-    const [w, h] = dims;
-
-    // Rich editorial gradient backdrop
-    const p = prompt.toLowerCase();
-    const g = ctx.createLinearGradient(0, 0, w, h);
-    if (p.includes('ocean') || p.includes('blue') || p.includes('night') || p.includes('space')) {
-      g.addColorStop(0, '#0f172a'); g.addColorStop(0.55, '#1e3a5f'); g.addColorStop(1, '#090d16');
-    } else if (p.includes('forest') || p.includes('green') || p.includes('nature')) {
-      g.addColorStop(0, '#0f291e'); g.addColorStop(0.55, '#1f4d3a'); g.addColorStop(1, '#0b1812');
-    } else {
-      g.addColorStop(0, '#1c1917'); g.addColorStop(0.5, '#443424'); g.addColorStop(1, '#18181b');
-    }
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-
-    // Ambient golden light orbs
-    for (let i = 0; i < 4; i++) {
-      const rx = w * (0.2 + ((i * 0.23) % 0.7));
-      const ry = h * (0.25 + ((i * 0.19) % 0.6));
-      const rad = Math.min(w, h) * (0.28 + i * 0.06);
-      const rg = ctx.createRadialGradient(rx, ry, 10, rx, ry, rad);
-      rg.addColorStop(0, 'rgba(212,175,115,0.28)');
-      rg.addColorStop(1, 'rgba(212,175,115,0)');
-      ctx.fillStyle = rg;
-      ctx.fillRect(0, 0, w, h);
-    }
-
-    // Editorial frame
-    ctx.strokeStyle = 'rgba(212,175,115,0.65)';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(w * 0.05, h * 0.05, w * 0.9, h * 0.9);
-
-    ctx.fillStyle = '#d4af73';
-    ctx.font = `600 ${Math.round(w * 0.022)}px Inter, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText('PARMAR AI ATELIER · STUDIO EDITION', w / 2, h * 0.13);
-
-    // Wrap prompt title cleanly
-    ctx.fillStyle = '#faf8f5';
-    const fontSize = Math.round(Math.min(w, h) * 0.052);
-    ctx.font = `400 ${fontSize}px Georgia, serif`;
-    const words = prompt.split(/\s+/).slice(0, 18);
-    const lines = [];
-    let line = '';
-    for (const word of words) {
-      const test = line ? `${line} ${word}` : word;
-      if (ctx.measureText(test).width > w * 0.76) {
-        lines.push(line);
-        line = word;
-      } else line = test;
-    }
-    if (line) lines.push(line);
-    const startY = h / 2 - ((lines.length - 1) * fontSize * 1.28) / 2;
-    lines.forEach((ln, idx) => ctx.fillText(ln, w / 2, startY + idx * fontSize * 1.28));
-  }
-
-  async function generateViaGemini(prompt, ratio) {
-    // 1) Try Imagen 3.0 endpoint
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${encodeURIComponent(state.apiKey)}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instances: [{ prompt }], parameters: { sampleCount: 1, aspectRatio: ratio } })
-      });
-      if (res.ok) {
-        const d = await res.json();
-        const b64 = d?.predictions?.[0]?.bytesBase64Encoded;
-        if (b64) return `data:image/png;base64,${b64}`;
-      }
-    } catch {}
-
-    // 2) Try Gemini native image generation model
-    const models = ['gemini-2.5-flash-image', 'gemini-2.0-flash-exp-image-generation'];
-    for (const m of models) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: `${prompt} (Aspect ratio: ${ratio})` }] }],
-            generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
-          })
+        `).join("");
+        capList.querySelectorAll("input").forEach(inp => {
+          inp.addEventListener("input", () => {
+            if (inp.dataset.capStart !== undefined) caps[inp.dataset.capStart].start = parseFloat(inp.value) || 0;
+            if (inp.dataset.capEnd !== undefined) caps[inp.dataset.capEnd].end = parseFloat(inp.value) || 0;
+            if (inp.dataset.capText !== undefined) caps[inp.dataset.capText].text = inp.value;
+          });
         });
-        if (res.ok) {
-          const d = await res.json();
-          const parts = d?.candidates?.[0]?.content?.parts || [];
-          const imgPart = parts.find(p => p.inlineData?.data);
-          if (imgPart) return `data:${imgPart.inlineData.mimeType || 'image/png'};base64,${imgPart.inlineData.data}`;
+
+        vEl.addEventListener("timeupdate", () => {
+          const ct = vEl.currentTime;
+          const active = caps.find(c => ct >= c.start && ct <= c.end);
+          if (active && active.text) { capOverlay.textContent = active.text; capOverlay.style.display = "block"; }
+          else { capOverlay.style.display = "none"; }
+        });
+
+        // Reliable Hardware-Accelerated Canvas + Audio Export (zero Worker errors!)
+        content.querySelector(".render-mp4-btn").addEventListener("click", async function () {
+          this.disabled = true;
+          errBox.classList.remove("show");
+          try {
+            setProgress(10, "Preparing HD Video Exporter...");
+            const offVid = document.createElement("video");
+            offVid.src = vidUrl;
+            offVid.playsInline = true;
+            await new Promise((res, rej) => {
+              offVid.onloadeddata = res;
+              offVid.onerror = () => rej(new Error("Could not load video for export."));
+            });
+
+            const vw = offVid.videoWidth || 540, vh = offVid.videoHeight || 960;
+            const sc = Math.min(1, 720 / Math.max(vw, vh));
+            const cw = Math.round(vw * sc), ch = Math.round(vh * sc);
+            const rCan = document.createElement("canvas");
+            rCan.width = cw; rCan.height = ch;
+            const rCtx = rCan.getContext("2d");
+
+            const tracks = [...rCan.captureStream(30).getVideoTracks()];
+            let ac = null;
+            try {
+              const AC = window.AudioContext || window.webkitAudioContext;
+              ac = new AC();
+              const srcNode = ac.createMediaElementSource(offVid);
+              const destNode = ac.createMediaStreamDestination();
+              srcNode.connect(destNode);
+              srcNode.connect(ac.destination);
+              if (destNode.stream.getAudioTracks().length) tracks.push(destNode.stream.getAudioTracks()[0]);
+            } catch {}
+
+            const mime = ["video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]
+              .find(m => MediaRecorder.isTypeSupported(m)) || "";
+            const ext = mime.includes("mp4") ? "mp4" : "webm";
+            const rec = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime, videoBitsPerSecond: 5000000 } : { videoBitsPerSecond: 5000000 });
+            const chunks = [];
+            rec.ondataavailable = e => { if (e.data?.size) chunks.push(e.data); };
+            const donePromise = new Promise(resolve => { rec.onstop = () => resolve(new Blob(chunks, { type: mime || "video/webm" })); });
+
+            offVid.playbackRate = safeSpd;
+            offVid.currentTime = 0;
+            await offVid.play();
+            rec.start(200);
+
+            const totalDur = Math.min(60, offVid.duration || 15);
+            let rafId = null;
+            const drawExport = () => {
+              const ct = offVid.currentTime || 0;
+              rCtx.save();
+              try { rCtx.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`; } catch {}
+              rCtx.drawImage(offVid, 0, 0, cw, ch);
+              rCtx.restore();
+
+              if (plan.vignette) {
+                const vg = rCtx.createRadialGradient(cw/2, ch/2, Math.min(cw,ch)*0.3, cw/2, ch/2, Math.max(cw,ch)*0.75);
+                vg.addColorStop(0, "transparent"); vg.addColorStop(1, "rgba(0,0,0,0.52)");
+                rCtx.fillStyle = vg; rCtx.fillRect(0, 0, cw, ch);
+              }
+              if (plan.titleBanner) {
+                rCtx.fillStyle = "rgba(24,24,27,0.86)";
+                const tw = Math.min(cw * 0.72, 240);
+                rCtx.fillRect((cw - tw) / 2, 20, tw, 28);
+                rCtx.fillStyle = "#ffffff"; rCtx.font = "600 13px sans-serif"; rCtx.textAlign = "center";
+                rCtx.fillText(plan.titleBanner, cw / 2, 39, tw - 16);
+              }
+              const active = caps.find(c => ct >= c.start && ct <= c.end);
+              if (active && active.text) {
+                const fs = Math.round(Math.min(cw, ch) * 0.046);
+                rCtx.font = `700 ${fs}px -apple-system, sans-serif`;
+                const bw = Math.min(cw * 0.88, rCtx.measureText(active.text).width + 26);
+                const by = ch - 56;
+                rCtx.fillStyle = "rgba(0,0,0,0.75)";
+                rCtx.fillRect((cw - bw) / 2, by - fs / 2 - 8, bw, fs + 16);
+                rCtx.fillStyle = "#fde047"; rCtx.textAlign = "center"; rCtx.textBaseline = "middle";
+                rCtx.fillText(active.text, cw / 2, by, bw - 16);
+              }
+
+              const pct = Math.min(99, 15 + Math.round((ct / totalDur) * 84));
+              setProgress(pct, `Rendering video... ${pct}%`);
+              if (!offVid.ended && ct < totalDur) rafId = requestAnimationFrame(drawExport);
+              else if (rec.state === "recording") rec.stop();
+            };
+            rafId = requestAnimationFrame(drawExport);
+            offVid.onended = () => { if (rec.state === "recording") rec.stop(); };
+
+            const outBlob = await donePromise;
+            cancelAnimationFrame(rafId);
+            if (ac) ac.close().catch(() => {});
+            const outUrl = URL.createObjectURL(outBlob);
+            setProgress(100, "Video Ready!");
+            content.querySelector(".mp4-out").innerHTML = `
+              <video controls playsinline src="${outUrl}" style="width:100%;border-radius:12px;max-height:300px;"></video>
+              <a href="${outUrl}" download="parmar-ai-edited.${ext}" class="btn btn-dark" style="width:100%;margin-top:8px;">Download Edited Video</a>
+            `;
+          } catch (fe) {
+            errBox.textContent = "Render error: " + (fe.message || fe);
+            errBox.classList.add("show");
+          } finally {
+            this.disabled = false;
+          }
+        });
+
+      // MODE 2: PHOTO EDITING (HDR / RETOUCH / ANY PROMPT)
+      } else if (media && media.type === "photo") {
+        addStep("ph", "Analyzing photo & applying DSLR edits...", "active");
+        const { b64, dataUrl: cachedImgUrl } = await fileToSafeJpegBase64(media);
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            summary: { type: "STRING" },
+            brightness: { type: "NUMBER" },
+            contrast: { type: "NUMBER" },
+            saturation: { type: "NUMBER" },
+            sepia: { type: "NUMBER" },
+            vignette: { type: "BOOLEAN" },
+            overlayText: { type: "STRING" }
+          },
+          required: ["summary", "brightness", "contrast", "saturation"]
+        };
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{
+            role: "user",
+            parts: [
+              { inline_data: { mime_type: "image/jpeg", data: b64 } },
+              { text: `Edit this photo as requested: "${text || "Enhance with crisp HDR contrast and vivid colors"}". Return brightness around 1.05 (0.85-1.3), contrast around 1.25, saturation around 1.3.` }
+            ]
+          }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "media");
+        const plan = JSON.parse(data.candidates[0].content.parts[0].text);
+        addStep("ph", `Photo edited (${model})`, "done");
+        badge.textContent = model;
+
+        const pb = (plan.brightness !== undefined && plan.brightness < 0.5) ? (1 + plan.brightness) : (plan.brightness || 1.05);
+        const pc = Math.min(1.6, Math.max(0.85, plan.contrast || 1.2));
+        const ps = Math.min(1.8, Math.max(0.7, plan.saturation || 1.25));
+
+        const img = new Image();
+        img.src = cachedImgUrl;
+        await img.decode();
+
+        const sc = Math.min(1, 1600 / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.className = "photo-out";
+        c.width = Math.round(img.width * sc);
+        c.height = Math.round(img.height * sc);
+        const ctx = c.getContext("2d");
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+
+        const imgData = ctx.getImageData(0, 0, c.width, c.height);
+        const d = imgData.data;
+        const warm = (plan.sepia || 0.08) * 28;
+        for (let i = 0; i < d.length; i += 4) {
+          let r = d[i], g = d[i + 1], b = d[i + 2];
+          r = ((r / 255 - 0.5) * pc + 0.5) * 255 * pb;
+          g = ((g / 255 - 0.5) * pc + 0.5) * 255 * pb;
+          b = ((b / 255 - 0.5) * pc + 0.5) * 255 * pb;
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+          r = lum + (r - lum) * ps + warm;
+          g = lum + (g - lum) * ps + warm * 0.35;
+          b = lum + (b - lum) * ps - warm * 0.5;
+          d[i] = Math.max(0, Math.min(255, r));
+          d[i + 1] = Math.max(0, Math.min(255, g));
+          d[i + 2] = Math.max(0, Math.min(255, b));
         }
-      } catch {}
-    }
-    throw new Error('Gemini image endpoint unavailable for this key/region');
-  }
+        ctx.putImageData(imgData, 0, 0);
 
-  async function runPhotoGenerator(prompt) {
-    const ui = createAICard('Image & Poster Generator', 'Multi-Engine Render', [
-      'Refining visual prompt & aspect ratio',
-      'Generating high-resolution artwork',
-      'Preparing studio preview & download'
-    ]);
-
-    let ratio = '1:1';
-    if (prompt.includes('16:9') || prompt.toLowerCase().includes('landscape') || prompt.toLowerCase().includes('youtube')) ratio = '16:9';
-    else if (prompt.includes('9:16') || prompt.toLowerCase().includes('reel') || prompt.toLowerCase().includes('portrait')) ratio = '9:16';
-
-    ui.setStep(0, 'done');
-    ui.setStep(1, 'active');
-
-    let dataUrl = null;
-    let engineUsed = '';
-
-    const enginePref = state.imageEngine;
-    if ((enginePref === 'auto' || enginePref === 'gemini') && state.apiKey) {
-      try {
-        dataUrl = await generateViaGemini(prompt, ratio);
-        engineUsed = 'Gemini Imagen';
-      } catch (e) {
-        if (enginePref === 'gemini') ui.showInfo(`Gemini image error (${e.message}), switching to Pollinations AI.`);
-      }
-    }
-
-    if (!dataUrl && enginePref !== 'canvas') {
-      try {
-        const dims = ratio === '16:9' ? [1280, 720] : ratio === '9:16' ? [720, 1280] : [1024, 1024];
-        const seed = Math.floor(Math.random() * 999999);
-        const polUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${dims[0]}&height=${dims[1]}&seed=${seed}&nologo=true`;
-        const resp = await fetch(polUrl);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const blob = await resp.blob();
-        dataUrl = await new Promise(r => {
-          const fr = new FileReader();
-          fr.onload = () => r(fr.result);
-          fr.readAsDataURL(blob);
-        });
-        engineUsed = 'Pollinations AI';
-      } catch {
-        // Fall through to Studio Canvas
-      }
-    }
-
-    ui.setStep(1, 'done');
-    ui.setStep(2, 'active');
-
-    const body = ui.body;
-    if (dataUrl) {
-      body.innerHTML = `
-        <div class="photo-stage">
-          <img class="gen-out" src="${dataUrl}" alt="${escapeHtml(prompt)}" />
-        </div>
-        <div class="row">
-          <span class="mini-badge">Engine: ${escapeHtml(engineUsed)} (${ratio})</span>
-          <a class="btn btn-dark" href="${dataUrl}" download="parmar-generated-art.png">⬇ Download PNG</a>
-          <button type="button" class="btn g-edit-btn">🎨 Open in Photo Editor</button>
-        </div>
-      `;
-      body.querySelector('.g-edit-btn').addEventListener('click', () => {
-        runPhotoEditor('Enhance contrast and warmth', { dataUrl, name: 'generated.png' });
-      });
-    } else {
-      body.innerHTML = `
-        <div class="photo-stage">
-          <canvas class="photo-out"></canvas>
-        </div>
-        <div class="row">
-          <span class="mini-badge">Engine: Offline Studio Poster (${ratio})</span>
-          <button type="button" class="btn btn-dark g-dl-btn">⬇ Download Poster PNG</button>
-        </div>
-      `;
-      const cvs = body.querySelector('canvas.photo-out');
-      renderStudioCanvasPoster(cvs, prompt, ratio);
-      body.querySelector('.g-dl-btn').addEventListener('click', () => {
-        const a = document.createElement('a');
-        a.download = 'parmar-studio-poster.png';
-        a.href = cvs.toDataURL('image/png');
-        a.click();
-      });
-      ui.showInfo('Network image API unreachable — rendered high-resolution Studio Editorial Poster locally.');
-    }
-
-    ui.setStep(2, 'done');
-    scrollChatBottom();
-  }
-
-  /* ==================== 4. Q&A, CODE & MULTI-SEARCH ENGINE AGENT ==================== */
-  async function runChatOrSearch(prompt, forceSearch = false) {
-    const useSearch = forceSearch || state.mode === 'search' || /\b(search|latest|news|price|weather|find|who is|2025|2026)\b/i.test(prompt);
-    const ui = createAICard(
-      useSearch ? 'Deep Web Research & Search Hub' : (state.mode === 'code' ? 'Code & Web Architect' : 'Parmar AI Assistant'),
-      state.apiKey ? getActiveModel() : 'Multi-Search Mode',
-      ['Understanding prompt & active skills', 'Querying AI & search engines']
-    );
-
-    const enabledEngines = SEARCH_ENGINES.filter(s => s.on);
-    let replyText = '';
-    let sources = [];
-
-    if (state.apiKey) {
-      try {
-        const parts = [];
-        if (state.attachment?.type === 'doc') {
-          parts.push({ text: `Attached file (${state.attachment.name}):\n\`\`\`\n${state.attachment.textContent}\n\`\`\`\n\nUser request: ${prompt}` });
-        } else {
-          parts.push({ text: prompt });
+        if (plan.vignette !== false) {
+          const g = ctx.createRadialGradient(c.width/2, c.height/2, c.width*0.26, c.width/2, c.height/2, c.width*0.76);
+          g.addColorStop(0, "transparent"); g.addColorStop(1, "rgba(0,0,0,0.48)");
+          ctx.fillStyle = g; ctx.fillRect(0, 0, c.width, c.height);
         }
-        const res = await callGemini({
-          parts,
-          systemText: buildSystemInstruction(state.mode === 'code' ? 'Provide clean, production-ready code.' : ''),
-          useSearch
-        });
-        replyText = res.text || 'No response text returned.';
-        sources = res.sources;
-        ui.setStep(0, 'done');
-        ui.setStep(1, 'done');
-      } catch (err) {
-        ui.setStep(0, 'done');
-        ui.setStep(1, 'err');
-        ui.showError(`Gemini API Error: ${err.message}`);
-        replyText = `Could not reach Gemini API (${err.message}). Use the instant search engine links below or check your API key in the drawer.`;
-      }
-    } else {
-      ui.setStep(0, 'done');
-      ui.setStep(1, 'done');
-      replyText = `Gemini API key is not set yet, so live LLM answers are paused — however, your **Video Editor**, **Photo Retoucher**, **Image Generator**, and **Multi-Search Engine Hub** below work right away!\n\nTap **Set API Key** at the top right to paste your Gemini key for full conversational Q&A, code generation, and grounded web research.`;
-    }
+        if (plan.overlayText) {
+          const fs = Math.round(c.width * 0.062);
+          ctx.font = `700 ${fs}px Georgia, serif`;
+          ctx.textAlign = "center"; ctx.fillStyle = "#fde047";
+          ctx.shadowColor = "rgba(0,0,0,0.85)"; ctx.shadowBlur = 14;
+          ctx.fillText(plan.overlayText, c.width / 2, c.height * 0.86, c.width * 0.88);
+        }
+        const pngUrl = c.toDataURL("image/png");
+        content.innerHTML = `<div class="alert info show" style="margin-bottom:10px;">${plan.summary}</div>`;
+        content.appendChild(c);
+        content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-photo.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download DSLR Edited Photo (PNG)</a>`);
 
-    const body = ui.body;
-    body.innerHTML = `
-      <div class="md-body">${escapeHtml(replyText)}</div>
-      ${sources.length ? `<div class="sources-wrap">${sources.map(s => `<a class="source-pill" href="${escapeHtml(s.uri)}" target="_blank" rel="noopener noreferrer">🔗 ${escapeHtml(s.title)}</a>`).join('')}</div>` : ''}
-      <div class="sources-wrap">
-        <span style="font-size:0.72rem;color:var(--muted);font-weight:600;align-self:center;">Search on:</span>
-        ${enabledEngines.map(se => `<a class="source-pill" href="${se.url(prompt)}" target="_blank" rel="noopener noreferrer">🔎 ${escapeHtml(se.name)}</a>`).join('')}
-      </div>
-      <div class="tts-row">
-        <button type="button" class="btn btn-sm tts-btn">🔊 Read Aloud</button>
-        <button type="button" class="btn btn-sm copy-btn">📋 Copy</button>
-      </div>
-    `;
+      // MODE 3: POSTER / PAMPHLET DESIGNER
+      } else if (isPosterReq) {
+        addStep("ds", "Designing custom business poster...", "active");
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            eyebrow: { type: "STRING" },
+            headline: { type: "STRING" },
+            subheadline: { type: "STRING" },
+            highlights: { type: "ARRAY", items: { type: "STRING" } },
+            cta: { type: "STRING" },
+            bgStart: { type: "STRING" },
+            bgEnd: { type: "STRING" },
+            accentColor: { type: "STRING" },
+            textColor: { type: "STRING" }
+          },
+          required: ["headline", "subheadline", "highlights", "cta"]
+        };
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{ role: "user", parts: [{ text: `Design a professional poster/pamphlet for: "${text}". Return clean hex colors and crisp copy.` }] }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
+        const spec = JSON.parse(data.candidates[0].content.parts[0].text);
+        addStep("ds", `Poster designed (${model})`, "done");
+        badge.textContent = model;
 
-    body.querySelector('.tts-btn').addEventListener('click', () => {
-      if (!('speechSynthesis' in window)) return showToast('Text-to-speech unavailable');
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(replyText);
-      window.speechSynthesis.speak(u);
-    });
-    body.querySelector('.copy-btn').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(replyText);
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = replyText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-      }
-      showToast('Copied to clipboard');
-    });
+        const c = renderPosterCanvas(spec);
+        const pngUrl = c.toDataURL("image/png");
+        content.appendChild(c);
+        content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-poster.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Poster (PNG)</a>`);
 
-    scrollChatBottom();
-  }
-
-  /* ==================== SMART ROUTER ==================== */
-  async function handleSend() {
-    if (state.isBusy) return;
-    const raw = promptInput.value.trim();
-    if (!raw && !state.attachment) return;
-
-    const prompt = raw || (state.attachment?.type === 'video' ? 'Edit this raw video cinematically' : 'Retouch this photo');
-    const att = state.attachment;
-
-    appendUserBubble(prompt, att ? `${att.type.toUpperCase()}: ${att.name}` : '');
-    promptInput.value = '';
-    promptInput.style.height = 'auto';
-    state.attachment = null;
-    attachChipWrap.innerHTML = '';
-    state.isBusy = true;
-
-    try {
-      const p = prompt.toLowerCase();
-      if (att?.type === 'video' || (state.mode === 'video' && att?.type === 'video')) {
-        await runVideoEditor(prompt, att);
-      } else if (att?.type === 'photo' || (state.mode === 'photo-edit' && att?.type === 'photo')) {
-        await runPhotoEditor(prompt, att);
-      } else if (state.mode === 'photo-gen' || /\b(generate|create|draw|make|design)\b.*\b(photo|image|picture|poster|logo|art|portrait|wallpaper)\b/i.test(p)) {
-        await runPhotoGenerator(prompt);
-      } else if (state.mode === 'video' && !att) {
-        const ui = createAICard('Video Director', 'Upload Needed', []);
-        ui.body.innerHTML = `<div class="md-body">Please attach a raw video file first so I can apply color grading, trim, captions, and export WebM.</div><div class="row" style="margin-top:8px;"><button type="button" class="btn btn-dark pick-v-btn">🎬 Choose Raw Video</button></div>`;
-        ui.body.querySelector('.pick-v-btn').addEventListener('click', () => $('videoFileInput').click());
-      } else if (state.mode === 'photo-edit' && !att) {
-        const ui = createAICard('Photo Retouch Agent', 'Upload Needed', []);
-        ui.body.innerHTML = `<div class="md-body">Please attach a photo first so I can retouch it on the high-res Canvas studio.</div><div class="row" style="margin-top:8px;"><button type="button" class="btn btn-dark pick-p-btn">🖼️ Choose Photo</button></div>`;
-        ui.body.querySelector('.pick-p-btn').addEventListener('click', () => $('photoFileInput').click());
+      // MODE 4: Q&A + GOOGLE SEARCH + SPEAKER BUTTON
       } else {
-        await runChatOrSearch(prompt, state.mode === 'search');
+        addStep("qa", "Thinking & searching with active AI Agents...", "active");
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{ role: "user", parts: [{ text }] }],
+          tools: [{ google_search: {} }]
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
+        const cand = data.candidates[0];
+        const reply = cand.content.parts.map(p => p.text || "").join("\n");
+        const chunks = cand.groundingMetadata?.groundingChunks || [];
+        addStep("qa", `Completed (${model})`, "done");
+        badge.textContent = model;
+
+        const sourcesHtml = chunks.filter(ch => ch.web?.uri).map(ch =>
+          `<a class="source-pill" href="${ch.web.uri}" target="_blank" rel="noopener">${ch.web.title || "Source"}</a>`
+        ).join("");
+
+        const speakerSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+        const stopSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>`;
+
+        content.innerHTML = `
+          <div class="md-body"></div>
+          ${sourcesHtml ? `<div class="sources-wrap">${sourcesHtml}</div>` : ""}
+          <div class="tts-row">
+            <button type="button" class="btn btn-sm tts-btn">${speakerSvg}<span>Listen</span></button>
+          </div>
+        `;
+
+        const mdEl = content.querySelector(".md-body");
+        function formatRichMd(raw) {
+          return raw
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+            .replace(/`([^`]+)`/g, '<code style="background:var(--surface);padding:1px 5px;border-radius:5px;border:1px solid var(--border);">$1</code>')
+            .replace(/^###\s+(.+)$/gm, '<strong style="font-family:Georgia,serif;font-size:1.05rem;">$1</strong>')
+            .replace(/^[\*\-]\s+(.+)$/gm, "• $1");
+        }
+        const safeWords = reply.split(/(\s+)/);
+        let wi = 0;
+        const streamText = () => {
+          const step = Math.max(1, Math.ceil(safeWords.length / 65));
+          wi = Math.min(safeWords.length, wi + step);
+          mdEl.innerHTML = formatRichMd(safeWords.slice(0, wi).join(""));
+          chatScroll.scrollTop = chatScroll.scrollHeight;
+          if (wi < safeWords.length) requestAnimationFrame(streamText);
+        };
+        requestAnimationFrame(streamText);
+
+        const ttsBtn = content.querySelector(".tts-btn");
+        ttsBtn.addEventListener("click", () => {
+          if (!("speechSynthesis" in window)) return;
+          if (window.speechSynthesis.speaking && ttsBtn.dataset.speaking === "1") {
+            window.speechSynthesis.cancel();
+            ttsBtn.dataset.speaking = "0";
+            ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`;
+            return;
+          }
+          window.speechSynthesis.cancel();
+          const clean = reply
+            .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "")
+            .replace(/[*_#`>~]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+          const utter = new SpeechSynthesisUtterance(clean);
+          const isHindi = /[\u0900-\u097F]/.test(clean);
+          utter.lang = isHindi ? "hi-IN" : "en-IN";
+          const voices = window.speechSynthesis.getVoices() || [];
+          const bestVoice = voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en-IN") && /natural|google|neural|microsoft|rishi|lekha/i.test(v.name))
+            || voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en"));
+          if (bestVoice) utter.voice = bestVoice;
+          utter.pitch = 0.98;
+          utter.rate = 1.0;
+          ttsBtn.dataset.speaking = "1";
+          ttsBtn.innerHTML = `${stopSvg}<span>Stop</span>`;
+          utter.onend = () => { ttsBtn.dataset.speaking = "0"; ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`; };
+          utter.onerror = () => { ttsBtn.dataset.speaking = "0"; ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`; };
+          window.speechSynthesis.speak(utter);
+        });
       }
     } catch (err) {
-      const ui = createAICard('Studio Error', 'Recovered', []);
-      ui.showError(err.message || 'Unexpected error occurred.');
-    } finally {
-      state.isBusy = false;
+      tracker.querySelectorAll(".tracker-step.active").forEach(el => {
+        el.className = "tracker-step err";
+        const dot = el.querySelector(".step-dot");
+        if (dot) dot.textContent = "!";
+      });
+      errBox.textContent = err.message || "Unexpected error.";
+      errBox.classList.add("show");
+      progWrap.classList.remove("show");
     }
+    chatScroll.scrollTop = chatScroll.scrollHeight;
   }
 
-  $('sendBtn').addEventListener('click', handleSend);
-  promptInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  });
-  promptInput.addEventListener('input', () => {
-    promptInput.style.height = 'auto';
-    promptInput.style.height = Math.min(110, promptInput.scrollHeight) + 'px';
+  document.getElementById("sendBtn").addEventListener("click", handleSend);
+  promptBox.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   });
 
-  /* Boot */
-  syncKeyUI();
-  renderAgents();
-  renderSkills();
-  renderSearchEngines();
-})();
+  renderDrawerControls();
 </script>
 </body>
 </html>
