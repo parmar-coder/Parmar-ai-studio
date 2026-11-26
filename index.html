@@ -372,6 +372,15 @@
       </section>
 
       <section class="drawer-section">
+        <div class="sec-title"><span>Colab Pro Backend (Whisper + FFmpeg)</span><span class="sec-tag" id="colabTag">Optional</span></div>
+        <div class="row">
+          <input type="text" id="colabUrlInput" class="grow" placeholder="Paste https://....trycloudflare.com" />
+          <button type="button" class="btn btn-dark btn-sm" id="saveColabBtn">Save</button>
+          <button type="button" class="btn btn-sm" id="clearColabBtn">Clear</button>
+        </div>
+      </section>
+
+      <section class="drawer-section">
         <div class="sec-title"><span>Connect AI Agents</span><span class="sec-tag" id="agentCountTag">5 Active</span></div>
         <div id="agentList" style="display:flex;flex-direction:column;gap:7px;"></div>
       </section>
@@ -455,6 +464,7 @@
 <script type="module">
   const STORAGE_KEY = "parmar_studio_gemini_key";
   const STORAGE_SKILLS = "parmar_studio_custom_skills";
+  const STORAGE_COLAB = "parmar_studio_colab_url";
 
   const AGENTS = [
     { id: "video_dir", name: "Video Director Agent", desc: "Dynamic edits, pacing, color & motion", on: true },
@@ -491,6 +501,9 @@
 
   function getApiKey() {
     try { return localStorage.getItem(STORAGE_KEY) || ""; } catch { return ""; }
+  }
+  function getColabUrl() {
+    try { return (localStorage.getItem(STORAGE_COLAB) || "").replace(/\/+$/, ""); } catch { return ""; }
   }
 
   function refreshHeader() {
@@ -583,6 +596,26 @@
     apiKeyInput.value = "";
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
     refreshHeader();
+  });
+  const colabUrlInput = document.getElementById("colabUrlInput");
+  const colabTag = document.getElementById("colabTag");
+  function refreshColabTag() {
+    const cu = getColabUrl();
+    if (cu) { colabUrlInput.value = cu; colabTag.textContent = "Connected"; }
+    else { colabTag.textContent = "Optional"; }
+  }
+  refreshColabTag();
+  document.getElementById("saveColabBtn").addEventListener("click", () => {
+    const v = colabUrlInput.value.trim().replace(/\/+$/, "");
+    if (!v) return;
+    try { localStorage.setItem(STORAGE_COLAB, v); } catch {}
+    refreshColabTag();
+    setDrawer(false);
+  });
+  document.getElementById("clearColabBtn").addEventListener("click", () => {
+    colabUrlInput.value = "";
+    try { localStorage.removeItem(STORAGE_COLAB); } catch {}
+    refreshColabTag();
   });
   document.getElementById("addCustomSkillBtn").addEventListener("click", () => {
     const n = document.getElementById("customSkillName").value.trim();
@@ -988,6 +1021,51 @@
 
       // MODE 1: VIDEO EDITING
       if (media && media.type === "video") {
+        const colabUrl = getColabUrl();
+        let plan = null;
+        if (colabUrl) {
+          addStep("up", "Sending video to Colab Whisper + FFmpeg...", "active");
+          setProgress(25, "Transcribing speech with Whisper...");
+          const fd = new FormData();
+          fd.append("video", media.file);
+          const trRes = await fetch(`${colabUrl}/transcribe`, { method: "POST", body: fd });
+          if (!trRes.ok) throw new Error(`Colab Whisper error (${trRes.status})`);
+          const trData = await trRes.json();
+          addStep("up", `Whisper transcribed (${trData.language || "auto"})`, "done");
+
+          addStep("ai", "Polishing Roman Hinglish captions & edit plan...", "active");
+          const polishSchema = {
+            type: "OBJECT",
+            properties: {
+              editSummary: { type: "STRING" },
+              speed: { type: "NUMBER" },
+              brightness: { type: "NUMBER" },
+              contrast: { type: "NUMBER" },
+              saturation: { type: "NUMBER" },
+              vignette: { type: "BOOLEAN" },
+              titleBanner: { type: "STRING" },
+              captions: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, text: { type: "STRING" } },
+                  required: ["start", "end", "text"]
+                }
+              }
+            },
+            required: ["editSummary", "speed", "brightness", "contrast", "saturation", "captions"]
+          };
+          const pPayload = {
+            system_instruction: { parts: [{ text: sysInstr }] },
+            contents: [{ role: "user", parts: [{ text: `User edit request: "${text}". Whisper transcript segments: ${JSON.stringify(trData.captions)}. Convert captions to crisp 3-4 word Roman Hinglish keeping exact timestamps, and pick bright color grading.` }] }],
+            generationConfig: { responseMimeType: "application/json", responseSchema: polishSchema }
+          };
+          const { model, data } = await callGeminiWithFallback(apiKey, pPayload, m => { badge.textContent = m; }, "chat");
+          plan = JSON.parse(data.candidates[0].content.parts[0].text);
+          addStep("ai", `Whisper + FFmpeg Plan ready (${model})`, "done");
+          badge.textContent = `Colab + ${model}`;
+          progWrap.classList.remove("show");
+        } else {
         addStep("up", "Uploading raw video to Gemini...", "active");
         setProgress(12, "Starting resumable upload...");
         const { fileUri, mimeType } = await uploadToGeminiFiles(apiKey, media.file, setProgress);
@@ -1030,9 +1108,10 @@
         };
 
         const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "media");
-        const plan = JSON.parse(data.candidates[0].content.parts[0].text);
+        plan = JSON.parse(data.candidates[0].content.parts[0].text);
         addStep("ai", `Edit Plan & Hinglish Captions ready (${model})`, "done");
         progWrap.classList.remove("show");
+        }
         badge.textContent = model;
 
         const normB = (plan.brightness !== undefined && plan.brightness < 0.5) ? (1 + plan.brightness) : (plan.brightness || 1);
@@ -1117,6 +1196,28 @@
           this.disabled = true;
           errBox.classList.remove("show");
           try {
+            const colabUrl = getColabUrl();
+            if (colabUrl) {
+              setProgress(20, "Rendering Pro MP4 with Colab FFmpeg...");
+              const fd = new FormData();
+              fd.append("video", media.file);
+              fd.append("captions_json", JSON.stringify(caps));
+              fd.append("speed", String(parseFloat(spIn.value) || 1));
+              fd.append("brightness", String(parseFloat(brIn.value) || 1));
+              fd.append("contrast", String(parseFloat(ctIn.value) || 1));
+              fd.append("saturation", String(parseFloat(stIn.value) || 1.1));
+              fd.append("title_text", ttIn.value || "");
+              const rRes = await fetch(`${colabUrl}/render-video`, { method: "POST", body: fd });
+              if (!rRes.ok) throw new Error(`Colab FFmpeg render failed (${rRes.status})`);
+              const blob = await rRes.blob();
+              const outUrl = URL.createObjectURL(blob);
+              setProgress(100, "Pro FFmpeg MP4 Ready!");
+              const oldDl = content.querySelector(".dl-final");
+              if (oldDl) oldDl.remove();
+              content.insertAdjacentHTML("beforeend", `<a href="${outUrl}" download="parmar-ai-pro.mp4" class="btn btn-gold dl-final" style="width:100%;">Download Pro FFmpeg Video (.mp4)</a>`);
+              this.disabled = false;
+              return;
+            }
             setProgress(10, "Preparing HD Video Exporter...");
             const offVid = document.createElement("video");
             offVid.src = vidUrl;
@@ -1328,28 +1429,68 @@
         const spec = JSON.parse(data.candidates[0].content.parts[0].text);
         addStep("ds", "Generating AI background artwork...", "active");
 
-        const c = await renderPosterCanvas(spec);
-        addStep("ds", `Banner ready (${model})`, "done");
-        badge.textContent = model;
-        let pngUrl = "";
-        try { pngUrl = c.toDataURL("image/png"); } catch { pngUrl = ""; }
-        content.appendChild(c);
-        if (pngUrl) {
-          content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-poster.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Banner / Poster (PNG)</a>`);
+        const colabUrl = getColabUrl();
+        let colabPosterUrl = "";
+        if (colabUrl) {
+          try {
+            const pRes = await fetch(`${colabUrl}/generate-poster`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(spec)
+            });
+            if (pRes.ok) {
+              const pBlob = await pRes.blob();
+              colabPosterUrl = URL.createObjectURL(pBlob);
+            }
+          } catch {}
+        }
+        if (colabPosterUrl) {
+          addStep("ds", `Pro Banner ready via Colab (${model})`, "done");
+          badge.textContent = `Colab + ${model}`;
+          content.innerHTML = `<img src="${colabPosterUrl}" class="gen-out" alt="Generated Poster" /><a href="${colabPosterUrl}" download="parmar-ai-poster.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Pro Banner / Poster (PNG)</a>`;
+        } else {
+          const c = await renderPosterCanvas(spec);
+          addStep("ds", `Banner ready (${model})`, "done");
+          badge.textContent = model;
+          let pngUrl = "";
+          try { pngUrl = c.toDataURL("image/png"); } catch { pngUrl = ""; }
+          content.appendChild(c);
+          if (pngUrl) {
+            content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-poster.png" class="btn btn-dark" style="width:100%;margin-top:10px;">Download Banner / Poster (PNG)</a>`);
+          }
         }
 
-      // MODE 4: Q&A + GOOGLE SEARCH + SPEAKER BUTTON
+      // MODE 4: Q&A + GOOGLE SEARCH + COLAB LIVE SEARCH + SPEAKER BUTTON
       } else {
-        addStep("qa", "Thinking & searching with active AI Agents...", "active");
+        addStep("qa", "Searching live web & active AI Agents...", "active");
+        const colabUrl = getColabUrl();
+        let liveWebCtx = "";
+        let extraSources = [];
+        if (colabUrl) {
+          try {
+            const sRes = await fetch(`${colabUrl}/search`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ query: text })
+            });
+            if (sRes.ok) {
+              const sj = await sRes.json();
+              extraSources = sj.results || [];
+              if (extraSources.length) {
+                liveWebCtx = "\n\n[LIVE WEB SEARCH RESULTS — USE THESE LATEST FACTS]:\n" + extraSources.map(r => `- ${r.title}: ${r.snippet} (${r.uri})`).join("\n");
+              }
+            }
+          } catch {}
+        }
         const payload = {
           system_instruction: { parts: [{ text: sysInstr }] },
-          contents: [{ role: "user", parts: [{ text }] }],
+          contents: [{ role: "user", parts: [{ text: text + liveWebCtx }] }],
           tools: [{ google_search: {} }]
         };
         const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
         const cand = data.candidates[0];
         const reply = cand.content.parts.map(p => p.text || "").join("\n");
-        const chunks = cand.groundingMetadata?.groundingChunks || [];
+        const chunks = [...(cand.groundingMetadata?.groundingChunks || []), ...extraSources.map(s => ({ web: { uri: s.uri, title: s.title } }))];
         addStep("qa", `Completed (${model})`, "done");
         badge.textContent = model;
 
