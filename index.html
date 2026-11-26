@@ -783,6 +783,21 @@
     } catch { return []; }
   }
 
+  async function fetchLiveNewsFallback(query) {
+    try {
+      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
+      const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+      const r = await fetch(api);
+      if (!r.ok) return [];
+      const j = await r.json();
+      return (j?.items || []).slice(0, 5).map(it => ({
+        title: it.title || "Google News",
+        snippet: (it.description || it.title || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 220),
+        uri: it.link || "https://news.google.com"
+      }));
+    } catch { return []; }
+  }
+
   async function callGeminiWithFallback(apiKey, bodyPayload, onStep, taskType = "chat") {
     const preferred = modelSelect.value;
     const fastChatChain = ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash"];
@@ -1024,20 +1039,25 @@
     try {
       const sysInstr = buildSystemInstruction();
       const isPosterReq = !media && /\b(poster|pamphlet|flyer|banner|brochure)\b/i.test(text);
+      const isVideoGenReq = !media && !isPosterReq && /(generate|create|make|banao|banake).{0,25}\b(video|reel|clip|animation)\b/i.test(text);
+      const isPhotoGenReq = !media && !isPosterReq && !isVideoGenReq && /(generate|create|make|banao|banake|draw).{0,25}\b(photo|image|picture|pic|art|wallpaper|logo|thumbnail)\b/i.test(text);
 
       // MODE 1: VIDEO EDITING
       if (media && media.type === "video") {
         const colabUrl = getColabUrl();
         let plan = null;
+        let usedColab = false;
         if (colabUrl) {
-          addStep("up", "Sending video to Colab Whisper + FFmpeg...", "active");
-          setProgress(25, "Transcribing speech with Whisper...");
-          const fd = new FormData();
-          fd.append("video", media.file);
-          const trRes = await fetch(`${colabUrl}/transcribe`, { method: "POST", body: fd });
-          if (!trRes.ok) throw new Error(`Colab Whisper error (${trRes.status})`);
-          const trData = await trRes.json();
-          addStep("up", `Whisper transcribed (${trData.language || "auto"})`, "done");
+          try {
+            addStep("up", "Sending video to Colab Whisper + FFmpeg...", "active");
+            setProgress(25, "Transcribing speech with Whisper...");
+            const fd = new FormData();
+            fd.append("video", media.file);
+            const trRes = await fetch(`${colabUrl}/transcribe`, { method: "POST", body: fd });
+            if (!trRes.ok) throw new Error(`Colab Whisper error (${trRes.status})`);
+            const trData = await trRes.json();
+            addStep("up", `Whisper transcribed (${trData.language || "auto"})`, "done");
+            usedColab = true;
 
           addStep("ai", "Polishing Roman Hinglish captions & edit plan...", "active");
           const polishSchema = {
@@ -1071,7 +1091,12 @@
           addStep("ai", `Whisper + FFmpeg Plan ready (${model})`, "done");
           badge.textContent = `Colab + ${model}`;
           progWrap.classList.remove("show");
-        } else {
+          } catch (ce) {
+            addStep("up", "Colab offline/slept — using built-in Gemini Video Editor...", "info");
+            usedColab = false;
+          }
+        }
+        if (!usedColab) {
         addStep("up", "Uploading raw video to Gemini...", "active");
         setProgress(12, "Starting resumable upload...");
         const { fileUri, mimeType } = await uploadToGeminiFiles(apiKey, media.file, setProgress);
@@ -1204,25 +1229,29 @@
           try {
             const colabUrl = getColabUrl();
             if (colabUrl) {
-              setProgress(20, "Rendering Pro MP4 with Colab FFmpeg...");
-              const fd = new FormData();
-              fd.append("video", media.file);
-              fd.append("captions_json", JSON.stringify(caps));
-              fd.append("speed", String(parseFloat(spIn.value) || 1));
-              fd.append("brightness", String(parseFloat(brIn.value) || 1));
-              fd.append("contrast", String(parseFloat(ctIn.value) || 1));
-              fd.append("saturation", String(parseFloat(stIn.value) || 1.1));
-              fd.append("title_text", ttIn.value || "");
-              const rRes = await fetch(`${colabUrl}/render-video`, { method: "POST", body: fd });
-              if (!rRes.ok) throw new Error(`Colab FFmpeg render failed (${rRes.status})`);
-              const blob = await rRes.blob();
-              const outUrl = URL.createObjectURL(blob);
-              setProgress(100, "Pro FFmpeg MP4 Ready!");
-              const oldDl = content.querySelector(".dl-final");
-              if (oldDl) oldDl.remove();
-              content.insertAdjacentHTML("beforeend", `<a href="${outUrl}" download="parmar-ai-pro.mp4" class="btn btn-gold dl-final" style="width:100%;">Download Pro FFmpeg Video (.mp4)</a>`);
-              this.disabled = false;
-              return;
+              try {
+                setProgress(20, "Rendering Pro MP4 with Colab FFmpeg...");
+                const fd = new FormData();
+                fd.append("video", media.file);
+                fd.append("captions_json", JSON.stringify(caps));
+                fd.append("speed", String(parseFloat(spIn.value) || 1));
+                fd.append("brightness", String(parseFloat(brIn.value) || 1));
+                fd.append("contrast", String(parseFloat(ctIn.value) || 1));
+                fd.append("saturation", String(parseFloat(stIn.value) || 1.1));
+                fd.append("title_text", ttIn.value || "");
+                const rRes = await fetch(`${colabUrl}/render-video`, { method: "POST", body: fd });
+                if (!rRes.ok) throw new Error(`Colab FFmpeg render failed (${rRes.status})`);
+                const blob = await rRes.blob();
+                const outUrl = URL.createObjectURL(blob);
+                setProgress(100, "Pro FFmpeg MP4 Ready!");
+                const oldDl = content.querySelector(".dl-final");
+                if (oldDl) oldDl.remove();
+                content.insertAdjacentHTML("beforeend", `<a href="${outUrl}" download="parmar-ai-pro.mp4" class="btn btn-gold dl-final" style="width:100%;">Download Pro FFmpeg Video (.mp4)</a>`);
+                this.disabled = false;
+                return;
+              } catch {
+                setProgress(15, "Colab offline — rendering with built-in HD exporter...");
+              }
             }
             setProgress(10, "Preparing HD Video Exporter...");
             const offVid = document.createElement("video");
@@ -1466,6 +1495,122 @@
           }
         }
 
+      // MODE 3B: TEXT-TO-PHOTO AI GENERATOR (FLUX)
+      } else if (isPhotoGenReq) {
+        addStep("pg", "Crafting pro visual prompt with Gemini...", "active");
+        const schema = {
+          type: "OBJECT",
+          properties: { imagePrompt: { type: "STRING" }, caption: { type: "STRING" } },
+          required: ["imagePrompt", "caption"]
+        };
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{ role: "user", parts: [{ text: `Convert this request into a detailed photorealistic English AI image prompt (no text overlays unless requested): "${text}".` }] }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
+        const spec = JSON.parse(data.candidates[0].content.parts[0].text);
+        addStep("pg", "Generating high-res AI image (Flux Engine)...", "active");
+        const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(spec.imagePrompt)}?width=1080&height=1080&model=flux&nologo=true&seed=${Date.now()%99999}`;
+        const aiImg = await new Promise((res, rej) => {
+          const im = new Image();
+          im.crossOrigin = "anonymous";
+          const t = setTimeout(() => rej(new Error("AI Image server timed out")), 30000);
+          im.onload = () => { clearTimeout(t); res(im); };
+          im.onerror = () => { clearTimeout(t); rej(new Error("Could not load generated AI image")); };
+          im.src = imgUrl;
+        });
+        const c = document.createElement("canvas");
+        c.width = aiImg.naturalWidth || 1080; c.height = aiImg.naturalHeight || 1080;
+        c.className = "photo-out";
+        c.getContext("2d").drawImage(aiImg, 0, 0);
+        let pngUrl = "";
+        try { pngUrl = c.toDataURL("image/png"); } catch { pngUrl = imgUrl; }
+        addStep("pg", `AI Photo generated (${model})`, "done");
+        badge.textContent = `Flux + ${model}`;
+        content.innerHTML = `<div class="alert info show" style="margin-bottom:10px;">${spec.caption}</div>`;
+        content.appendChild(c);
+        content.insertAdjacentHTML("beforeend", `<a href="${pngUrl}" download="parmar-ai-image.png" target="_blank" class="btn btn-dark" style="width:100%;margin-top:10px;">Download AI Photo (PNG)</a>`);
+
+      // MODE 3C: TEXT-TO-VIDEO AI MOTION REEL GENERATOR
+      } else if (isVideoGenReq) {
+        addStep("vg", "Directing 3-scene AI video storyboard...", "active");
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            title: { type: "STRING" },
+            scenes: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  imagePrompt: { type: "STRING" },
+                  caption: { type: "STRING" }
+                },
+                required: ["imagePrompt", "caption"]
+              }
+            }
+          },
+          required: ["title", "scenes"]
+        };
+        const payload = {
+          system_instruction: { parts: [{ text: sysInstr }] },
+          contents: [{ role: "user", parts: [{ text: `Create a 3-scene vertical 9:16 AI reel storyboard for: "${text}". Each scene needs a vivid English imagePrompt and a short punchy Roman Hinglish caption.` }] }],
+          generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+        };
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
+        const sb = JSON.parse(data.candidates[0].content.parts[0].text);
+        const scenes = (sb.scenes || []).slice(0, 3);
+        addStep("vg", "Generating 3 AI scenes & rendering motion reel...", "active");
+        setProgress(25, "Generating AI scene frames...");
+
+        const loadedImgs = [];
+        for (let i = 0; i < scenes.length; i++) {
+          const im = await loadAiArtwork(scenes[i].imagePrompt);
+          if (im) loadedImgs.push({ img: im, caption: scenes[i].caption });
+          setProgress(25 + Math.round(((i + 1) / Math.max(1, scenes.length)) * 35), `Scene ${i + 1}/${scenes.length} ready`);
+        }
+        if (!loadedImgs.length) throw new Error("AI scene generator busy — please try again.");
+
+        const c = document.createElement("canvas");
+        c.width = 720; c.height = 1280;
+        const ctx = c.getContext("2d");
+        const stream = c.captureStream(30);
+        const mime = ["video/webm;codecs=vp9", "video/webm"].find(m => MediaRecorder.isTypeSupported(m)) || "";
+        const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 4000000 } : { videoBitsPerSecond: 4000000 });
+        const chunks = [];
+        rec.ondataavailable = ev => { if (ev.data.size) chunks.push(ev.data); };
+        const doneP = new Promise(res => { rec.onstop = () => res(new Blob(chunks, { type: rec.mimeType || "video/webm" })); });
+        rec.start(200);
+
+        const framesPerScene = 75; // 2.5s per scene at 30fps
+        for (let sIdx = 0; sIdx < loadedImgs.length; sIdx++) {
+          const { img, caption } = loadedImgs[sIdx];
+          for (let f = 0; f < framesPerScene; f++) {
+            const prog = f / framesPerScene;
+            const zoom = 1.0 + prog * 0.12;
+            const sc = Math.max(c.width / img.width, c.height / img.height) * zoom;
+            const dw = img.width * sc, dh = img.height * sc;
+            ctx.fillStyle = "#000"; ctx.fillRect(0, 0, c.width, c.height);
+            ctx.drawImage(img, (c.width - dw) / 2, (c.height - dh) / 2, dw, dh);
+            ctx.fillStyle = "rgba(0,0,0,0.68)";
+            ctx.fillRect(40, c.height - 220, c.width - 80, 110);
+            ctx.fillStyle = "#fde047";
+            ctx.font = "700 32px -apple-system, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(caption.slice(0, 42), c.width / 2, c.height - 155, c.width - 110);
+            await new Promise(r => setTimeout(r, 33));
+          }
+          setProgress(60 + Math.round(((sIdx + 1) / loadedImgs.length) * 35), "Rendering AI Video Reel...");
+        }
+        rec.stop();
+        const vidBlob = await doneP;
+        const vidUrl = URL.createObjectURL(vidBlob);
+        setProgress(100, "AI Video Reel Ready!");
+        addStep("vg", `AI Video Reel generated (${model})`, "done");
+        badge.textContent = `AI Reel + ${model}`;
+        content.innerHTML = `<div class="alert info show" style="margin-bottom:10px;">${sb.title}</div><div class="stage"><video controls playsinline src="${vidUrl}"></video></div><a href="${vidUrl}" download="parmar-ai-reel.webm" class="btn btn-dark" style="width:100%;margin-top:10px;">Download AI Video Reel</a>`;
+
       // MODE 4: Q&A + GOOGLE SEARCH + COLAB LIVE SEARCH + SPEAKER BUTTON
       } else {
         const colabUrl = getColabUrl();
@@ -1497,6 +1642,17 @@
             }
           } catch {
             addStep("web", "Colab unreachable (re-run Cell 3 if Colab slept)", "err");
+          }
+        }
+        if (!extraSources.length) {
+          addStep("web", "Fetching live Google News & Wikipedia...", "active");
+          const [newsHits, wikiHits] = await Promise.all([fetchLiveNewsFallback(text), fetchWikiFallback(text)]);
+          extraSources = [...newsHits, ...wikiHits];
+          if (extraSources.length) {
+            liveWebCtx = "\n\n[LIVE 2026 GOOGLE NEWS & WEB RESULTS — USE THESE LATEST FACTS]:\n" + extraSources.map(r => `- ${r.title}: ${r.snippet} (${r.uri})`).join("\n");
+            addStep("web", `Research Engine: ${extraSources.length} live sources`, "done");
+          } else {
+            addStep("web", "Research Engine: using Gemini Search", "done");
           }
         }
         addStep("qa", "Generating answer with active AI Agents...", "active");
