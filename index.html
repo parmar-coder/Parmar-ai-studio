@@ -605,12 +605,18 @@
     else { colabTag.textContent = "Optional"; }
   }
   refreshColabTag();
-  document.getElementById("saveColabBtn").addEventListener("click", () => {
+  document.getElementById("saveColabBtn").addEventListener("click", async () => {
     const v = colabUrlInput.value.trim().replace(/\/+$/, "");
     if (!v) return;
     try { localStorage.setItem(STORAGE_COLAB, v); } catch {}
-    refreshColabTag();
-    setDrawer(false);
+    colabTag.textContent = "Checking...";
+    try {
+      const r = await fetch(`${v}/health`);
+      if (r.ok) { colabTag.textContent = "Connected ✓"; setTimeout(() => setDrawer(false), 450); return; }
+      colabTag.textContent = "Offline !";
+    } catch {
+      colabTag.textContent = "Unreachable !";
+    }
   });
   document.getElementById("clearColabBtn").addEventListener("click", () => {
     colabUrlInput.value = "";
@@ -1462,11 +1468,11 @@
 
       // MODE 4: Q&A + GOOGLE SEARCH + COLAB LIVE SEARCH + SPEAKER BUTTON
       } else {
-        addStep("qa", "Searching live web & active AI Agents...", "active");
         const colabUrl = getColabUrl();
         let liveWebCtx = "";
         let extraSources = [];
         if (colabUrl) {
+          addStep("web", "Searching live web via Colab...", "active");
           try {
             const sRes = await fetch(`${colabUrl}/search`, {
               method: "POST",
@@ -1477,22 +1483,34 @@
               const sj = await sRes.json();
               extraSources = sj.results || [];
               if (extraSources.length) {
-                liveWebCtx = "\n\n[LIVE WEB SEARCH RESULTS — USE THESE LATEST FACTS]:\n" + extraSources.map(r => `- ${r.title}: ${r.snippet} (${r.uri})`).join("\n");
+                liveWebCtx = "\n\n[LIVE 2026 WEB SEARCH RESULTS — YOU MUST PRIORITIZE THESE LATEST FACTS OVER OLD TRAINING DATA]:\n" + extraSources.map(r => `- ${r.title}: ${r.snippet} (${r.uri})`).join("\n");
+                addStep("web", `Colab Live Search: ${extraSources.length} sources found`, "done");
+              } else {
+                addStep("web", "Colab connected (0 web hits, using Wikipedia)", "done");
+                extraSources = await fetchWikiFallback(text);
+                if (extraSources.length) {
+                  liveWebCtx = "\n\n[LIVE WIKIPEDIA RESULTS]:\n" + extraSources.map(r => `- ${r.title}: ${r.snippet} (${r.uri})`).join("\n");
+                }
               }
+            } else {
+              addStep("web", `Colab returned HTTP ${sRes.status} — check Colab tab`, "err");
             }
-          } catch {}
+          } catch {
+            addStep("web", "Colab unreachable (re-run Cell 3 if Colab slept)", "err");
+          }
         }
+        addStep("qa", "Generating answer with active AI Agents...", "active");
         const payload = {
           system_instruction: { parts: [{ text: sysInstr }] },
           contents: [{ role: "user", parts: [{ text: text + liveWebCtx }] }],
           tools: [{ google_search: {} }]
         };
-        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = m; }, "chat");
+        const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = colabUrl ? `Colab + ${m}` : m; }, "chat");
         const cand = data.candidates[0];
         const reply = cand.content.parts.map(p => p.text || "").join("\n");
         const chunks = [...(cand.groundingMetadata?.groundingChunks || []), ...extraSources.map(s => ({ web: { uri: s.uri, title: s.title } }))];
-        addStep("qa", `Completed (${model})`, "done");
-        badge.textContent = model;
+        addStep("qa", `Completed (${colabUrl && extraSources.length ? "Colab + " + model : model})`, "done");
+        badge.textContent = colabUrl && extraSources.length ? `Colab + ${model}` : model;
 
         const sourcesHtml = chunks.filter(ch => ch.web?.uri).map(ch =>
           `<a class="source-pill" href="${ch.web.uri}" target="_blank" rel="noopener">${ch.web.title || "Source"}</a>`
