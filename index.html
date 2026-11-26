@@ -232,10 +232,13 @@
       pointer-events: none; display: none;
     }
     .stage-caption {
-      position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); max-width: 88%;
-      text-align: center; pointer-events: none; font-weight: 700; font-size: 1rem;
-      padding: 6px 12px; border-radius: 8px; background: rgba(0,0,0,0.65); color: #fde047; display: none;
+      position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); max-width: 86%;
+      text-align: center; pointer-events: none; font-weight: 700; font-size: 0.86rem; line-height: 1.3;
+      padding: 5px 12px; border-radius: 8px; background: rgba(0,0,0,0.72); color: #fde047;
+      display: none; transition: opacity 0.15s ease;
     }
+    .ai-card, .btn, .quick-chip, .attach-menu { transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+    .tts-row { display: flex; align-items: center; gap: 8px; padding-top: 6px; border-top: 1px solid var(--border); }
     .stage-vignette {
       position: absolute; inset: 0; pointer-events: none;
       background: radial-gradient(circle, transparent 52%, rgba(0,0,0,0.65) 100%); display: none;
@@ -749,16 +752,18 @@
     });
   }
 
-  // FFmpeg.wasm Loader (Single-thread Blob Worker Patch for GitHub Pages)
+  // FFmpeg.wasm Loader (Full Blob Worker Patch for GitHub Pages)
   async function loadFFmpeg() {
     if (ffmpegInstance) return ffmpegInstance;
     const { FFmpeg } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js");
     const { toBlobURL } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js");
     const ff = new FFmpeg();
-    const base = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
+    const coreBase = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
+    const ffBase = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm";
     await ff.load({
-      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm")
+      classWorkerURL: await toBlobURL(`${ffBase}/worker.js`, "text/javascript"),
+      coreURL: await toBlobURL(`${coreBase}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${coreBase}/ffmpeg-core.wasm`, "application/wasm")
     });
     ffmpegInstance = ff;
     return ff;
@@ -922,12 +927,38 @@
         const vigOverlay = content.querySelector(".stage-vignette");
         const capList = content.querySelector(".captions-list");
 
-        vEl.playbackRate = Math.min(2, Math.max(0.5, plan.speed || 1));
-        vEl.style.filter = `brightness(${plan.brightness || 1}) contrast(${plan.contrast || 1.1}) saturate(${plan.saturation || 1.2})`;
+        // Normalize brightness/contrast/saturation safely so video never turns black
+        const normB = (plan.brightness !== undefined && plan.brightness < 0.5) ? (1 + plan.brightness) : (plan.brightness || 1);
+        const safeB = Math.min(1.35, Math.max(0.85, normB));
+        const safeC = Math.min(1.45, Math.max(0.85, plan.contrast || 1.12));
+        const safeS = Math.min(1.75, Math.max(0.70, plan.saturation || 1.22));
+        const safeSpd = Math.min(2, Math.max(0.5, plan.speed || 1));
+
+        vEl.playbackRate = safeSpd;
+        vEl.style.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`;
         if (plan.vignette) vigOverlay.style.display = "block";
         if (plan.titleBanner) { titleOverlay.textContent = plan.titleBanner; titleOverlay.style.display = "block"; }
 
-        const caps = plan.captions || [];
+        // Split long captions into smooth 3-4 word chunks
+        const caps = [];
+        for (const rawC of (plan.captions || [])) {
+          const words = (rawC.text || "").trim().split(/\s+/).filter(Boolean);
+          if (words.length <= 4) {
+            if (words.length) caps.push({ start: rawC.start, end: rawC.end, text: words.join(" ") });
+          } else {
+            const chunks = [];
+            for (let i = 0; i < words.length; i += 4) chunks.push(words.slice(i, i + 4).join(" "));
+            const dur = Math.max(0.4, (rawC.end || 1) - (rawC.start || 0));
+            const step = dur / chunks.length;
+            chunks.forEach((ch, idx) => {
+              caps.push({
+                start: Number(((rawC.start || 0) + idx * step).toFixed(2)),
+                end: Number(((rawC.start || 0) + (idx + 1) * step).toFixed(2)),
+                text: ch
+              });
+            });
+          }
+        }
         capList.innerHTML = caps.map((c, idx) => `
           <div class="cap-item">
             <input type="number" step="0.1" value="${c.start}" data-cap-start="${idx}" />
@@ -955,41 +986,111 @@
           }
         });
 
-        // FFmpeg Render MP4
+        // Render Edited Video (Canvas + Audio Recorder with burned captions & effects, plus FFmpeg.wasm option)
         content.querySelector(".render-mp4-btn").addEventListener("click", async function () {
           this.disabled = true;
+          errBox.classList.remove("show");
           try {
-            setProgress(10, "Loading FFmpeg.wasm...");
-            const ff = await loadFFmpeg();
-            const { fetchFile } = await import("https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js");
-            setProgress(35, "Writing video to FFmpeg...");
-            await ff.writeFile("input.mp4", await fetchFile(media.file));
+            setProgress(10, "Preparing HD Video Renderer...");
+            const offVid = document.createElement("video");
+            offVid.src = vidUrl;
+            offVid.playsInline = true;
+            offVid.crossOrigin = "anonymous";
+            await new Promise((res, rej) => {
+              offVid.onloadedmetadata = res;
+              offVid.onerror = () => rej(new Error("Could not load video for export."));
+            });
 
-            const spd = Math.min(2, Math.max(0.5, plan.speed || 1));
-            const eq = `eq=brightness=${((plan.brightness || 1) - 1).toFixed(2)}:contrast=${(plan.contrast || 1.1).toFixed(2)}:saturation=${(plan.saturation || 1.2).toFixed(2)}`;
-            const filters = ["scale=trunc(iw/2)*2:trunc(ih/2)*2", eq];
-            if (plan.vignette) filters.push("vignette=PI/4");
-            if (plan.letterbox) filters.push("drawbox=x=0:y=0:w=iw:h=ih*0.08:color=black:t=fill", "drawbox=x=0:y=ih*0.92:w=iw:h=ih*0.08:color=black:t=fill");
-            filters.push(`setpts=${(1 / spd).toFixed(3)}*PTS`);
+            const vw = offVid.videoWidth || 540, vh = offVid.videoHeight || 960;
+            const sc = Math.min(1, 720 / Math.max(vw, vh));
+            const cw = Math.round(vw * sc), ch = Math.round(vh * sc);
+            const rCan = document.createElement("canvas");
+            rCan.width = cw; rCan.height = ch;
+            const rCtx = rCan.getContext("2d");
 
-            setProgress(60, "Rendering MP4...");
-            await ff.exec([
-              "-i", "input.mp4",
-              "-vf", filters.join(","),
-              "-map", "0:v:0", "-map", "0:a?",
-              "-c:v", "libx264", "-preset", "ultrafast", "-crf", "23",
-              "-c:a", "aac",
-              "output.mp4"
-            ]);
-            const outData = await ff.readFile("output.mp4");
-            const outUrl = URL.createObjectURL(new Blob([outData.buffer], { type: "video/mp4" }));
-            setProgress(100, "MP4 Ready!");
+            const tracks = [...rCan.captureStream(30).getVideoTracks()];
+            let ac = null;
+            try {
+              const AC = window.AudioContext || window.webkitAudioContext;
+              ac = new AC();
+              const srcNode = ac.createMediaElementSource(offVid);
+              const destNode = ac.createMediaStreamDestination();
+              srcNode.connect(destNode);
+              srcNode.connect(ac.destination);
+              if (destNode.stream.getAudioTracks().length) tracks.push(destNode.stream.getAudioTracks()[0]);
+            } catch {}
+
+            const mime = ["video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]
+              .find(m => MediaRecorder.isTypeSupported(m)) || "";
+            const ext = mime.includes("mp4") ? "mp4" : "webm";
+            const rec = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime, videoBitsPerSecond: 5000000 } : { videoBitsPerSecond: 5000000 });
+            const chunks = [];
+            rec.ondataavailable = e => { if (e.data?.size) chunks.push(e.data); };
+
+            const donePromise = new Promise(resolve => {
+              rec.onstop = () => resolve(new Blob(chunks, { type: mime || "video/webm" }));
+            });
+
+            offVid.playbackRate = safeSpd;
+            offVid.currentTime = 0;
+            await offVid.play();
+            rec.start(200);
+
+            const totalDur = Math.min(60, offVid.duration || 15);
+            let rafId = null;
+            const drawExport = () => {
+              const ct = offVid.currentTime || 0;
+              rCtx.save();
+              rCtx.filter = `brightness(${safeB}) contrast(${safeC}) saturate(${safeS})`;
+              rCtx.drawImage(offVid, 0, 0, cw, ch);
+              rCtx.restore();
+
+              if (plan.vignette) {
+                const vg = rCtx.createRadialGradient(cw/2, ch/2, Math.min(cw,ch)*0.3, cw/2, ch/2, Math.max(cw,ch)*0.75);
+                vg.addColorStop(0, "transparent"); vg.addColorStop(1, "rgba(0,0,0,0.55)");
+                rCtx.fillStyle = vg; rCtx.fillRect(0, 0, cw, ch);
+              }
+              if (plan.titleBanner) {
+                rCtx.fillStyle = "rgba(24,24,27,0.85)";
+                const tw = Math.min(cw * 0.72, 240);
+                rCtx.fillRect((cw - tw) / 2, 22, tw, 30);
+                rCtx.fillStyle = "#ffffff"; rCtx.font = "600 13px sans-serif"; rCtx.textAlign = "center";
+                rCtx.fillText(plan.titleBanner, cw / 2, 42, tw - 16);
+              }
+              const active = caps.find(c => ct >= c.start && ct <= c.end);
+              if (active && active.text) {
+                const fs = Math.round(Math.min(cw, ch) * 0.048);
+                rCtx.font = `700 ${fs}px -apple-system, sans-serif`;
+                const bw = Math.min(cw * 0.88, rCtx.measureText(active.text).width + 26);
+                const by = ch - 64;
+                rCtx.fillStyle = "rgba(0,0,0,0.75)";
+                rCtx.fillRect((cw - bw) / 2, by - fs / 2 - 8, bw, fs + 16);
+                rCtx.fillStyle = "#fde047"; rCtx.textAlign = "center"; rCtx.textBaseline = "middle";
+                rCtx.fillText(active.text, cw / 2, by, bw - 16);
+              }
+
+              const pct = Math.min(99, 15 + Math.round((ct / totalDur) * 84));
+              setProgress(pct, `Rendering video with captions & sound... ${pct}%`);
+              if (!offVid.ended && ct < totalDur) {
+                rafId = requestAnimationFrame(drawExport);
+              } else {
+                if (rec.state === "recording") rec.stop();
+              }
+            };
+            rafId = requestAnimationFrame(drawExport);
+            offVid.onended = () => { if (rec.state === "recording") rec.stop(); };
+
+            const outBlob = await donePromise;
+            cancelAnimationFrame(rafId);
+            if (ac) ac.close().catch(() => {});
+            const outUrl = URL.createObjectURL(outBlob);
+            setProgress(100, "Edited Video Ready!");
             content.querySelector(".mp4-out").innerHTML = `
               <video controls playsinline src="${outUrl}" style="width:100%;border-radius:12px;max-height:300px;"></video>
-              <a href="${outUrl}" download="parmar-ai-edited.mp4" class="btn btn-dark" style="width:100%;margin-top:8px;">Download Edited MP4</a>
+              <a href="${outUrl}" download="parmar-ai-edited.${ext}" class="btn btn-dark" style="width:100%;margin-top:8px;">Download Edited Video</a>
             `;
           } catch (fe) {
-            errBox.textContent = "MP4 Render error: " + (fe.message || fe);
+            errBox.textContent = "Render error: " + (fe.message || fe);
             errBox.classList.add("show");
           } finally {
             this.disabled = false;
@@ -1079,7 +1180,30 @@
         content.innerHTML = `
           <div class="md-body">${reply.replace(/</g, "&lt;")}</div>
           ${sourcesHtml ? `<div class="sources-wrap">${sourcesHtml}</div>` : ""}
+          <div class="tts-row">
+            <button type="button" class="btn btn-sm tts-btn">🔊 Listen</button>
+          </div>
         `;
+        const ttsBtn = content.querySelector(".tts-btn");
+        ttsBtn.addEventListener("click", () => {
+          if (!("speechSynthesis" in window)) return;
+          if (window.speechSynthesis.speaking && ttsBtn.dataset.speaking === "1") {
+            window.speechSynthesis.cancel();
+            ttsBtn.dataset.speaking = "0";
+            ttsBtn.textContent = "🔊 Listen";
+            return;
+          }
+          window.speechSynthesis.cancel();
+          const cleanText = reply.replace(/[*_#`>]/g, "").trim();
+          const utter = new SpeechSynthesisUtterance(cleanText);
+          utter.lang = /[\u0900-\u097F]/.test(cleanText) ? "hi-IN" : "en-IN";
+          utter.rate = 1.02;
+          ttsBtn.dataset.speaking = "1";
+          ttsBtn.textContent = "⏹ Stop";
+          utter.onend = () => { ttsBtn.dataset.speaking = "0"; ttsBtn.textContent = "🔊 Listen"; };
+          utter.onerror = () => { ttsBtn.dataset.speaking = "0"; ttsBtn.textContent = "🔊 Listen"; };
+          window.speechSynthesis.speak(utter);
+        });
       }
     } catch (err) {
       tracker.querySelectorAll(".tracker-step.active").forEach(el => {
