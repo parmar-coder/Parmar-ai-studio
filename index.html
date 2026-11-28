@@ -563,10 +563,48 @@
     refreshHeader();
   }
 
+  const CHAT_HISTORY = [];
+
+  async function smartBrainRoute(apiKey, userText) {
+    const recent = CHAT_HISTORY.slice(-4).map(m => `${m.role}: ${m.text.slice(0, 140)}`).join("\n");
+    const brainSchema = {
+      type: "OBJECT",
+      properties: {
+        intent: { type: "STRING", enum: ["chat", "research", "photo_gen", "poster", "video_gen"] },
+        needsLiveSearch: { type: "BOOLEAN" },
+        cleanSearchQuery: { type: "STRING" }
+      },
+      required: ["intent", "needsLiveSearch", "cleanSearchQuery"]
+    };
+    const prompt = `You are the Master AI Brain Router (like ChatGPT/Gemini). Understand Hindi, Gujarati, Hinglish, English, and voice-typing typos.
+Recent context:
+${recent || "(none)"}
+
+User message: "${userText}"
+
+Classify intent:
+- "poster": wants a poster, banner, flyer, pamphlet, invitation, thumbnail with text/layout (even if voice-typed as "bahana", "benner", etc.)
+- "photo_gen": wants to generate/draw/create an AI photo, picture, tasveer, logo, art, wallpaper (without text layout)
+- "video_gen": wants to generate/create an AI video, reel, clip, animation from text
+- "research": asks about current/latest 2026 prices, gold rate, news, weather, net worth, sports, live facts -> set needsLiveSearch=true and write cleanSearchQuery in crisp English keywords!
+- "chat": general Q&A, coding, writing, advice, follow-up on previous answer (needsLiveSearch=false unless fresh facts needed).`;
+
+    try {
+      const { data } = await callGeminiWithFallback(apiKey, {
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json", responseSchema: brainSchema, temperature: 0.1 }
+      }, null, "chat");
+      return JSON.parse(data.candidates[0].content.parts[0].text);
+    } catch {
+      return null;
+    }
+  }
+
   function buildSystemInstruction() {
     const activeAgents = AGENTS.filter(a => a.on).map(a => `- ${a.name}: ${a.desc}`).join("\n");
     const activeSkills = [...BUILTIN_SKILLS.filter(s => s.on), ...customSkills].map(s => `- ${s.name}: ${s.instr}`).join("\n");
-    return `You are Parmar AI Studio, a fast, elite multi-agent creative & technical assistant.\nActive Agents:\n${activeAgents}\nActive Skills:\n${activeSkills}`;
+    const todayStr = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+    return `Today's exact date is ${todayStr}. Always prioritize live 2026 web/news results over outdated training memory.\nYou are Parmar AI Studio, a fast, elite multi-agent creative & technical assistant.\nActive Agents:\n${activeAgents}\nActive Skills:\n${activeSkills}`;
   }
 
   function setDrawer(open) {
@@ -634,6 +672,7 @@
     renderDrawerControls();
   });
   document.getElementById("newChatBtn").addEventListener("click", () => {
+    CHAT_HISTORY.length = 0;
     chatContainer.innerHTML = "";
     chatContainer.appendChild(homeHero);
     homeHero.classList.remove("hidden");
@@ -784,18 +823,48 @@
   }
 
   async function fetchLiveNewsFallback(query) {
-    try {
-      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
-      const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-      const r = await fetch(api);
-      if (!r.ok) return [];
-      const j = await r.json();
-      return (j?.items || []).slice(0, 5).map(it => ({
-        title: it.title || "Google News",
-        snippet: (it.description || it.title || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 220),
-        uri: it.link || "https://news.google.com"
-      }));
-    } catch { return []; }
+    const q = encodeURIComponent(query.trim());
+    const engines = [
+      // Engine 1: Google News India RSS
+      fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(`https://news.google.com/rss/search?q=${q}&hl=en-IN&gl=IN&ceid=IN:en`)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(j => (j?.items || []).slice(0, 4).map(it => ({
+          title: it.title || "Google News",
+          snippet: (it.description || it.title || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 240),
+          uri: it.link || "https://news.google.com"
+        }))),
+      // Engine 2: Bing News RSS
+      fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(`https://www.bing.com/news/search?q=${q}&format=rss`)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(j => (j?.items || []).slice(0, 3).map(it => ({
+          title: it.title || "Bing News",
+          snippet: (it.description || it.title || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 240),
+          uri: it.link || "https://www.bing.com/news"
+        }))),
+      // Engine 3: DuckDuckGo Instant Answer API
+      fetch(`https://api.duckduckgo.com/?q=${q}&format=json&no_html=1&skip_disambig=1`)
+        .then(r => r.ok ? r.json() : null)
+        .then(j => {
+          const out = [];
+          if (j?.AbstractText) out.push({ title: j.Heading || "DuckDuckGo", snippet: j.AbstractText.slice(0, 260), uri: j.AbstractURL || "https://duckduckgo.com" });
+          (j?.RelatedTopics || []).slice(0, 2).forEach(t => { if (t.Text && t.FirstURL) out.push({ title: t.Text.slice(0, 55), snippet: t.Text.slice(0, 220), uri: t.FirstURL }); });
+          return out;
+        }),
+      // Engine 4: Reddit Live Discussions
+      fetch(`https://www.reddit.com/search.json?q=${q}&sort=relevance&t=month&limit=3`)
+        .then(r => r.ok ? r.json() : null)
+        .then(j => (j?.data?.children || []).map(c => ({
+          title: c.data?.title || "Reddit",
+          snippet: (c.data?.selftext || c.data?.title || "").slice(0, 220),
+          uri: c.data?.permalink ? `https://www.reddit.com${c.data.permalink}` : "https://www.reddit.com"
+        })))
+    ];
+    const settled = await Promise.allSettled(engines);
+    const merged = [];
+    for (const s of settled) {
+      if (s.status === "fulfilled" && Array.isArray(s.value)) merged.push(...s.value);
+    }
+    return merged.slice(0, 8);
   }
 
   async function callGeminiWithFallback(apiKey, bodyPayload, onStep, taskType = "chat") {
@@ -864,17 +933,22 @@
     return { b64: c.toDataURL("image/jpeg", 0.88).split(",")[1], dataUrl };
   }
 
-  function loadAiArtwork(promptText) {
-    return new Promise((resolve) => {
-      if (!promptText) return resolve(null);
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      const timer = setTimeout(() => resolve(null), 22000);
-      img.onload = () => { clearTimeout(timer); resolve(img); };
-      img.onerror = () => { clearTimeout(timer); resolve(null); };
-      const seed = Math.floor(Math.random() * 99999);
-      img.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptText)}?width=1080&height=1350&nologo=true&seed=${seed}`;
-    });
+  async function loadAiArtwork(promptText, w = 1080, h = 1350) {
+    if (!promptText) return null;
+    const models = ["flux", "turbo"];
+    for (const m of models) {
+      const img = await new Promise((resolve) => {
+        const im = new Image();
+        im.crossOrigin = "anonymous";
+        const timer = setTimeout(() => resolve(null), 24000);
+        im.onload = () => { clearTimeout(timer); resolve(im); };
+        im.onerror = () => { clearTimeout(timer); resolve(null); };
+        const seed = Math.floor(Math.random() * 99999);
+        im.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptText)}?width=${w}&height=${h}&model=${m}&enhance=true&nologo=true&seed=${seed}`;
+      });
+      if (img) return img;
+    }
+    return null;
   }
 
   async function renderPosterCanvas(spec) {
@@ -1038,9 +1112,17 @@
 
     try {
       const sysInstr = buildSystemInstruction();
-      const isPosterReq = !media && /\b(poster|pamphlet|flyer|banner|brochure)\b/i.test(text);
-      const isVideoGenReq = !media && !isPosterReq && /(generate|create|make|banao|banake).{0,25}\b(video|reel|clip|animation)\b/i.test(text);
-      const isPhotoGenReq = !media && !isPosterReq && !isVideoGenReq && /(generate|create|make|banao|banake|draw).{0,25}\b(photo|image|picture|pic|art|wallpaper|logo|thumbnail)\b/i.test(text);
+      let brain = null;
+      if (!media && text) {
+        addStep("brain", "AI Brain analyzing intent & context...", "active");
+        brain = await smartBrainRoute(apiKey, text);
+        addStep("brain", `AI Brain routed: ${brain ? brain.intent.toUpperCase() : "AUTO"}`, "done");
+      }
+      const isPosterReq = !media && (brain ? brain.intent === "poster" : /\b(poster|pamphlet|flyer|banner|brochure)\b/i.test(text));
+      const isVideoGenReq = !media && !isPosterReq && (brain ? brain.intent === "video_gen" : /(generate|create|make|banao|banake).{0,25}\b(video|reel|clip|animation)\b/i.test(text));
+      const isPhotoGenReq = !media && !isPosterReq && !isVideoGenReq && (brain ? brain.intent === "photo_gen" : /(generate|create|make|banao|banake|draw).{0,25}\b(photo|image|picture|pic|art|wallpaper|logo|thumbnail)\b/i.test(text));
+      const searchQ = (brain && brain.cleanSearchQuery) ? brain.cleanSearchQuery : text;
+      const shouldWebSearch = !brain || brain.intent === "research" || brain.needsLiveSearch;
 
       // MODE 1: VIDEO EDITING
       if (media && media.type === "video") {
@@ -1100,11 +1182,46 @@
         }
         if (!usedColab) {
         addStep("up", "Uploading raw video to Gemini...", "active");
-        setProgress(12, "Starting resumable upload...");
-        const { fileUri, mimeType } = await uploadToGeminiFiles(apiKey, media.file, setProgress);
-        addStep("up", "Video uploaded & ready", "done");
+        setProgress(12, "Starting resilient upload...");
+        let fileUri = "", mimeType = media.file.type || "video/mp4";
+        try {
+          const upRes = await uploadToGeminiFiles(apiKey, media.file, setProgress);
+          fileUri = upRes.fileUri; mimeType = upRes.mimeType;
+        } catch (upErr) {
+          try {
+            setProgress(15, "Retrying upload...");
+            const upRes2 = await uploadToGeminiFiles(apiKey, media.file, setProgress);
+            fileUri = upRes2.fileUri; mimeType = upRes2.mimeType;
+          } catch {
+            addStep("up", "Mobile network dropped large video — extracting lightweight audio track...", "active");
+            setProgress(35, "Extracting audio for fast transcription...");
+            const vUrlTmp = URL.createObjectURL(media.file);
+            const tmpV = document.createElement("video");
+            tmpV.src = vUrlTmp; tmpV.muted = false; tmpV.playsInline = true;
+            await new Promise((res, rej) => { tmpV.onloadedmetadata = res; tmpV.onerror = rej; });
+            const ac = new (window.AudioContext || window.webkitAudioContext)();
+            const srcNode = ac.createMediaElementSource(tmpV);
+            const dst = ac.createMediaStreamDestination();
+            srcNode.connect(dst);
+            const rec = new MediaRecorder(dst.stream);
+            const ch = [];
+            rec.ondataavailable = e => { if (e.data.size) ch.push(e.data); };
+            const recDone = new Promise(r => { rec.onstop = () => r(new Blob(ch, { type: rec.mimeType || "audio/webm" })); });
+            tmpV.playbackRate = 2.0;
+            rec.start(200);
+            await tmpV.play();
+            await new Promise(r => { tmpV.onended = r; setTimeout(r, Math.min(35000, ((tmpV.duration || 10) / 2) * 1000 + 800)); });
+            rec.stop();
+            const audioBlob = await recDone;
+            ac.close(); URL.revokeObjectURL(vUrlTmp);
+            const audioFile = new File([audioBlob], "audio.webm", { type: audioBlob.type || "audio/webm" });
+            const upAud = await uploadToGeminiFiles(apiKey, audioFile, setProgress);
+            fileUri = upAud.fileUri; mimeType = upAud.mimeType;
+          }
+        }
+        addStep("up", "Media uploaded & ready", "done");
 
-        addStep("ai", "Analyzing video & generating smooth Hinglish captions...", "active");
+        addStep("ai", "Analyzing speech & generating style-matched edit plan...", "active");
         const schema = {
           type: "OBJECT",
           properties: {
@@ -1619,13 +1736,13 @@
         const colabUrl = getColabUrl();
         let liveWebCtx = "";
         let extraSources = [];
-        if (colabUrl) {
+        if (colabUrl && shouldWebSearch) {
           addStep("web", "Searching live web via Colab...", "active");
           try {
             const sRes = await fetch(`${colabUrl}/search`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ query: text })
+              body: JSON.stringify({ query: searchQ })
             });
             if (sRes.ok) {
               const sj = await sRes.json();
@@ -1647,9 +1764,9 @@
             addStep("web", "Colab unreachable (re-run Cell 3 if Colab slept)", "err");
           }
         }
-        if (!extraSources.length) {
-          addStep("web", "Fetching live Google News & Wikipedia...", "active");
-          const [newsHits, wikiHits] = await Promise.all([fetchLiveNewsFallback(text), fetchWikiFallback(text)]);
+        if (shouldWebSearch && !extraSources.length) {
+          addStep("web", "Fetching live Google News, Bing, DDG & Reddit...", "active");
+          const [newsHits, wikiHits] = await Promise.all([fetchLiveNewsFallback(searchQ), fetchWikiFallback(searchQ)]);
           extraSources = [...newsHits, ...wikiHits];
           if (extraSources.length) {
             liveWebCtx = "\n\n[LIVE 2026 GOOGLE NEWS & WEB RESULTS — USE THESE LATEST FACTS]:\n" + extraSources.map(r => `- ${r.title}: ${r.snippet} (${r.uri})`).join("\n");
@@ -1659,14 +1776,16 @@
           }
         }
         addStep("qa", "Generating answer with active AI Agents...", "active");
+        const historyTurns = CHAT_HISTORY.slice(-6).map(h => ({ role: h.role === "model" ? "model" : "user", parts: [{ text: h.text }] }));
         const payload = {
           system_instruction: { parts: [{ text: sysInstr }] },
-          contents: [{ role: "user", parts: [{ text: text + liveWebCtx }] }],
+          contents: [...historyTurns, { role: "user", parts: [{ text: text + liveWebCtx }] }],
           tools: [{ google_search: {} }]
         };
         const { model, data } = await callGeminiWithFallback(apiKey, payload, m => { badge.textContent = colabUrl ? `Colab + ${m}` : m; }, "chat");
         const cand = data.candidates[0];
         const reply = cand.content.parts.map(p => p.text || "").join("\n");
+        CHAT_HISTORY.push({ role: "user", text }, { role: "model", text: reply.slice(0, 1200) });
         const chunks = [...(cand.groundingMetadata?.groundingChunks || []), ...extraSources.map(s => ({ web: { uri: s.uri, title: s.title } }))];
         addStep("qa", `Completed (${colabUrl && extraSources.length ? "Colab + " + model : model})`, "done");
         badge.textContent = colabUrl && extraSources.length ? `Colab + ${model}` : model;
@@ -1707,34 +1826,58 @@
         requestAnimationFrame(streamText);
 
         const ttsBtn = content.querySelector(".tts-btn");
+        let ttsCancelled = false;
         ttsBtn.addEventListener("click", () => {
           if (!("speechSynthesis" in window)) return;
-          if (window.speechSynthesis.speaking && ttsBtn.dataset.speaking === "1") {
+          if (ttsBtn.dataset.speaking === "1") {
+            ttsCancelled = true;
             window.speechSynthesis.cancel();
             ttsBtn.dataset.speaking = "0";
             ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`;
             return;
           }
+          ttsCancelled = false;
           window.speechSynthesis.cancel();
           const clean = reply
+            .replace(/https?:\/\/\S+/g, "")
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
             .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "")
-            .replace(/[*_#`>~]/g, " ")
+            .replace(/[*_#`>~|]/g, " ")
             .replace(/\s+/g, " ")
             .trim();
-          const utter = new SpeechSynthesisUtterance(clean);
+          const chunks = clean.match(/[^.!?।\n]+[.!?।]?/g) || [clean];
           const isHindi = /[\u0900-\u097F]/.test(clean);
-          utter.lang = isHindi ? "hi-IN" : "en-IN";
           const voices = window.speechSynthesis.getVoices() || [];
-          const bestVoice = voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en-IN") && /natural|google|neural|microsoft|rishi|lekha/i.test(v.name))
-            || voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en"));
-          if (bestVoice) utter.voice = bestVoice;
-          utter.pitch = 0.98;
-          utter.rate = 1.0;
+          const bestVoice =
+            voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en-IN") && /natural|google|neural|online/i.test(v.name)) ||
+            voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en") && /natural|google|neural/i.test(v.name)) ||
+            voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en-IN")) ||
+            voices.find(v => v.lang.startsWith(isHindi ? "hi" : "en"));
+
           ttsBtn.dataset.speaking = "1";
           ttsBtn.innerHTML = `${stopSvg}<span>Stop</span>`;
-          utter.onend = () => { ttsBtn.dataset.speaking = "0"; ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`; };
-          utter.onerror = () => { ttsBtn.dataset.speaking = "0"; ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`; };
-          window.speechSynthesis.speak(utter);
+          let idx = 0;
+          function speakNext() {
+            if (ttsCancelled || idx >= chunks.length) {
+              ttsBtn.dataset.speaking = "0";
+              ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`;
+              return;
+            }
+            const seg = chunks[idx++].trim();
+            if (!seg) return speakNext();
+            const u = new SpeechSynthesisUtterance(seg);
+            u.lang = isHindi ? "hi-IN" : "en-IN";
+            if (bestVoice) u.voice = bestVoice;
+            u.pitch = 1.02;
+            u.rate = 0.96;
+            u.onend = speakNext;
+            u.onerror = () => {
+              ttsBtn.dataset.speaking = "0";
+              ttsBtn.innerHTML = `${speakerSvg}<span>Listen</span>`;
+            };
+            window.speechSynthesis.speak(u);
+          }
+          speakNext();
         });
       }
     } catch (err) {
